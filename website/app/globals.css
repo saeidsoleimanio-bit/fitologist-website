@@ -22,8 +22,9 @@
   --color-bmi-over: #ff6a00;
   --color-bmi-obese: #ff3b30;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-barlow), "Arial Narrow", ui-sans-serif, sans-serif;
+  /* --font-locale-* are set by app/[lang]/layout.tsx for scripts Inter/Barlow don't cover (Arabic, Cyrillic display) */
+  --font-sans: var(--font-locale-sans, var(--font-inter)), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-locale-display, var(--font-barlow)), "Arial Narrow", ui-sans-serif, sans-serif;
 
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -35,18 +36,18 @@
     /* Header height once scrolled (anchor targets always land in this state) */
     --header-compact: 4rem;
     /* Vertical rhythm for content sections (tightened for an editorial flow) */
-    --section-py: 3rem;
+    --section-py: 2.75rem;
   }
 
   @media (min-width: 640px) {
     :root {
-      --section-py: 3.5rem;
+      --section-py: 3rem;
     }
   }
 
   @media (min-width: 1024px) {
     :root {
-      --section-py: 4rem;
+      --section-py: 3.5rem;
       --header-h: 5.375rem;
       --header-compact: 4.5rem;
     }
@@ -184,6 +185,23 @@
   }
 }
 
+/*
+ * Arabic: letter-spacing breaks letter joining and the condensed Latin line-heights clip
+ * Arabic ascenders/descenders, so both are normalised for the whole document.
+ */
+html[lang="ar"] {
+  --font-locale-display: var(--font-locale-sans);
+}
+html[lang="ar"] body * {
+  letter-spacing: 0 !important;
+}
+html[lang="ar"] .display {
+  line-height: 1.2 !important;
+}
+html[lang="ru"] .display {
+  line-height: 0.98;
+}
+
 /* Header BMI CTA — slow, elegant attention pulse */
 @keyframes cta-pulse {
   0%,
@@ -215,4 +233,45 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/*
+ * About portrait as a background layer: photo → soft fade → page tone.
+ * Mobile: fades out at the bottom into the copy. Desktop: dissolves to the right (toward the
+ * charcoal / silver background) and softly at top and bottom. Two intersected masks, no frame.
+ */
+.about-portrait-mask {
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 18%, #000 58%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 18%, #000 58%, transparent 100%);
+  mask-composite: intersect;
+}
+@media (min-width: 1024px) {
+  .about-portrait-mask {
+    -webkit-mask-image:
+      linear-gradient(to right, #000 0%, #000 46%, rgb(0 0 0 / 0.6) 64%, rgb(0 0 0 / 0.18) 82%, transparent 96%),
+      linear-gradient(to bottom, transparent 0, #000 14%, #000 82%, transparent 100%);
+    mask-image:
+      linear-gradient(to right, #000 0%, #000 46%, rgb(0 0 0 / 0.6) 64%, rgb(0 0 0 / 0.18) 82%, transparent 96%),
+      linear-gradient(to bottom, transparent 0, #000 14%, #000 82%, transparent 100%);
+  }
+}
+
+/*
+ * Photo album layers (About journey gallery): the photograph dissolves into the page on every side —
+ * an elliptical core with soft falloff, plus a longer fade at the bottom. No frame, no card.
+ */
+.photo-layer-mask {
+  -webkit-mask-image:
+    radial-gradient(ellipse 50% 50% at 50% 46%, #000 38%, rgb(0 0 0 / 0.72) 58%, rgb(0 0 0 / 0.3) 80%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 16%, #000 68%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(ellipse 50% 50% at 50% 46%, #000 38%, rgb(0 0 0 / 0.72) 58%, rgb(0 0 0 / 0.3) 80%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 16%, #000 68%, transparent 100%);
+  mask-composite: intersect;
 }

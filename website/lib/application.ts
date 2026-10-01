@@ -1,3 +1,4 @@
+import type { Dictionary } from "./i18n/dictionaries/en";
 import { COACHING_TYPES, GOALS, type CoachingType, type Goal } from "./site";
 
 export type ApplicationData = {
@@ -32,52 +33,56 @@ export const FIELD_ORDER: (keyof ApplicationData)[] = [
   "note",
 ];
 
-export function validateApplication(data: ApplicationData): ApplicationErrors {
+export function validateApplication(
+  data: ApplicationData,
+  msg: Dictionary["form"]["errors"],
+): ApplicationErrors {
   const errors: ApplicationErrors = {};
   const name = data.name.trim();
-  if (name.length < 2) errors.name = "Please enter your name.";
-  else if (name.length > 60) errors.name = "Please keep your name under 60 characters.";
+  if (name.length < 2) errors.name = msg.nameRequired;
+  else if (name.length > 60) errors.name = msg.nameLong;
 
   const age = Number(data.age.trim());
-  if (!data.age.trim()) errors.age = "Please enter your age.";
-  else if (!Number.isInteger(age) || age < 16 || age > 99)
-    errors.age = "Please enter an age between 16 and 99.";
+  if (!data.age.trim()) errors.age = msg.ageRequired;
+  else if (!Number.isInteger(age) || age < 16 || age > 99) errors.age = msg.ageRange;
 
   const phone = data.whatsapp.trim();
   const digits = phone.replace(/\D/g, "");
-  if (!phone) errors.whatsapp = "Please enter your WhatsApp number.";
+  if (!phone) errors.whatsapp = msg.phoneRequired;
   else if (!/^\+?[\d\s()-]+$/.test(phone) || digits.length < 8 || digits.length > 15)
-    errors.whatsapp = "Please enter a valid number, including country code (e.g. +971 50 000 0000).";
+    errors.whatsapp = msg.phoneInvalid;
 
-  if (!GOALS.includes(data.goal as Goal)) errors.goal = "Please choose your main goal.";
-  if (!COACHING_TYPES.includes(data.coaching as CoachingType))
-    errors.coaching = "Please choose a coaching type.";
+  if (!GOALS.includes(data.goal as Goal)) errors.goal = msg.goalRequired;
+  if (!COACHING_TYPES.includes(data.coaching as CoachingType)) errors.coaching = msg.coachingRequired;
 
-  if (data.note.length > NOTE_MAX) errors.note = `Please keep your note under ${NOTE_MAX} characters.`;
+  if (data.note.length > NOTE_MAX) errors.note = msg.noteLong;
 
   return errors;
 }
 
 /**
- * Pre-filled WhatsApp message. Plain text only; the whole string is passed through
- * encodeURIComponent by whatsappLink(), so spaces, line breaks, "&", "#", "?", emoji
- * and other user input cannot break the URL.
+ * Pre-filled WhatsApp message, written in the visitor's language. Plain text only; the whole
+ * string is passed through encodeURIComponent by whatsappLink(), so spaces, line breaks, "&",
+ * "#", "?", emoji and other user input cannot break the URL.
  */
-export function applicationMessage(data: ApplicationData): string {
+export function applicationMessage(data: ApplicationData, t: Dictionary): string {
+  const m = t.form.message;
   const clean = (v: string) => v.replace(/\s+/g, " ").trim();
+  const goal = data.goal ? t.goals[data.goal].label : "";
+  const coaching = data.coaching ? t.coaching.options[data.coaching].title : "";
   const lines = [
-    "Hi Saeid,",
+    m.greeting,
     "",
-    "I'd like to start training.",
+    m.intro,
     "",
-    `Name: ${clean(data.name)}`,
-    `Age: ${clean(data.age)}`,
-    `Goal: ${data.goal}`,
-    `Coaching Type: ${data.coaching}`,
+    `${m.name}: ${clean(data.name)}`,
+    `${m.age}: ${clean(data.age)}`,
+    `${m.goal}: ${goal}`,
+    `${m.coaching}: ${coaching}`,
   ];
   const note = data.note.trim();
   if (note) lines.push("", note);
-  lines.push("", "Thank you.");
+  lines.push("", m.thanks);
   return lines.join("\n");
 }
 

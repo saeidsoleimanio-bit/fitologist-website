@@ -3,10 +3,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/components/i18n/I18nProvider";
 import { useApplication } from "@/components/providers/ApplicationProvider";
 import { Button, ButtonLink } from "@/components/ui/Button";
-import { WhatsAppIcon } from "@/components/ui/icons";
-import { AccentLine, LogoWatermark, Reveal, SectionHeading } from "@/components/ui/primitives";
+import { WhatsAppGlyph } from "@/components/ui/icons";
+import { AccentLine } from "@/components/ui/primitives";
 import {
   EMPTY_APPLICATION,
   FIELD_ORDER,
@@ -20,14 +21,11 @@ import {
 import { EASE } from "@/lib/motion";
 import { COACHING_TYPES, GOALS, WHATSAPP, whatsappLink } from "@/lib/site";
 
-const STEPS = [
-  { title: "Apply", body: "Six quick questions." },
-  { title: "Connect", body: "Continue the conversation with Saeid on WhatsApp." },
-  { title: "Assess", body: "Start with your goals, history and schedule." },
-];
-
 const inputBase =
-  "mt-1.5 block w-full border bg-ink/60 px-4 py-3 text-base text-bone placeholder:text-bone/30 transition-colors duration-300 focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember focus-visible:outline-none";
+  "mt-1.5 block w-full border bg-[#0b0d0e]/80 px-3.5 text-base text-bone shadow-[inset_0_1px_0_rgb(255_255_255/0.03)] placeholder:text-bone/25 transition-[border-color,box-shadow] duration-300 hover:border-silver/35 focus:border-ember focus:shadow-[0_0_0_3px_rgb(255_106_0/0.18)] focus:outline-none focus-visible:outline-none";
+
+/** Strong, readable field labels. */
+const LABEL = "block font-display text-[0.82rem] font-bold uppercase tracking-[0.16em] text-bone/90";
 
 function ErrorText({ id, children }: { id: string; children?: string }) {
   return (
@@ -58,7 +56,7 @@ function ChoiceGroup<T extends string>({
 }: {
   name: keyof ApplicationData;
   legend: string;
-  options: readonly T[];
+  options: readonly { value: T; label: string }[];
   value: T | "";
   onChange: (v: T) => void;
   error?: string;
@@ -67,14 +65,14 @@ function ChoiceGroup<T extends string>({
   const errId = `app-${name}-error`;
   return (
     <fieldset aria-describedby={error ? errId : undefined} aria-invalid={error ? true : undefined}>
-      <legend className="eyebrow text-[0.72rem]">{legend}</legend>
+      <legend className={LABEL}>{legend}</legend>
       <div className={`mt-1.5 grid gap-2 ${columns}`}>
         {options.map((opt, i) => {
-          const checked = value === opt;
+          const checked = value === opt.value;
           return (
             <label
-              key={opt}
-              className={`group relative flex min-h-11 cursor-pointer items-center gap-2.5 border px-3.5 py-2 text-[0.95rem] leading-tight lg:text-sm transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ember ${
+              key={opt.value}
+              className={`group relative flex min-h-11 lg:min-h-10 cursor-pointer items-center gap-2.5 border bg-[#0b0d0e]/60 px-3 py-1.5 text-[0.92rem] font-medium leading-tight transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ember ${
                 checked
                   ? "border-ember bg-ember/10 text-bone"
                   : error
@@ -86,9 +84,9 @@ function ChoiceGroup<T extends string>({
                 type="radio"
                 id={i === 0 ? `app-${name}` : undefined}
                 name={name}
-                value={opt}
+                value={opt.value}
                 checked={checked}
-                onChange={() => onChange(opt)}
+                onChange={() => onChange(opt.value)}
                 className="sr-only"
               />
               <span
@@ -99,7 +97,7 @@ function ChoiceGroup<T extends string>({
               >
                 {checked && <Check className="size-3 text-ink" strokeWidth={3} />}
               </span>
-              {opt}
+              {opt.label}
             </label>
           );
         })}
@@ -109,7 +107,10 @@ function ChoiceGroup<T extends string>({
   );
 }
 
-export function Application() {
+/** Application card (form → success) — graphite with a brushed silver sheen, compact enough for one desktop screen. Goal / coaching come from shared context, so earlier choices are pre-selected. */
+export function ApplicationForm({ titleId }: { titleId: string }) {
+  const { t } = useI18n();
+  const f = t.form;
   const { goal, coaching, setGoal, setCoaching } = useApplication();
   const [data, setData] = useState<ApplicationData>(EMPTY_APPLICATION);
   const [fieldErrors, setErrors] = useState<ApplicationErrors>({});
@@ -135,7 +136,7 @@ export function Application() {
     setData((d) => ({ ...d, [key]: value }));
     // Re-validate the field live once the user has tried to submit.
     if (submitted) {
-      const next = validateApplication({ ...form, [key]: value });
+      const next = validateApplication({ ...form, [key]: value }, f.errors);
       setErrors((e) => ({ ...e, [key]: next[key] }));
     }
   };
@@ -143,7 +144,7 @@ export function Application() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitted(true);
-    const errs = validateApplication(form);
+    const errs = validateApplication(form, f.errors);
     setErrors(errs);
     const firstInvalid = FIELD_ORDER.find((k) => errs[k]);
     if (firstInvalid) {
@@ -161,62 +162,23 @@ export function Application() {
 
   const describe = (key: keyof ApplicationData) =>
     errors[key] ? `app-${key}-error` : undefined;
-  const border = (key: keyof ApplicationData) => (errors[key] ? "border-ember/70" : "border-bone/15");
+  const border = (key: keyof ApplicationData) => (errors[key] ? "border-ember/70" : "border-silver/20");
 
-  const waHref = whatsappLink(applicationMessage(form));
+  const waHref = whatsappLink(applicationMessage(form, t));
+  const goalOptions = GOALS.map((g) => ({ value: g, label: t.goals[g].label }));
+  const coachingOptions = COACHING_TYPES.map((c) => ({ value: c, label: t.coaching.options[c].title }));
 
   return (
-    <section
-      id="start-training"
-      aria-labelledby="apply-title"
-      className="section-y surface-deep relative overflow-hidden [--glow-x:85%] [--glow-y:60%]"
-    >
-      <LogoWatermark className="-left-[30%] bottom-[5%] w-[110vw] lg:-left-[6%] lg:w-[48vw]" opacity={0.03} />
-
-      <div className="relative mx-auto grid max-w-[88rem] gap-10 px-5 sm:px-8 lg:grid-cols-12 lg:gap-14 lg:px-12">
-        <div className="lg:col-span-5">
-          <div>
-            <SectionHeading index="07" label="Apply" title="Start training" id="apply-title" />
-            <Reveal delay={0.1}>
-              <p className="mt-6 max-w-md text-lg leading-relaxed text-silver">
-                Tell Saeid a little about you and what you want to achieve. It takes about a
-                minute.
-              </p>
-            </Reveal>
-
-            <motion.ol
-              className="mt-8 max-w-md space-y-0 border-t hairline"
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.2 } } }}
-            >
-              {STEPS.map((s, i) => (
-                <motion.li
-                  key={s.title}
-                  variants={{
-                    hidden: { opacity: 0, y: 12 },
-                    show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
-                  }}
-                  className="flex gap-5 border-b hairline py-4"
-                >
-                  <span className="font-display text-sm font-semibold tracking-[0.2em] text-ember">
-                    0{i + 1}
-                  </span>
-                  <div>
-                    <p className="font-display text-lg font-semibold uppercase tracking-[0.12em] text-bone">
-                      {s.title}
-                    </p>
-                    <p className="mt-0.5 text-sm text-silver">{s.body}</p>
-                  </div>
-                </motion.li>
-              ))}
-            </motion.ol>
-          </div>
-        </div>
-
-        <Reveal delay={0.1} className="lg:col-span-7">
-          <div className="relative border hairline bg-carbon p-5 sm:p-7 lg:p-8">
+          <div
+            className="relative border border-silver/25 p-5 lg:px-6 lg:py-5 shadow-[0_40px_90px_-45px_rgba(0,0,0,0.95),inset_0_1px_0_rgb(255_255_255/0.1)] sm:p-6"
+            style={{
+              backgroundImage: [
+                "radial-gradient(80% 60% at 100% 0%, rgb(191 192 194 / 0.12) 0%, transparent 70%)",
+                "repeating-linear-gradient(100deg, rgb(255 255 255 / 0.014) 0 1px, transparent 1px 4px)",
+                "linear-gradient(160deg, #1f2225 0%, #17191b 55%, #121415 100%)",
+              ].join(", "),
+            }}
+          >
             <span aria-hidden className="absolute inset-x-0 top-0 block">
               <AccentLine />
             </span>
@@ -227,17 +189,18 @@ export function Application() {
                   key="form"
                   noValidate
                   onSubmit={onSubmit}
-                  aria-labelledby="apply-title"
+                  aria-labelledby={titleId}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.45, ease: EASE }}
-                  className="space-y-4"
+                  className="space-y-4 lg:space-y-3.5"
                 >
-                  <div className="grid gap-4 sm:grid-cols-[1fr_7rem]">
+                  {/* Name | Age | WhatsApp — one row on desktop */}
+                  <div className="grid gap-4 sm:grid-cols-[1fr_6rem] lg:grid-cols-[minmax(0,1.15fr)_5.5rem_minmax(0,1.25fr)] lg:gap-3">
                     <div>
-                      <label htmlFor="app-name" className="eyebrow text-[0.72rem]">
-                        Name
+                      <label htmlFor="app-name" className={LABEL}>
+                        {f.name}
                       </label>
                       <input
                         id="app-name"
@@ -249,14 +212,14 @@ export function Application() {
                         aria-describedby={describe("name")}
                         aria-required
                         maxLength={80}
-                        placeholder="Your name"
-                        className={`${inputBase} ${border("name")}`}
+                        placeholder={f.namePlaceholder}
+                        className={`${inputBase} h-12 ${border("name")}`}
                       />
                       <ErrorText id="app-name-error">{errors.name}</ErrorText>
                     </div>
                     <div>
-                      <label htmlFor="app-age" className="eyebrow text-[0.72rem]">
-                        Age
+                      <label htmlFor="app-age" className={LABEL}>
+                        {f.age}
                       </label>
                       <input
                         id="app-age"
@@ -269,14 +232,14 @@ export function Application() {
                         aria-describedby={describe("age")}
                         aria-required
                         placeholder="30"
-                        className={`${inputBase} ${border("age")}`}
+                        className={`${inputBase} h-12 ${border("age")}`}
                       />
                       <ErrorText id="app-age-error">{errors.age}</ErrorText>
                     </div>
 
-                    <div className="sm:col-span-2">
-                      <label htmlFor="app-whatsapp" className="eyebrow text-[0.72rem]">
-                        WhatsApp number
+                    <div className="sm:col-span-2 lg:col-span-1">
+                      <label htmlFor="app-whatsapp" className={LABEL}>
+                        {f.whatsapp}
                       </label>
                       <input
                         id="app-whatsapp"
@@ -291,7 +254,8 @@ export function Application() {
                         aria-required
                         maxLength={24}
                         placeholder="+971 50 000 0000"
-                        className={`${inputBase} ${border("whatsapp")}`}
+                        dir="ltr"
+                        className={`${inputBase} h-12 ${border("whatsapp")}`}
                       />
                       <ErrorText id="app-whatsapp-error">{errors.whatsapp}</ErrorText>
                     </div>
@@ -300,18 +264,18 @@ export function Application() {
 
                   <ChoiceGroup
                     name="goal"
-                    legend="Main goal"
-                    options={GOALS}
+                    legend={f.goal}
+                    options={goalOptions}
                     value={form.goal}
                     onChange={setGoal}
                     error={errors.goal}
-                    columns="grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4"
+                    columns="grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-3"
                   />
 
                   <ChoiceGroup
                     name="coaching"
-                    legend="Coaching type"
-                    options={COACHING_TYPES}
+                    legend={f.coaching}
+                    options={coachingOptions}
                     value={form.coaching}
                     onChange={setCoaching}
                     error={errors.coaching}
@@ -320,9 +284,12 @@ export function Application() {
 
                   <div>
                     <div className="flex items-baseline justify-between">
-                      <label htmlFor="app-note" className="eyebrow text-[0.72rem]">
-                        Anything Saeid should know? <span className="normal-case tracking-normal text-steel">(optional)</span>
+                      <label htmlFor="app-note" className={LABEL}>
+                        {f.note} <span className="normal-case tracking-normal text-steel">{f.optional}</span>
                       </label>
+                      <p id="app-note-count" className="text-xs text-steel" dir="ltr">
+                        {form.note.length}/{NOTE_MAX}
+                      </p>
                     </div>
                     <textarea
                       id="app-note"
@@ -333,21 +300,15 @@ export function Application() {
                       aria-invalid={errors.note ? true : undefined}
                       aria-describedby={`app-note-count${errors.note ? " app-note-error" : ""}`}
                       maxLength={NOTE_MAX + 50}
-                      placeholder="Training history, injuries, schedule…"
-                      className={`${inputBase} ${border("note")} resize-y`}
+                      placeholder={f.notePlaceholder}
+                      className={`${inputBase} ${border("note")} h-auto min-h-[3.5rem] resize-y py-2.5`}
                     />
-                    <div className="flex justify-between">
-                      <ErrorText id="app-note-error">{errors.note}</ErrorText>
-                      <p id="app-note-count" className="ml-auto pt-2 text-xs text-steel">
-                        {form.note.length}/{NOTE_MAX}
-                      </p>
-                    </div>
+                    <ErrorText id="app-note-error">{errors.note}</ErrorText>
                   </div>
 
                   {status === "error" && (
                     <p role="alert" className="border border-ember/50 bg-ember/10 p-4 text-sm text-bone">
-                      Something went wrong sending your application. Please try again, or message
-                      Saeid directly on{" "}
+                      {f.failure}{" "}
                       <a className="underline underline-offset-4" href={waHref} target="_blank" rel="noopener noreferrer">
                         WhatsApp
                       </a>
@@ -355,17 +316,17 @@ export function Application() {
                     </p>
                   )}
 
-                  <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
                     <Button
                       type="submit"
                       className="w-full sm:w-auto"
                       disabled={status === "submitting"}
                       icon={status === "submitting" ? <Loader2 className="size-4 animate-spin" /> : undefined}
                     >
-                      {status === "submitting" ? "Sending…" : "Apply to train"}
+                      {status === "submitting" ? f.sending : f.submit}
                     </Button>
-                    <p className="text-xs leading-relaxed text-steel sm:max-w-[14rem] sm:text-right">
-                      Your details are only used to contact you about coaching.
+                    <p className="text-xs leading-relaxed text-steel sm:max-w-[14rem] sm:text-end">
+                      {f.privacy}
                     </p>
                   </div>
                 </motion.form>
@@ -391,11 +352,11 @@ export function Application() {
                     tabIndex={-1}
                     className="display mt-8 text-[clamp(2.75rem,10vw,4.5rem)] text-bone outline-none"
                   >
-                    Application received
+                    {f.success.title}
                   </h3>
                   <motion.span
                     aria-hidden
-                    className="mt-5 block h-px w-24 origin-left bg-ember"
+                    className="mt-5 block h-px w-24 origin-left bg-ember rtl:origin-right"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
                     transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
@@ -405,24 +366,21 @@ export function Application() {
                     link carries the application (pre-filled) so it reaches Saeid either way.
                   */}
                   <p className="mt-5 max-w-lg text-lg leading-relaxed text-bone">
-                    Your information has been received.
+                    {f.success.received}
                   </p>
-                  <p className="mt-3 max-w-lg leading-relaxed text-silver">
-                    Next step: contact Saeid on WhatsApp. Your details open as a ready-to-send
-                    message — just review it and press Send.
-                  </p>
+                  <p className="mt-3 max-w-lg leading-relaxed text-silver">{f.success.next}</p>
 
                   <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                     <ButtonLink
                       href={waHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      icon={<ArrowRight className="size-4" strokeWidth={2} />}
+                      icon={<ArrowRight className="size-4 rtl:-scale-x-100" strokeWidth={2} />}
                       className="w-full sm:w-auto"
                     >
                       <span className="inline-flex items-center gap-3">
-                        <WhatsAppIcon className="size-5" />
-                        WhatsApp Saeid
+                        <WhatsAppGlyph className="size-5" color="#050505" handset="#FF6A00" />
+                        {f.success.button}
                       </span>
                     </ButtonLink>
                     <button
@@ -430,16 +388,15 @@ export function Application() {
                       onClick={() => setStatus("idle")}
                       className="min-h-11 font-display text-sm font-semibold uppercase tracking-[0.18em] text-silver underline decoration-bone/25 underline-offset-4 transition-colors duration-300 hover:text-ember-soft"
                     >
-                      Edit details
+                      {f.success.edit}
                     </button>
                   </div>
-                  <p className="mt-6 text-sm text-steel">WhatsApp: {WHATSAPP.display}</p>
+                  <p className="mt-6 text-sm text-steel">
+                    WhatsApp: <span dir="ltr">{WHATSAPP.display}</span>
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-        </Reveal>
-      </div>
-    </section>
   );
 }

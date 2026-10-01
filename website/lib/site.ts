@@ -24,57 +24,41 @@ export function whatsappLink(message?: string) {
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
 
-export const DEFAULT_WHATSAPP_MESSAGE =
-  "Hi Saeid, I found FITologist.me and I'd like to start training.";
-
+/** Site navigation. Labels come from the dictionary (`nav.<key>`); paths are locale-independent. */
 export const NAV_ITEMS = [
-  { id: "home", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "coaching", label: "Coaching" },
-  { id: "method", label: "Method" },
+  { key: "home", path: "/" },
+  { key: "about", path: "/about" },
+  { key: "method", path: "/method" },
+  { key: "coaching", path: "/coaching" },
 ] as const;
 
-export const CTA_SECTION = { id: "start-training", label: "Start Training" } as const;
-export const BMI_SECTION = { id: "bmi", label: "BMI Calculator" } as const;
+export const BMI_PATH = "/#bmi";
+export const START_PATH = "/coaching#start-training";
 
-export const GOALS = ["Build Muscle", "Lose Fat", "Get Stronger", "General Fitness"] as const;
+/** Goal keys — labels live in the dictionary (`goals.<key>`). */
+export const GOALS = ["muscle", "fat", "strength", "mobility", "confidence", "unsure"] as const;
 export type Goal = (typeof GOALS)[number];
 
-export const COACHING_TYPES = [
-  "1:1 Personal Training",
-  "Online Coaching",
-  "Hybrid Coaching",
-] as const;
+/** Coaching keys — labels live in the dictionary (`coaching.options.<key>`). */
+export const COACHING_TYPES = ["personal", "online", "hybrid"] as const;
 export type CoachingType = (typeof COACHING_TYPES)[number];
 
-/** Coach profile — supplied by Saeid. Facts unchanged; grouped for display. */
-export const COACH = {
-  name: "Saeid Soleimani",
-  /**
-   * One integrated Active IQ qualification (the Level 3 Diploma covers gym instructing),
-   * plus REPs UAE registration. Logos are the exact supplied files, never resized out of ratio.
-   */
-  credentials: [
-    {
-      org: "Active IQ",
-      label: "ACTIVE IQ",
-      logo: { src: "/images/credentials/aiqLogo.png", width: 786, height: 180, alt: "Active IQ logo" },
-      lines: ["Level 3 Diploma", "Gym Instructing & Personal Training"],
-      fullTitle: "Active IQ Level 3 Diploma in Gym Instructing and Personal Training",
-    },
-    {
-      org: "REPs UAE",
-      label: "REPs UAE",
-      logo: { src: "/images/credentials/REPs-logo.webp", width: 261, height: 141, alt: "REPs UAE logo" },
-      lines: ["Category A Personal Trainer"],
-      fullTitle: "REPs UAE — Category A Personal Trainer",
-    },
-  ],
-  education: [
-    "BA in English Literature",
-    "5+ Years Teaching English as a Second Language",
-    "12+ Years in Business Development",
-    "2+ Years in Fitness",
-  ],
-  languages: ["English", "Persian", "Azerbaijani", "Turkish"],
-} as const;
+/**
+ * Coach credentials — exact supplied logo files, never resized out of ratio.
+ * One integrated Active IQ qualification (the Level 3 Diploma covers gym instructing) + REPs UAE.
+ * Descriptive lines are translated in the dictionary (`about.credentials.<key>`).
+ */
+export const CREDENTIALS = [
+  {
+    key: "aiq",
+    org: "Active IQ",
+    logo: { src: "/images/credentials/aiqLogo.png", width: 786, height: 180, alt: "Active IQ" },
+  },
+  {
+    key: "reps",
+    org: "REPs UAE",
+    logo: { src: "/images/credentials/REPs-logo.webp", width: 261, height: 141, alt: "REPs UAE" },
+  },
+] as const;
+
+export const COACH_NAME = "Saeid Soleimani";

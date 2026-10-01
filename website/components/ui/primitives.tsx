@@ -38,17 +38,18 @@ export function Reveal({
 export function AccentLine({
   className = "",
   delay = 0,
-  origin = "left",
+  origin = "start",
 }: {
   className?: string;
   delay?: number;
-  origin?: "left" | "right" | "center";
+  origin?: "start" | "end" | "center";
 }) {
+  // Logical origin: grows from the reading start (right edge in RTL).
+  const originCls = origin === "center" ? "origin-center" : origin === "end" ? "origin-right rtl:origin-left" : "origin-left rtl:origin-right";
   return (
     <motion.span
       aria-hidden
-      className={`block h-px bg-ember ${className}`}
-      style={{ transformOrigin: origin }}
+      className={`block h-px bg-ember ${originCls} ${className}`}
       initial={{ scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
       viewport={{ once: true, amount: 0.8 }}
@@ -67,7 +68,7 @@ export function SectionHeading({
   className = "",
   align = "left",
 }: {
-  index: string;
+  index?: string;
   label: string;
   title: React.ReactNode;
   id?: string;
@@ -80,7 +81,7 @@ export function SectionHeading({
       <Reveal
         className={`eyebrow flex items-center gap-4 ${centered ? "justify-center" : ""}`}
       >
-        <span className="text-ember">{index}</span>
+        {index && <span className="text-ember">{index}</span>}
         <AccentLine className="w-10" />
         <span>{label}</span>
       </Reveal>

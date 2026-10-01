@@ -1,26 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ButtonLink } from "@/components/ui/Button";
-import { WhatsAppIcon } from "@/components/ui/icons";
 import Image, { getImageProps } from "next/image";
+import { useI18n } from "@/components/i18n/I18nProvider";
 import { AccentLine, Reveal } from "@/components/ui/primitives";
 import { EASE, VIEWPORT } from "@/lib/motion";
-import { DEFAULT_WHATSAPP_MESSAGE, SITE, whatsappLink } from "@/lib/site";
+import { ApplicationForm } from "./Application";
 
-/**
- * SAEID PHOTO → WALL / GREY ATMOSPHERE → CTA CONTENT (left to right on desktop).
- * The photo keeps a natural left edge; from its centre rightwards it dissolves into a
- * warm charcoal sampled from the textured wall behind Saeid.
- */
 /** Optimised (640w) URL of photo 07, shared by both wall-extension strips. */
 const WALL_SRC = getImageProps({ src: "/images/hero-mobile.webp", alt: "", width: 640, height: 1045, quality: 75 }).props.src;
 
-export function FinalCta() {
+/**
+ * Coaching page, section 2 — "Ready to start?": photo 07 with its wall-extension treatment
+ * (SAEID → WALL / GREY ATMOSPHERE) beside the application form. Anchor: #start-training.
+ * The photo composition is physical (left) in every language — it is a photograph, not text.
+ */
+export function StartTraining() {
+  const { t, dir } = useI18n();
+  const titleId = "apply-title";
+
   return (
     <section
-      aria-labelledby="final-cta-title"
-      className="grain section-y relative isolate overflow-hidden bg-ink [--section-pb:2.5rem]"
+      id="start-training"
+      aria-labelledby={titleId}
+      className="grain section-y relative isolate overflow-hidden bg-ink"
     >
       <div
         aria-hidden
@@ -39,9 +42,12 @@ export function FinalCta() {
         }}
       />
 
-      <div className="mx-auto grid max-w-[88rem] items-center gap-10 px-5 sm:px-8 lg:grid-cols-12 lg:gap-12 lg:px-12">
-        {/* Full-height photo: natural left, dissolving right into the grey atmosphere */}
-        <Reveal delay={0.1} className="lg:col-span-6 lg:translate-x-[3.5vw]">
+      <div className="mx-auto grid max-w-[88rem] items-start gap-10 px-5 sm:px-8 lg:grid-cols-12 lg:gap-12 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]" dir="ltr">
+        {/* Photo: after the form on mobile, sticky on the left from lg */}
+        <Reveal
+          delay={0.1}
+          className="order-2 mx-auto w-full max-w-sm lg:sticky lg:top-[calc(var(--header-compact)+1rem)] lg:order-none lg:col-span-5 lg:max-w-none"
+        >
           {/*
             Box = left wall extension (11.5%) + photo (70.8%) + right wall extension (17.7%).
             Extensions stretch the photo's own outermost 2% columns (pure wall), mirrored so they
@@ -49,7 +55,7 @@ export function FinalCta() {
             untouched. Right side: IMAGE → WALL TONE → charcoal → dark.
           */}
           <div
-            className="blend-edges relative aspect-[1329/1537] w-full max-w-[34rem] lg:max-w-[min(100%,calc(86vh*0.8647))]"
+            className="blend-edges relative aspect-[1329/1537] w-full max-w-[34rem] lg:max-w-[min(100%,calc(86vh*0.8647))] lg:mx-auto"
             style={{ "--fade-l": "14%", "--fade-r": "19%", "--fade-t": "9%", "--fade-b": "14%" } as React.CSSProperties}
           >
             <motion.div
@@ -79,9 +85,9 @@ export function FinalCta() {
               <div className="absolute inset-y-0 left-[11.5%] w-[70.8%] [mask-image:linear-gradient(to_right,transparent_0,#000_3.5%,#000_96.5%,transparent_100%)]">
                 <Image
                   src="/images/hero-mobile.webp"
-                  alt="Saeid, full length, arms crossed, standing in front of a textured wall with the FITologist.me sign"
+                  alt={t.start.imageAlt}
                   fill
-                  sizes="(min-width: 1024px) 34vw, 70vw"
+                  sizes="(min-width: 1024px) 30vw, 70vw"
                   quality={85}
                   className="object-cover"
                 />
@@ -90,64 +96,33 @@ export function FinalCta() {
           </div>
         </Reveal>
 
-        <div className="lg:col-span-6 lg:pl-[4.5vw]">
+        <div className="order-1 lg:order-none lg:col-span-7" dir={dir}>
           <Reveal className="eyebrow flex items-center gap-4">
             <AccentLine className="w-10" />
-            <span>{SITE.location}</span>
+            <span className="text-ember">{t.start.eyebrow}</span>
           </Reveal>
-
-          {/* Observe the (unclipped) heading; lines start hidden inside overflow-hidden masks. */}
+          {/* Observe the (unclipped) heading; the line starts hidden inside an overflow-hidden mask. */}
           <motion.h2
-            id="final-cta-title"
-            className="display mt-6 text-[clamp(3.25rem,13vw,7.5rem)] leading-[0.85] text-bone"
+            id={titleId}
+            className="display mt-4 text-[clamp(2.75rem,9vw,5.5rem)] leading-[0.88] text-bone lg:mt-3 lg:text-[clamp(3rem,4.4vw,4.25rem)]"
             initial="hidden"
             whileInView="show"
             viewport={VIEWPORT}
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12 } } }}
           >
-            {["Ready to", "start?"].map((w, i) => (
-              <span key={w} className="block overflow-hidden pb-[0.05em]">
-                <motion.span
-                  className={`block ${i === 1 ? "text-ember" : ""}`}
-                  variants={{
-                    hidden: { y: "105%" },
-                    show: { y: "0%", transition: { duration: 1.1, ease: EASE } },
-                  }}
-                >
-                  {w}
-                </motion.span>
-                {i === 0 && " "}
-              </span>
-            ))}
+            <span className="block overflow-hidden pb-[0.05em]">
+              <motion.span
+                className="block"
+                variants={{ hidden: { y: "105%" }, show: { y: "0%", transition: { duration: 1.1, ease: EASE } } }}
+              >
+                {t.start.title}
+              </motion.span>
+            </span>
           </motion.h2>
-
-          <Reveal delay={0.25}>
-            <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-display text-lg font-semibold uppercase tracking-[0.28em] text-silver sm:text-xl">
-              {SITE.tagline.map((t, i) => (
-                <span key={t} className="flex items-center gap-3">
-                  {t}
-                  {i < SITE.tagline.length - 1 && (
-                    <span aria-hidden className="size-1.5 rounded-full bg-ember" />
-                  )}
-                </span>
-              ))}
-            </p>
+          <Reveal delay={0.15}>
+            <p className="mt-4 max-w-xl text-lg leading-relaxed text-silver lg:mt-3 lg:max-w-none lg:text-base">{t.start.body}</p>
           </Reveal>
-
-          <Reveal delay={0.35} className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="#start-training" className="w-full sm:w-auto">
-              Start training
-            </ButtonLink>
-            <ButtonLink
-              href={whatsappLink(DEFAULT_WHATSAPP_MESSAGE)}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="ghost"
-              icon={<WhatsAppIcon className="size-5" />}
-              className="w-full sm:w-auto"
-            >
-              WhatsApp Saeid
-            </ButtonLink>
+          <Reveal delay={0.2} className="mt-7 lg:mt-5">
+            <ApplicationForm titleId={titleId} />
           </Reveal>
         </div>
       </div>

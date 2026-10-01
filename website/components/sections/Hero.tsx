@@ -4,10 +4,11 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
+import { useI18n } from "@/components/i18n/I18nProvider";
 import { ButtonLink } from "@/components/ui/Button";
+import Link from "next/link";
 import { EASE } from "@/lib/motion";
-
-const HERO_ALT = "Saeid, personal trainer, smiling with arms crossed in a Dubai gym";
+import { START_PATH } from "@/lib/site";
 
 /*
  * Composition (photo 05 at every size — no art-directed swap):
@@ -34,6 +35,7 @@ const fade = {
 };
 
 export function Hero() {
+  const { t, href, locale } = useI18n();
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -86,7 +88,7 @@ export function Hero() {
           >
             <Image
               src="/images/hero-desktop.webp"
-              alt={HERO_ALT}
+              alt={t.hero.alt}
               fill
               preload
               quality={90}
@@ -138,13 +140,18 @@ export function Hero() {
       {/* Copy + CTAs — one column (right-hand on desktop) */}
       <motion.div
         style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
-        className="relative z-10 -mt-[18vw] px-5 pb-14 sm:-mt-20 sm:px-8 md:pb-16 lg:absolute lg:inset-y-0 lg:right-[max(3rem,5vw)] lg:mt-0 lg:flex lg:w-[min(34rem,34vw)] lg:flex-col lg:justify-center lg:px-0 lg:pb-0 lg:pt-[var(--header-h)]"
+        className="relative z-10 -mt-[18vw] px-5 pb-14 sm:-mt-20 sm:px-8 md:pb-16 lg:absolute lg:inset-y-0 lg:right-[max(3rem,5vw)] rtl:pr-6 rtl:sm:pr-10 rtl:lg:right-[max(5rem,8vw)] rtl:lg:pr-0 lg:mt-0 lg:flex lg:w-[min(34rem,34vw)] lg:flex-col lg:justify-center lg:px-0 lg:pb-0 lg:pt-[var(--header-h)]"
       >
         <h1
           id="hero-title"
-          className="display text-[clamp(3rem,15.5vw,5.75rem)] leading-[0.86] text-bone sm:text-[clamp(4.25rem,10vw,6.25rem)] lg:text-[clamp(3.5rem,min(5.6vw,9.6vh),7.25rem)]"
+          className={`display text-bone ${
+            locale === "ru"
+              ? // Cyrillic words are longer and carry diacritics (Й): smaller size, roomier lines.
+                "text-[clamp(2.3rem,10.6vw,4.5rem)] leading-[1.02] sm:text-[clamp(3.5rem,8vw,5rem)] lg:text-[clamp(2.75rem,min(4.3vw,8vh),5.5rem)]"
+              : "text-[clamp(3rem,15.5vw,5.75rem)] leading-[0.86] sm:text-[clamp(4.25rem,10vw,6.25rem)] lg:text-[clamp(3.5rem,min(5.6vw,9.6vh),7.25rem)]"
+          }`}
         >
-          {["Train.", "Transform.", "Transcend."].map((word, i) => (
+          {t.hero.lines.map((word, i) => (
             <span key={word} className="block overflow-hidden pb-[0.04em]">
               <motion.span
                 className={`block ${i === 2 ? "text-ember" : ""}`}
@@ -161,7 +168,7 @@ export function Hero() {
 
         <motion.span
           aria-hidden
-          className="mt-6 block h-px w-24 origin-left bg-ember sm:w-28"
+          className="mt-6 block h-px w-24 origin-left bg-ember sm:w-28 rtl:origin-right"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 1.2, ease: EASE, delay: 1.1 }}
@@ -174,9 +181,9 @@ export function Hero() {
           variants={fade}
           className="mt-5 font-display text-[1.05rem] font-semibold uppercase tracking-[0.08em] text-bone min-[360px]:text-[1.35rem] min-[360px]:tracking-[0.12em] lg:text-[1.5rem]"
         >
-          Personal Training by Saeid
+          {t.hero.sub}
           <span className="mt-1.5 block text-[1.05rem] font-medium tracking-[0.24em] text-silver lg:text-lg">
-            Dubai, UAE
+            {t.hero.location}
           </span>
         </motion.p>
 
@@ -187,21 +194,21 @@ export function Hero() {
           variants={fade}
           className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-6 lg:flex-col lg:items-start lg:gap-4"
         >
-          <ButtonLink href="#start-training" className="w-full sm:w-auto">
-            Start your transformation
+          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto">
+            {t.hero.primary}
           </ButtonLink>
-          <a
-            href="#coaching"
+          <Link
+            href={href("/coaching")}
             className="group inline-flex min-h-11 items-center justify-center gap-2 font-display text-[0.95rem] font-semibold uppercase tracking-[0.18em] text-silver transition-colors duration-300 hover:text-ember-soft sm:justify-start"
           >
             <span className="border-b border-bone/25 pb-0.5 transition-colors duration-300 group-hover:border-ember">
-              View coaching
+              {t.hero.secondary}
             </span>
             <ArrowRight
               aria-hidden
-              className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+              className="size-4 transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1"
             />
-          </a>
+          </Link>
         </motion.div>
       </motion.div>
     </section>

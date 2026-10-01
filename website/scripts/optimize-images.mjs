@@ -33,7 +33,9 @@ const jobs = [
   // Method gallery (professional journey). Full frames, encode only.
   { out: "method-activeiq.webp", from: "01-saeid-activeiq-certification.png", q: 86 },
   { out: "method-mypt.webp", from: "02-saeid-mypt-academy.png", q: 86 },
-  { out: "brand-banner.webp", from: "10-fitologist-brand-banner.png", q: 86 },
+  { out: "journey-12me.webp", from: "12me.PNG", q: 86 },
+  // Landscape brand banner (#10, banner2) — homepage philosophy visual + Method hero. Encode only.
+  { out: "brand-banner2.webp", from: "10-fitologist-brand-banner2.PNG", q: 88 },
 ];
 
 /**

@@ -1,11 +1,11 @@
 "use client";
 
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
 import Image, { getImageProps } from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EASE } from "@/lib/motion";
 
-export type FragmentSlide = { src: string; alt: string; width: number; height: number };
+export type LayerSlide = { src: string; alt: string; width: number; height: number };
 
 const COLS = 4;
 const ROWS = 3;
@@ -66,24 +66,31 @@ function Fragments({ url, mode }: { url: string; mode: "out" | "in" }) {
 }
 
 /**
- * Editorial gallery with a slow "fragment / dispersion" transition.
- * - Each slide keeps its natural aspect ratio (no crop, no fixed frame) inside a
- *   frameless, edge-blended box; the container accommodates the widest slide.
- * - Holds ~5s, transition ~1.45s; fragments only exist during the transition.
- * - Pauses when hovered/focused or off-screen. Reduced motion: plain crossfade, no autoplay.
+ * Photographs as large layers embedded in the page background — no frame, card, border or halo.
+ * - The dominant photo is a masked layer at its own ratio (never cropped or distorted); its edges
+ *   dissolve into the dark page (`.photo-layer-mask`).
+ * - A faint, offset "echo" of the next photo sits deeper behind it, so the photos overlap in depth.
+ * - Transition: the current photo disintegrates into fragments that drift outward while the next
+ *   one assembles in its place (~1.45s; holds ~5s). Fragments exist only during the transition.
+ * - Pauses on hover/focus or off-screen. Reduced motion: plain crossfade, no autoplay.
  */
-export function FragmentGallery({
+export function FragmentLayerGallery({
   slides,
   label,
   sizes,
   className = "",
   interval = 5000,
+  dotsLabel = (i: number, n: number) => `${i} / ${n}`,
+  dotsClassName = "bottom-0",
 }: {
-  slides: FragmentSlide[];
+  slides: LayerSlide[];
   label: string;
   sizes: string;
   className?: string;
   interval?: number;
+  dotsLabel?: (i: number, n: number) => string;
+  /** Position of the slide indicator (e.g. raised when the layer bleeds past its section). */
+  dotsClassName?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -131,24 +138,77 @@ export function FragmentGallery({
   }, [reduce, paused, inView, prev, index, slides.length, interval, goTo]);
 
   const transitioning = prev !== null;
+  const echo = slides[(index + 1) % slides.length];
 
   return (
     <div
+      ref={ref}
       role="group"
       aria-roledescription="gallery"
       aria-label={label}
+      className={`relative ${className}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className="mb-2 flex justify-center gap-2">
+      {/* Deeper layer: a faint echo of the next photograph, offset and smaller, overlapping behind */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 flex items-start justify-start">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={echo.src}
+            className="photo-layer-mask absolute left-[-6%] top-[2%] h-[74%] blur-[1.5px]"
+            style={{ aspectRatio: `${echo.width} / ${echo.height}` }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.22 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: EASE }}
+          >
+            <Image src={echo.src} alt="" fill sizes="30vw" quality={60} className="object-cover" />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Dominant layer */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        {slides.map((s, i) => {
+          const isCurrent = i === index;
+          const isPrev = i === prev;
+          const visible = isCurrent || isPrev;
+          return (
+            // Layer takes the photo's own ratio (never cropped); its edges dissolve via the mask.
+            <motion.div
+              key={s.src}
+              aria-hidden={!isCurrent}
+              className="photo-layer-mask absolute h-full max-w-full"
+              style={{ aspectRatio: `${s.width} / ${s.height}` }}
+              initial={false}
+              animate={{ opacity: reduce ? (isCurrent ? 1 : 0) : visible ? 1 : 0 }}
+              transition={{ duration: reduce ? 1 : 0.01 }}
+            >
+              <Image
+                src={s.src}
+                alt={isCurrent ? s.alt : ""}
+                fill
+                sizes={sizes}
+                quality={85}
+                className={`object-cover ${transitioning && !reduce ? "opacity-0" : ""}`}
+              />
+              {transitioning && !reduce && isPrev && <Fragments url={spriteUrls[i]} mode="out" />}
+              {transitioning && !reduce && isCurrent && <Fragments url={spriteUrls[i]} mode="in" />}
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Slide indicator — fine lines, bottom centre */}
+      <div className={`absolute inset-x-0 z-10 flex justify-center gap-2 ${dotsClassName}`} dir="ltr">
         {slides.map((s, i) => (
           <button
             key={s.src}
             type="button"
             onClick={() => goTo(i)}
-            aria-label={`Show image ${i + 1} of ${slides.length}`}
+            aria-label={dotsLabel(i + 1, slides.length)}
             aria-current={i === index ? "true" : undefined}
             className="group flex h-8 items-center px-1"
           >
@@ -159,46 +219,6 @@ export function FragmentGallery({
             />
           </button>
         ))}
-      </div>
-
-      <div ref={ref} className={`relative ${className}`}>
-        {slides.map((s, i) => {
-          const isCurrent = i === index;
-          const isPrev = i === prev;
-          const visible = isCurrent || isPrev;
-          return (
-            // Box takes the slide's own aspect ratio → full composition, edges blended.
-            <motion.div
-              key={s.src}
-              aria-hidden={!isCurrent}
-              className="blend-edges absolute inset-y-0 left-1/2 h-full max-w-full -translate-x-1/2"
-              style={
-                {
-                  aspectRatio: `${s.width} / ${s.height}`,
-                  "--fade-t": "6%",
-                  "--fade-r": "10%",
-                  "--fade-b": "16%",
-                  "--fade-l": "10%",
-                } as React.CSSProperties
-              }
-              initial={false}
-              animate={{ opacity: reduce ? (isCurrent ? 1 : 0) : visible ? 1 : 0 }}
-              transition={{ duration: reduce ? 1 : 0.01 }}
-            >
-              {/* Resting state: one real image (also keeps every slide loaded for SEO/a11y) */}
-              <Image
-                src={s.src}
-                alt={isCurrent ? s.alt : ""}
-                fill
-                sizes={sizes}
-                quality={85}
-                className={`object-contain ${transitioning && !reduce ? "opacity-0" : ""}`}
-              />
-              {transitioning && !reduce && isPrev && <Fragments url={spriteUrls[i]} mode="out" />}
-              {transitioning && !reduce && isCurrent && <Fragments url={spriteUrls[i]} mode="in" />}
-            </motion.div>
-          );
-        })}
       </div>
     </div>
   );

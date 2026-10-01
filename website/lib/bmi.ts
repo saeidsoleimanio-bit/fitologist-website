@@ -1,14 +1,9 @@
 export type UnitSystem = "metric" | "imperial";
 
-export type Sex = "male" | "female";
+export type Gender = "male" | "female";
 
 export type BmiTone = "under" | "healthy" | "over" | "obese";
 
-export type BmiCategory = {
-  label: "Underweight" | "Healthy weight" | "Overweight" | "Obesity";
-  range: string;
-  tone: BmiTone;
-};
 
 /** CSS colour per category (tokens defined in globals.css). */
 export const BMI_TONE_COLOR: Record<BmiTone, string> = {
@@ -21,7 +16,7 @@ export const BMI_TONE_COLOR: Record<BmiTone, string> = {
 /**
  * Standard adult categories only apply from 18. Children/teens need age- and
  * sex-specific percentiles, so the calculator is restricted to adults.
- * Sex is recorded as part of the starting profile; it does not change adult BMI.
+ * Gender is recorded as part of the starting profile; it does not change adult BMI.
  */
 export const AGE_LIMITS = { min: 18, max: 100 } as const;
 
@@ -36,10 +31,10 @@ export const BMI_LIMITS = {
 export const BMI_SCALE = { min: 15, max: 40 } as const;
 
 export const BMI_BANDS = [
-  { label: "Underweight", tone: "under", from: BMI_SCALE.min, to: 18.5 },
-  { label: "Healthy weight", tone: "healthy", from: 18.5, to: 25 },
-  { label: "Overweight", tone: "over", from: 25, to: 30 },
-  { label: "Obesity", tone: "obese", from: 30, to: BMI_SCALE.max },
+  { tone: "under", from: BMI_SCALE.min, to: 18.5 },
+  { tone: "healthy", from: 18.5, to: 25 },
+  { tone: "over", from: 25, to: 30 },
+  { tone: "obese", from: 30, to: BMI_SCALE.max },
 ] as const;
 
 /** Parses user input, accepting a comma as decimal separator. Returns NaN when not a clean number. */
@@ -54,12 +49,12 @@ export function calculateBmi(weightKg: number, heightCm: number): number {
   return weightKg / (m * m);
 }
 
-/** BMI = kg / m². Identical for men and women. */
-export function bmiCategory(bmi: number): BmiCategory {
-  if (bmi < 18.5) return { label: "Underweight", range: "Below 18.5", tone: "under" };
-  if (bmi < 25) return { label: "Healthy weight", range: "18.5 – 24.9", tone: "healthy" };
-  if (bmi < 30) return { label: "Overweight", range: "25 – 29.9", tone: "over" };
-  return { label: "Obesity", range: "30 and above", tone: "obese" };
+/** Adult category for a (rounded) BMI. BMI = kg / m², identical for men and women. Labels/ranges are translated. */
+export function bmiCategory(bmi: number): BmiTone {
+  if (bmi < 18.5) return "under";
+  if (bmi < 25) return "healthy";
+  if (bmi < 30) return "over";
+  return "obese";
 }
 
 /** Position (0–1) of a BMI value on the visual scale, clamped. */

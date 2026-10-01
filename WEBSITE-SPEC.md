@@ -89,3 +89,43 @@ Semantic landmarks, labelled fields, keyboard navigable menu (Escape closes, foc
 - Footer: ~91px desktop; contact left-aligned in a 2×2 grid, 16px semibold.
 - BMI under-18 message: "This calculator uses adult BMI categories and is not intended for children or teens (under 18)."
 - Application success: next step = contact Saeid on WhatsApp; message opens ready to send (user presses Send).
+
+## Multilingual restructure (en / ar / ru)
+- Routes: `/`, `/about`, `/method`, `/coaching` (English, unprefixed) + `/ar/...` (RTL) + `/ru/...`. `app/[lang]` root layout sets `<html lang dir>`; `proxy.ts` rewrites unprefixed paths to `/en`, 308-redirects `/en/...` to clean URLs. Unknown paths → localized 404.
+- Translations: `website/lib/i18n/dictionaries/{en,ar,ru}.ts`. `en.ts` defines the `Dictionary` type; ar/ru must match it (missing key = build error). Client components read strings via `useI18n()`; data constants in `lib/site.ts` are language-neutral keys (goals, coaching types, credentials).
+- Fonts: Inter + Barlow Condensed (en); Cairo for Arabic; Oswald for Russian headings (Inter covers Cyrillic body). Arabic: no letter-spacing, roomier display line-height; directional arrows mirror, brand icons and photographs do not.
+- SEO: per-page/per-language title, description, canonical, hreflang (en/ar/ru/x-default), OG locale; sitemap lists all 12 URLs with alternates.
+- Homepage: Hero → Philosophy + "What are you training for?" (6 selectable goals, "This is my goal →") → BMI → Who is this for? → short start/WhatsApp CTA.
+- /about: Meet your coach, intro quote, credentials (Active IQ Level 3 Diploma; REPs UAE Category A) with logos secondary to text, "2+ years in fitness" with the fitness credentials; journey gallery + Educational & professional background lower.
+- /method: banner2 (`brand-banner2.webp` from `10-fitologist-brand-banner2.PNG`) hero, four stages with the new copy, "Ready to start? / Take the assessment →".
+- /coaching: "Choose how you train" (includes, no prices, pricing note) + "Ready to start?" (photo 07 treatment + application form, `#start-training`).
+- Goal/coaching choices persist in sessionStorage across pages and languages and pre-fill the form; the WhatsApp message is written in the visitor's language.
+- Floating "Chat on WhatsApp" button appears after the first screen (reading-end corner). Flag language selector in header, mobile header and footer; switching keeps the page and section hash.
+- Homepage philosophy visual replaced: old #10 (`10-fitologist-brand-banner.png`) removed from the site; `brand-banner2.webp` (banner2, full 1672×941 frame, edge-blended) sits beside the philosophy copy. Philosophy + Goals tightened to one desktop viewport (section 804px at 1440×900, 748px at 1366×768; was 1052px).
+- Homepage banner2 is now a full-bleed background layer on desktop (≥1024px): from the section top to the bottom of the goal cards, bleeding off the right edge (~1200px wide at 1440, left edge ≈ 233px), box ratio kept within ~3% of the image's 1672:941 (branding never cropped). Content sits above it; contrast comes from the image's own masked edges plus localized gradients (#050505 / #111111) under the goals and behind the goals intro — no full overlay. Goal cards are slightly translucent with a light blur. Mobile keeps the banner in flow, full frame.
+
+## Final UI/UX refinement
+- Home goals: disclaimer and helper line removed; no divider; heading closer to philosophy; cards slightly lower; large 52px line icons; "I'm not sure yet" = Signpost; "Select a goal to continue" / "This is my goal →" start-aligned under the cards.
+- BMI: graphite/silver metallic card on a distinct graphite band; Height · Weight · Age · Gender in one row (2×2 on mobile); bold 0.9rem labels; boxed 56px controls; result area reserved from the start (no layout shift — verified 453px before/after at 1440).
+- Home CTA copy: "Tell Saeid about your goals, it takes about a minute" / "Or simply say hello on WhatsApp." (exact; translated for ar/ru).
+- About: saeid-original-01 (about-portrait.webp) is a background layer — photo → soft fade → charcoal → faint silver (`.about-portrait-mask`); 2+ years in fitness directly under the approach line, before credentials; "Know Saeid more"; larger Instagram/WhatsApp lockups; tighter gap before Ready to start.
+- Coaching form: Name | Age | WhatsApp on one desktop row; graphite card with silver sheen; full form + Apply visible in one viewport at 1440×778 and 1366×768.
+- Floating WhatsApp shows after ~35% of the first screen (soft fade-up). Header: Instagram icon beside the flags (BMI Calculator CTA kept).
+- Section rhythm tokens: 2.75 / 3 / 3.5rem.
+
+## Final visual refinement — round 2
+- Goal cards: vector inside the card on a fine circular plate (turns orange on hover) → larger/bolder title → description → "Choose goal →" (Selected ✓).
+- BMI: result absent until calculated, then revealed (height + fade); desktop card column reserves the revealed height (verified 0px shift for en/ar/ru at 1440 and 1366). Card max 36rem (576px); fields 48px; Height · Weight · Age row, then Gender + Calculate. "Your BMI" bold orange. Left copy wider (5 cols) and larger.
+- Who is this for: low-opacity orange line vectors clipped per row — briefcase (professionals), footprints (beginners), barbell (experienced lifters).
+- About: Instagram/WhatsApp lockups centred as one group under the credentials.
+- Photo album = `PhotoLayerGallery` (replaces FragmentGallery): 04 → 01 → 02 → 12me; 3.4s per image, 1.15s turn (slight rotateY ±14°, drift, fade); each photo is a masked layer at its own ratio (`.photo-layer-mask`), edges dissolve — no frame. Reduced motion: crossfade. Used on About only.
+- New asset: `journey-12me.webp` (encode of `12me.PNG`). `about-portrait.webp` regenerated from the current `saeid-original-01.PNG`.
+- Method page reverted (by request) to its state before round 2: banner2 hero, four-stage editorial grid with logo watermark, Ready to start CTA — no photo album on Method.
+
+## Arabic RTL refinement (rtl: variants only — English/Russian unaffected)
+- Right inset for Arabic content containers: `rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]` (≈ +31px at 1440, +27px at 1366, +4px at 390) on BMI, Who is this for, Home CTA, Coaching, Start training, About intro, About background.
+- Hero copy: `rtl:lg:right-[max(5rem,8vw)]` (+43px at 1440) and `rtl:pr-6 rtl:sm:pr-10` below lg.
+- Philosophy (desktop): Arabic copy placed over the banner's dark left third (`rtl:lg:col-start-7 rtl:xl:col-start-8`) so it no longer sits on the banner logo; still RTL / right-aligned. Banner never mirrored.
+- Goals heading only: `rtl:lg:pr-[clamp(1.5rem,2.2vw,2rem)]`; goal cards unchanged.
+- About intro: grid pinned LTR with the text column `dir="rtl"`, so the Arabic copy sits right of the portrait instead of over it.
+- Header (Arabic, desktop): `rtl:lg:px-[clamp(3.5rem,4.2vw,4.25rem)]`.

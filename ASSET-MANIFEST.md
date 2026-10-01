@@ -18,7 +18,8 @@ Originals live in `assets/originals/` and are **read-only**. Web-optimised copie
 | 07 | 07-saeid-fitologist-fullbody.jpg | 941×1537 | Full body | Final CTA (radial edge blend) |
 | 08 | 08-fitologist-logo-light-bg.png | 1254×1254 | Logo on light backgrounds | Not used in V1 (site is dark-only); reserved for light contexts |
 | 09 | 09-fitologist-logo-dark-bg.png | 1254×1254 | Primary dark logo | Header wordmark crop, footer lockup, favicon mark, background watermark |
-| 10 | 10-fitologist-brand-banner.png | 941×1671 | Brand visual | Positioning / philosophy section (edge-blended) |
+| 10 | 10-fitologist-brand-banner.png | 941×1671 | Brand visual (superseded) | No longer used on the site — replaced by banner2 |
+| 10 (v2) | 10-fitologist-brand-banner2.PNG | 1672×941 | Brand visual (landscape) | Homepage philosophy visual (edge-blended, uncropped) + Method page hero |
 
 ## Derived files (crops/resizes only — no content changes)
 | Output | Source | Operation |
@@ -29,7 +30,7 @@ Originals live in `assets/originals/` and are **read-only**. Web-optimised copie
 | method-full.webp | 04 | encode (full frame) |
 | method-activeiq.webp | 01 | encode |
 | method-mypt.webp | 02 | encode |
-| brand-banner.webp | 10 | encode |
+| brand-banner2.webp | 10 (v2) | encode only (no crop/resize) |
 | logo-lockup.png | 09 | tight crop of full lockup, black → transparent (un-premultiplied, visually identical on dark) |
 | logo-wordmark.png | 09 | crop of "FITologist.me" wordmark row, black → transparent |
 | logo-emblem.png | 09 | mark + wordmark crop (no tagline), black → transparent — header logo |

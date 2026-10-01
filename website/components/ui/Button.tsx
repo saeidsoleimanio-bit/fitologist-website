@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 type Variant = "primary" | "ghost" | "outline";
 
@@ -17,7 +18,7 @@ function Sweep({ variant }: { variant: Variant }) {
   return (
     <span
       aria-hidden
-      className={`absolute inset-0 origin-left scale-x-0 ${tone} transition-transform duration-300 ease-[var(--ease-premium)] group-hover:scale-x-100 group-focus-visible:scale-x-100`}
+      className={`absolute inset-0 origin-left scale-x-0 rtl:origin-right ${tone} transition-transform duration-300 ease-[var(--ease-premium)] group-hover:scale-x-100 group-focus-visible:scale-x-100`}
     />
   );
 }
@@ -37,27 +38,38 @@ function Inner({ variant, icon, children }: Required<Pick<CommonProps, "variant"
       {icon !== false && (
         <span
           aria-hidden
-          className="relative transition-transform duration-300 ease-[var(--ease-premium)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          className="relative transition-transform duration-300 ease-[var(--ease-premium)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:group-hover:-translate-x-0.5"
         >
-          {icon ?? <ArrowUpRight className="size-4" strokeWidth={2} />}
+          {/* Directional icons mirror in RTL; brand icons passed in (e.g. WhatsApp) never do. */}
+          {icon ?? <ArrowUpRight className="size-4 rtl:-scale-x-100" strokeWidth={2} />}
         </span>
       )}
     </>
   );
 }
 
+/** Internal paths ("/…") use next/link for client-side navigation; anything else is a plain anchor. */
 export function ButtonLink({
   variant = "primary",
   icon,
   className = "",
   children,
+  href = "",
   ...props
 }: CommonProps & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "children">) {
-  return (
-    <a className={`${base} ${variants[variant]} ${className}`} {...props}>
-      <Inner variant={variant} icon={icon}>
-        {children}
-      </Inner>
+  const cls = `${base} ${variants[variant]} ${className}`;
+  const inner = (
+    <Inner variant={variant} icon={icon}>
+      {children}
+    </Inner>
+  );
+  return href.startsWith("/") ? (
+    <Link href={href} className={cls} {...props}>
+      {inner}
+    </Link>
+  ) : (
+    <a href={href} className={cls} {...props}>
+      {inner}
     </a>
   );
 }
