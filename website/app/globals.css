@@ -1,0 +1,218 @@
+@import "tailwindcss";
+
+@theme {
+  /* Dark surface levels */
+  --color-ink: #050505; /* L1 — main background */
+  --color-deep: #0b0d0e; /* L2 — alternate section */
+  --color-carbon: #111416; /* L3 — cards / panels */
+  --color-graphite: #1a1d1f; /* L4 — elevated interactive surface */
+  --color-bone: #f5f5f5;
+  --color-ember: #ff6a00;
+  --color-ember-soft: #ff8a3d;
+  --color-silver: #bfc0c2;
+  --color-steel: #8d8e91;
+  /* Logo silver ramp, sampled from 09-fitologist-logo-dark-bg.png */
+  --color-logo-silver-hi: #dddddd;
+  --color-logo-silver-mid: #a4a3a3;
+  --color-logo-silver-lo: #4e4e4d;
+  --color-logo-silver-shadow: #444443;
+  /* BMI category colours */
+  --color-bmi-under: #facc15;
+  --color-bmi-healthy: #4ade80;
+  --color-bmi-over: #ff6a00;
+  --color-bmi-obese: #ff3b30;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-barlow), "Arial Narrow", ui-sans-serif, sans-serif;
+
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --header-h: 4.25rem;
+    /* Header height once scrolled (anchor targets always land in this state) */
+    --header-compact: 4rem;
+    /* Vertical rhythm for content sections (tightened for an editorial flow) */
+    --section-py: 3rem;
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --section-py: 3.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --section-py: 4rem;
+      --header-h: 5.375rem;
+      --header-compact: 4.5rem;
+    }
+  }
+
+  html {
+    background: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-ember);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  button,
+  [role="button"],
+  label {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  /*
+   * Content section spacing + anchor alignment.
+   * scroll-margin compensates for the section's own top padding so that, when
+   * navigated to, the first line of content sits just below the fixed header.
+   */
+  .section-y {
+    --section-pt: var(--section-py);
+    --section-pb: var(--section-py);
+    padding-top: var(--section-pt);
+    padding-bottom: var(--section-pb);
+    scroll-margin-top: calc(var(--header-compact) + 1.25rem - var(--section-pt));
+  }
+
+  /*
+   * Photograph → gradually disappears → background.
+   * Two intersected linear masks; fade sizes are set per use via CSS vars.
+   */
+  .blend-edges {
+    --fade-t: 12%;
+    --fade-r: 14%;
+    --fade-b: 22%;
+    --fade-l: 14%;
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%),
+      linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%),
+      linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%);
+    mask-composite: intersect;
+  }
+
+  /*
+   * L2 section surface: fades in/out of the L1 background so section changes
+   * read as depth, not hard bands. Optional ambient glow via --glow-x/--glow-y.
+   */
+  .surface-deep {
+    background:
+      radial-gradient(60% 45% at var(--glow-x, 85%) var(--glow-y, 20%), rgb(255 106 0 / 0.045), transparent 70%),
+      radial-gradient(70% 60% at 15% 80%, rgb(191 192 194 / 0.035), transparent 70%),
+      linear-gradient(180deg, var(--color-ink) 0%, var(--color-deep) 14%, var(--color-deep) 86%, var(--color-ink) 100%);
+  }
+
+  /*
+   * Near-black on the left → L2 charcoal → faint logo-silver atmosphere on the right.
+   * Top/bottom fade back to L1 so the section joins its neighbours seamlessly.
+   */
+  .surface-silver-right {
+    background:
+      linear-gradient(180deg, var(--color-ink) 0%, transparent 16%, transparent 84%, var(--color-ink) 100%),
+      radial-gradient(55% 70% at 78% 50%, rgb(191 192 194 / 0.1), rgb(191 192 194 / 0.035) 45%, transparent 75%),
+      linear-gradient(90deg, var(--color-ink) 0%, var(--color-ink) 38%, var(--color-deep) 58%, color-mix(in srgb, var(--color-silver) 7%, var(--color-deep)) 100%);
+  }
+
+  /* Soft charcoal pool behind a photograph so it lifts off the black */
+  .image-halo {
+    background: radial-gradient(closest-side, rgb(30 33 35 / 0.95), rgb(24 27 29 / 0.6) 45%, rgb(191 192 194 / 0.035) 72%, transparent 100%);
+  }
+
+  /* Small uppercase label used above section headings */
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-silver);
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: -0.005em;
+  }
+
+  .hairline {
+    border-color: rgb(245 245 245 / 0.09);
+  }
+
+  /* Fine film grain so large dark surfaces don't band */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+}
+
+/* Header BMI CTA — slow, elegant attention pulse */
+@keyframes cta-pulse {
+  0%,
+  100% {
+    border-color: rgb(255 106 0 / 0.65);
+    box-shadow: 0 0 0 0 rgb(255 106 0 / 0);
+  }
+  50% {
+    border-color: rgb(255 106 0 / 1);
+    box-shadow: 0 0 18px -4px rgb(255 106 0 / 0.45);
+  }
+}
+
+.cta-pulse {
+  animation: cta-pulse 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-pulse {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
