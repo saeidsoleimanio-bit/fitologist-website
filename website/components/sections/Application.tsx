@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { useApplication } from "@/components/providers/ApplicationProvider";
@@ -25,7 +25,7 @@ const inputBase =
   "mt-1.5 block w-full border bg-[#0b0d0e]/80 px-3.5 text-base text-bone shadow-[inset_0_1px_0_rgb(255_255_255/0.03)] placeholder:text-bone/25 transition-[border-color,box-shadow] duration-300 hover:border-silver/35 focus:border-ember focus:shadow-[0_0_0_3px_rgb(255_106_0/0.18)] focus:outline-none focus-visible:outline-none";
 
 /** Strong, readable field labels. */
-const LABEL = "block font-display text-[0.82rem] font-bold uppercase tracking-[0.16em] text-bone/90";
+const LABEL = "block font-display text-[0.82rem] font-bold uppercase tracking-[0.12em] text-bone/90";
 
 function ErrorText({ id, children }: { id: string; children?: string }) {
   return (
@@ -375,7 +375,6 @@ export function ApplicationForm({ titleId }: { titleId: string }) {
                       href={waHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      icon={<ArrowRight className="size-4 rtl:-scale-x-100" strokeWidth={2} />}
                       className="w-full sm:w-auto"
                     >
                       <span className="inline-flex items-center gap-3">
@@ -386,7 +385,7 @@ export function ApplicationForm({ titleId }: { titleId: string }) {
                     <button
                       type="button"
                       onClick={() => setStatus("idle")}
-                      className="min-h-11 font-display text-sm font-semibold uppercase tracking-[0.18em] text-silver underline decoration-bone/25 underline-offset-4 transition-colors duration-300 hover:text-ember-soft"
+                      className="min-h-11 font-display text-sm font-semibold uppercase tracking-[0.12em] text-silver underline decoration-bone/25 underline-offset-4 transition-colors duration-300 hover:text-ember-soft"
                     >
                       {f.success.edit}
                     </button>

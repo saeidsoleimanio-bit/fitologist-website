@@ -8,7 +8,7 @@ type I18nValue = {
   locale: Locale;
   dir: "ltr" | "rtl";
   t: Dictionary;
-  /** Localize a site path, e.g. href("/coaching#start-training"). */
+  /** Localize a site path, e.g. href("/coaching#start"). */
   href: (path: string) => string;
 };
 

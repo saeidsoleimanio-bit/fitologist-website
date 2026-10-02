@@ -9,7 +9,7 @@ const ar: Dictionary = {
     about: {
       title: "تعرّف على مدربك — سعيد سليماني | FITologist.me",
       description:
-        "سعيد سليماني مدرب شخصي في دبي — حاصل على دبلوم المستوى الثالث من Active IQ في تدريب الصالات الرياضية والتدريب الشخصي، ومدرب شخصي من الفئة A لدى REPs UAE.",
+        "تعرّف على سعيد سليماني، مدرب شخصي في دبي يدرّب المهنيين المشغولين بشكل فردي وأونلاين وهجين.",
     },
     method: {
       title: "منهجية FITologist | FITologist.me",
@@ -26,11 +26,12 @@ const ar: Dictionary = {
 
   nav: {
     home: "الرئيسية",
-    about: "من نحن",
-    method: "المنهجية",
-    coaching: "التدريب",
-    bmi: "حاسبة مؤشر كتلة الجسم",
-    startTraining: "ابدأ التدريب",
+    method: "كيف نعمل",
+    plans: "خطط التدريب",
+    about: "تعرّف على سعيد",
+    bmi: "فحص BMI مجاني",
+    cta: "احجز استشارة مجانية",
+    ctaShort: "استشارة مجانية",
     primaryLabel: "القائمة الرئيسية",
     mobileLabel: "قائمة الجوال",
     footerLabel: "روابط التذييل",
@@ -40,38 +41,38 @@ const ar: Dictionary = {
     skip: "تخطَّ إلى المحتوى",
     backToTop: "العودة إلى الأعلى",
     language: "اللغة",
+    instagram: "FITologist على Instagram",
   },
 
   common: {
     location: "دبي، الإمارات",
     tagline: ["تدرّب", "تحوّل", "تجاوز"],
     whatsappSaeid: "راسل سعيد على واتساب",
-    chatOnWhatsApp: "تحدث عبر واتساب",
+    chatOnWhatsApp: "تحدث مع سعيد على واتساب",
     newTab: "يفتح في علامة تبويب جديدة",
-    defaultWhatsAppMessage: "مرحباً سعيد، وجدت موقع FITologist.me وأرغب في بدء التدريب.",
+    defaultWhatsAppMessage: "مرحباً سعيد، وجدتك على fitologist.me وأود معرفة المزيد.",
   },
 
+  // needs native review (hero + trust strip)
   hero: {
-    lines: ["تدرّب.", "تحوّل.", "تجاوز."],
-    sub: "تدريب شخصي مع سعيد",
-    location: "دبي، الإمارات",
-    primary: "ابدأ تحوّلك",
-    secondary: "استعرض التدريب",
+    eyebrow: "مدرب شخصي · دبي",
+    eyebrowCertified: "مدرب شخصي معتمد · دبي",
+    title: "تدريب شخصي في دبي، مصمَّم حول جدولك",
+    sub: "تدريب فردي وثنائي وأونلاين وهجين للمهنيين المشغولين، في منزلك أو في الجداف وما حولها.",
+    primary: "احجز استشارة مجانية",
+    secondary: "افحص مؤشر كتلة جسمك في 30 ثانية",
     alt: "سعيد، مدرب شخصي، يبتسم مكتوف الذراعين في صالة رياضية في دبي",
   },
 
-  philosophy: {
-    eyebrow: "فلسفتنا",
-    headline: { before: "التدريب يعني أن تبني نسخة", accent: "أقوى", after: "منك." },
-    support: "بالتنظيم والاستمرارية والهدف.",
-    goalsEyebrow: "هدفك",
-    goalsTitle: "ما الذي تتدرب من أجله؟",
-    chooseGoal: "اختر الهدف",
-    selected: "تم الاختيار",
-    cta: "هذا هو هدفي",
-    selectHint: "اختر هدفاً للمتابعة",
-    imageAlt: "صورة لعلامة FITologist.me: الشعار فوق دمبل على أرضية صالة رياضية داكنة",
+  trust: {
+    label: "لمحة سريعة",
+    reps: "REPs UAE",
+    repsNo: "رقم",
+    activeIq: "Active IQ المستوى الثالث",
+    area: "الجداف وما حولها",
+    homeSessions: "جلسات منزلية متاحة",
   },
+
 
   goals: {
     muscle: { label: "بناء العضلات", body: "تدريب تدريجي ومنظم لبناء عضلات متناسقة." },
@@ -97,7 +98,7 @@ const ar: Dictionary = {
     eyebrow: "ابدأ",
     title: "مستعد للبدء؟",
     body: ["أخبر سعيد عن أهدافك، يستغرق الأمر دقيقة تقريباً", "أو ببساطة قل مرحباً على واتساب."],
-    primary: "ابدأ التدريب",
+    primary: "احجز استشارة مجانية",
   },
 
   bmi: {
@@ -128,7 +129,7 @@ const ar: Dictionary = {
     srYourBmi: "مؤشر كتلة جسمك هو",
     adultRange: "نطاق البالغين",
     onlyStart: "المؤشر مجرد بداية.",
-    startTraining: "ابدأ التدريب",
+    startTraining: "احجز استشارة مجانية",
     categories: {
       under: "نقص الوزن",
       healthy: "وزن صحي",
@@ -159,7 +160,8 @@ const ar: Dictionary = {
 
   about: {
     eyebrow: "تعرّف على مدربك",
-    subtitle: "مدرب شخصي معتمد · دبي",
+    subtitle: "مدرب شخصي · دبي",
+    subtitleCertified: "مدرب شخصي مسجّل لدى REPs UAE · دبي",
     quote: [
       "لا أؤمن بتدريب واحد يناسب الجميع.",
       "يجمع أسلوبي بين التنظيم والأداء الصحيح والاستمرارية لبناء نتائج تدوم إلى ما بعد الصالة الرياضية.",
@@ -213,7 +215,7 @@ const ar: Dictionary = {
       },
     ],
     ctaTitle: "مستعد للبدء؟",
-    ctaButton: "ابدأ التقييم",
+    ctaButton: "احجز استشارة مجانية",
     imageAlt: "صورة لعلامة FITologist.me: الشعار فوق دمبل ومنشفة على أرضية صالة رياضية داكنة",
   },
 
@@ -221,8 +223,8 @@ const ar: Dictionary = {
     eyebrow: "التدريب",
     title: "اختر طريقة تدريبك",
     includesLabel: "ما الذي يشمله",
-    apply: "قدّم الآن",
-    applyAria: "قدّم الآن على",
+    apply: "احجز استشارة مجانية",
+    applyAria: "احجز استشارة مجانية:",
     options: {
       personal: {
         title: "تدريب شخصي فردي",
@@ -261,7 +263,7 @@ const ar: Dictionary = {
     note: "هل هناك ما يجب أن يعرفه سعيد؟",
     optional: "(اختياري)",
     notePlaceholder: "تاريخك التدريبي، الإصابات، جدولك…",
-    submit: "قدّم طلب التدريب",
+    submit: "أرسل إلى سعيد عبر واتساب",
     sending: "جارٍ الإرسال…",
     privacy: "تُستخدم بياناتك فقط للتواصل معك بشأن التدريب.",
     failure: "حدث خطأ أثناء إرسال طلبك. يرجى المحاولة مرة أخرى، أو مراسلة سعيد مباشرة عبر",

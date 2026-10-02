@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed, Cairo, Inter, Oswald } from "next/font/google";
+import { Barlow_Condensed, Cairo, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { Footer } from "@/components/Footer";
@@ -12,7 +12,7 @@ import { INSTAGRAM, SITE, WHATSAPP } from "@/lib/site";
 import "../globals.css";
 
 const inter = Inter({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
 });
@@ -33,19 +33,9 @@ const cairo = Cairo({
   preload: false,
 });
 
-/* Russian headings: Oswald is the condensed display face closest to Barlow Condensed with Cyrillic. */
-const oswald = Oswald({
-  subsets: ["cyrillic", "latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-locale-display",
-  display: "swap",
-  preload: false,
-});
-
 const LOCALE_FONTS: Record<Locale, string> = {
   en: `${inter.variable} ${barlow.variable}`,
   ar: `${inter.variable} ${barlow.variable} ${cairo.variable}`,
-  ru: `${inter.variable} ${barlow.variable} ${oswald.variable}`,
 };
 
 export const dynamicParams = false;

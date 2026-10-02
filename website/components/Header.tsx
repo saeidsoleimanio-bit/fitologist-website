@@ -9,11 +9,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { scrollToSection } from "@/components/providers/ApplicationProvider";
-import { InstagramGlyph, InstagramIcon, WhatsAppIcon } from "@/components/ui/icons";
+import { InstagramGlyph, WhatsAppGlyph } from "@/components/ui/icons";
 import { stripLocale } from "@/lib/i18n/config";
 import { EASE } from "@/lib/motion";
-import { BMI_PATH, INSTAGRAM, NAV_ITEMS, SITE, START_PATH, WHATSAPP, whatsappLink } from "@/lib/site";
+import { INSTAGRAM, NAV_ITEMS, SITE, START_PATH, WHATSAPP, whatsappLink } from "@/lib/site";
 
+/**
+ * Header (§2.1).
+ * - Desktop (xl+): logo · menu · primary button · Instagram · text language switcher. Transparent at
+ *   the very top of the page, glass once scrolled; the logo compacts on scroll.
+ * - Below xl: always solid; compact 40px logo (same size at top and on scroll); short primary button
+ *   (hidden below 360px); hamburger. Instagram and the language switcher live in the drawer.
+ */
 export function Header() {
   const { t, href } = useI18n();
   const pathname = stripLocale(usePathname() ?? "/");
@@ -56,7 +63,7 @@ export function Header() {
     }
   };
 
-  // Mobile menu: scroll lock, Escape to close, focus trap, close on desktop resize.
+  // Drawer: scroll lock, Escape to close, focus trap, close when switching to the desktop layout.
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
@@ -84,7 +91,7 @@ export function Header() {
         }
       }
     };
-    const mq = window.matchMedia("(min-width: 1024px)");
+    const mq = window.matchMedia("(min-width: 1280px)");
     const onMq = () => mq.matches && close(false);
     document.addEventListener("keydown", onKey);
     mq.addEventListener("change", onMq);
@@ -95,21 +102,16 @@ export function Header() {
     };
   }, [open, close]);
 
-  const menuItems = [
-    ...NAV_ITEMS.map((n) => ({ key: n.key, path: n.path as string, label: t.nav[n.key] })),
-    { key: "bmi", path: BMI_PATH, label: t.nav.bmi },
-    { key: "start", path: START_PATH, label: t.nav.startTraining },
-  ];
-
   const solid = scrolled || open;
+  const isActive = (path: string) => !path.includes("#") && pathname === path;
 
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-400 ease-[var(--ease-premium)] ${
+        className={`fixed inset-x-0 top-0 z-50 border-b bg-ink transition-[background-color,border-color,backdrop-filter] duration-400 ease-[var(--ease-premium)] ${
           solid
-            ? "border-white/[0.08] bg-[rgb(5_5_5/0.72)] backdrop-blur-[14px]"
-            : "border-transparent bg-transparent backdrop-blur-none"
+            ? "border-white/[0.08] xl:bg-[rgb(5_5_5/0.72)] xl:backdrop-blur-[14px]"
+            : "border-white/[0.06] xl:border-transparent xl:bg-transparent"
         }`}
       >
         <a
@@ -120,25 +122,24 @@ export function Header() {
         </a>
 
         <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
-          className={`mx-auto flex max-w-[88rem] items-center justify-between px-5 transition-[height] duration-500 ease-[var(--ease-premium)] sm:px-8 lg:px-12 rtl:lg:px-[clamp(3.5rem,4.2vw,4.25rem)] ${
-            solid ? "h-[var(--header-compact)]" : "h-[var(--header-h)]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className={`mx-auto flex h-[var(--header-compact)] max-w-[88rem] items-center justify-between gap-3 px-4 transition-[height] duration-500 ease-[var(--ease-premium)] sm:px-8 xl:px-12 rtl:lg:px-[clamp(3.5rem,4.2vw,4.25rem)] ${
+            solid ? "xl:h-[var(--header-compact)]" : "xl:h-[var(--header-h)]"
           }`}
         >
           <Link
             href={href("/")}
             onClick={(e) => onNavigate(e, "/")}
-            className={`relative flex self-start transition-[margin] duration-500 ease-[var(--ease-premium)] ${
-              solid ? "mt-[10px] lg:mt-[4px]" : "mt-3 lg:mt-[11px]"
+            className={`relative flex shrink-0 transition-[margin] duration-500 ease-[var(--ease-premium)] xl:self-start ${
+              solid ? "xl:mt-[4px]" : "xl:mt-[11px]"
             }`}
             aria-label={`${SITE.name} — ${t.nav.home}`}
           >
             {/*
-              Complete official logo. Rendered at its large "top of page" size (≈1.45×) and scaled
-              down to the compact size once scrolling starts (transform only — asset untouched).
-              At the top it is allowed to hang slightly below the header.
+              Below xl: one compact size (40px), never scaled. Desktop keeps the large-at-top logo
+              that compacts on scroll (transform only — asset untouched).
             */}
             <Image
               src="/images/logo-emblem.png"
@@ -146,33 +147,33 @@ export function Header() {
               width={640}
               height={367}
               preload
-              sizes="(min-width: 1024px) 168px, 112px"
-              className={`h-[62px] w-auto origin-top-left rtl:origin-top-right drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] transition-[scale] duration-500 ease-[var(--ease-premium)] motion-reduce:transition-none lg:h-[92px] ${
-                solid ? "scale-[0.71] lg:scale-[0.7]" : "scale-100"
+              sizes="(min-width: 1280px) 168px, 72px"
+              className={`h-10 w-auto origin-top-left drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] transition-[scale] duration-500 ease-[var(--ease-premium)] motion-reduce:transition-none rtl:origin-top-right xl:h-[92px] ${
+                solid ? "xl:scale-[0.7]" : "xl:scale-100"
               }`}
             />
           </Link>
 
-          <div className="flex items-center gap-2 lg:gap-0">
-          <nav aria-label={t.nav.primaryLabel} className="hidden lg:block">
-            <ul className="flex items-center gap-1 xl:gap-3">
+          {/* Desktop navigation */}
+          <nav aria-label={t.nav.primaryLabel} className="hidden xl:block">
+            <ul className="flex items-center">
               {NAV_ITEMS.map((item) => {
-                const isActive = pathname === item.path;
+                const active = isActive(item.path);
                 return (
                   <li key={item.key}>
                     <Link
                       href={href(item.path)}
                       onClick={(e) => onNavigate(e, item.path)}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`relative flex min-h-11 items-center px-4 font-display text-[0.95rem] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${
-                        isActive ? "text-ember" : "text-silver hover:text-ember-soft"
+                      aria-current={active ? "page" : undefined}
+                      className={`relative flex min-h-11 items-center px-3 font-display text-[0.92rem] font-semibold uppercase tracking-[0.12em] transition-colors duration-300 2xl:px-4 ${
+                        active ? "text-ember" : "text-silver hover:text-ember-soft"
                       }`}
                     >
                       {t.nav[item.key]}
-                      {isActive && (
+                      {active && (
                         <motion.span
                           layoutId="nav-underline"
-                          className="absolute inset-x-4 bottom-1.5 h-px bg-ember"
+                          className="absolute inset-x-3 bottom-1.5 h-px bg-ember 2xl:inset-x-4"
                           transition={{ duration: 0.4, ease: EASE }}
                         />
                       )}
@@ -180,67 +181,64 @@ export function Header() {
                   </li>
                 );
               })}
-              <li className="ms-3 xl:ms-5">
-                <Link
-                  href={href(BMI_PATH)}
-                  onClick={(e) => onNavigate(e, BMI_PATH)}
-                  className="cta-pulse group relative inline-flex min-h-11 items-center overflow-hidden border border-ember/70 px-5 font-sans text-[0.875rem] font-semibold uppercase tracking-[0.1em] text-bone transition-[border-color] duration-300 hover:border-ember xl:px-6"
-                >
-                  <span
-                    aria-hidden
-                    className="absolute inset-0 origin-left scale-x-0 bg-ember/20 transition-transform duration-300 ease-[var(--ease-premium)] group-hover:scale-x-100 rtl:origin-right"
-                  />
-                  <span className="relative">{t.nav.bmi}</span>
-                </Link>
-              </li>
             </ul>
           </nav>
 
-          <div className="flex items-center lg:ms-4">
-            <a
-              href={INSTAGRAM.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${t.about.followAria} (${t.common.newTab})`}
-              title="Instagram"
-              className="flex min-h-11 min-w-9 items-center justify-center text-silver transition-colors duration-300 hover:text-ember-soft"
+          <div className="flex items-center gap-1.5 sm:gap-2 xl:gap-0">
+            {/* Primary button — full label on desktop, short label below xl (hidden under 360px) */}
+            <Link
+              href={href(START_PATH)}
+              onClick={(e) => onNavigate(e, START_PATH)}
+              className="group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 font-sans text-[0.8rem] font-semibold tracking-[0.01em] text-ink min-[360px]:inline-flex sm:px-4 sm:text-[0.85rem] xl:ms-4 xl:px-5"
             >
-              <InstagramGlyph className="size-[18px]" />
-            </a>
-            <span aria-hidden className="mx-1 h-4 w-px bg-bone/15" />
-            <LanguageSwitcher size="sm" />
-          </div>
+              <span
+                aria-hidden
+                className="absolute inset-0 origin-left scale-x-0 bg-bone transition-transform duration-300 ease-[var(--ease-premium)] group-hover:scale-x-100 rtl:origin-right"
+              />
+              <span className="relative xl:hidden">{t.nav.ctaShort}</span>
+              <span className="relative hidden xl:inline">{t.nav.cta}</span>
+            </Link>
 
-          <button
-            ref={toggleRef}
-            type="button"
-            onClick={() => (open ? close() : setOpen(true))}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-            aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
-            className="relative -me-2 flex size-12 items-center justify-center text-bone lg:hidden"
-          >
-            <AnimatePresence initial={false} mode="wait">
-              <motion.span
-                key={open ? "x" : "menu"}
-                initial={{ opacity: 0, rotate: -45 }}
-                animate={{ opacity: 1, rotate: 0 }}
-                exit={{ opacity: 0, rotate: 45 }}
-                transition={{ duration: 0.25 }}
+            <div className="hidden items-center xl:ms-3 xl:flex">
+              <a
+                href={INSTAGRAM.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${t.nav.instagram} (${t.common.newTab})`}
+                className="flex min-h-11 min-w-11 items-center justify-center text-silver transition-colors duration-300 hover:text-ember-soft"
               >
-                {open ? (
-                  <X className="size-6" strokeWidth={1.5} />
-                ) : (
-                  <Menu className="size-6" strokeWidth={1.5} />
-                )}
-              </motion.span>
-            </AnimatePresence>
-          </button>
+                <InstagramGlyph className="size-[18px]" />
+              </a>
+              <span aria-hidden className="mx-1 h-4 w-px bg-bone/15" />
+              <LanguageSwitcher />
+            </div>
+
+            <button
+              ref={toggleRef}
+              type="button"
+              onClick={() => (open ? close() : setOpen(true))}
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+              aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
+              className="relative -me-2 flex size-11 items-center justify-center text-bone xl:hidden"
+            >
+              <AnimatePresence initial={false} mode="wait">
+                <motion.span
+                  key={open ? "x" : "menu"}
+                  initial={{ opacity: 0, rotate: -45 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 45 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  {open ? <X className="size-6" strokeWidth={1.5} /> : <Menu className="size-6" strokeWidth={1.5} />}
+                </motion.span>
+              </AnimatePresence>
+            </button>
           </div>
         </motion.div>
       </header>
 
-      {/* Sibling of <header>: its backdrop-filter would otherwise become the containing block for this fixed panel. */}
+      {/* Drawer — sibling of <header>: its backdrop-filter would otherwise contain this fixed panel. */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -252,73 +250,63 @@ export function Header() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: EASE }}
-            className="fixed inset-x-0 bottom-0 top-[var(--header-compact)] z-40 flex flex-col overflow-y-auto bg-ink px-5 pb-8 sm:px-8 lg:hidden"
+            transition={{ duration: 0.3, ease: EASE }}
+            className="fixed inset-x-0 bottom-0 top-[var(--header-compact)] z-40 flex flex-col overflow-y-auto bg-ink px-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-8 xl:hidden"
           >
-            <nav aria-label={t.nav.mobileLabel} className="flex-1 pt-6">
-              <motion.ul
-                initial="hidden"
-                animate="show"
-                variants={{
-                  hidden: {},
-                  show: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-                }}
-                className="border-t hairline"
-              >
-                {menuItems.map((item, i) => (
-                  <motion.li
-                    key={item.key}
-                    variants={{
-                      hidden: { opacity: 0, y: 16 },
-                      show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
-                    }}
-                    className="border-b hairline"
-                  >
+            <nav aria-label={t.nav.mobileLabel} className="pt-4">
+              <ul className="border-t hairline">
+                {NAV_ITEMS.map((item) => (
+                  <li key={item.key} className="border-b hairline">
                     <Link
                       href={href(item.path)}
                       onClick={(e) => onNavigate(e, item.path)}
-                      aria-current={pathname === item.path ? "page" : undefined}
-                      className="flex min-h-16 items-center justify-between py-3 font-display text-[clamp(2rem,10vw,2.75rem)] font-bold uppercase leading-none tracking-tight"
+                      aria-current={isActive(item.path) ? "page" : undefined}
+                      className={`flex min-h-14 items-center py-2 font-display text-[clamp(1.6rem,7vw,2.1rem)] font-bold uppercase leading-none ${
+                        isActive(item.path) ? "text-ember" : "text-bone"
+                      }`}
                     >
-                      <span className={item.key === "start" ? "text-ember" : "text-bone"}>
-                        {item.label}
-                      </span>
-                      <span className="font-display text-sm font-semibold tracking-[0.2em] text-steel">
-                        0{i + 1}
-                      </span>
+                      {t.nav[item.key]}
                     </Link>
-                  </motion.li>
+                  </li>
                 ))}
-              </motion.ul>
+              </ul>
             </nav>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { delay: 0.35 } }}
-              className="mt-10 space-y-4"
-            >
+            <div className="mt-6 space-y-3">
+              <Link
+                href={href(START_PATH)}
+                onClick={(e) => onNavigate(e, START_PATH)}
+                className="flex min-h-13 items-center justify-center bg-ember px-5 font-sans text-[0.95rem] font-semibold tracking-[0.01em] text-ink"
+              >
+                {t.nav.cta}
+              </Link>
               <a
                 href={whatsappLink(t.common.defaultWhatsAppMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex min-h-14 items-center justify-center gap-3 bg-ember px-5 font-display text-base font-semibold uppercase tracking-[0.18em] text-ink"
+                className="flex min-h-13 items-center justify-center gap-3 border hairline px-5 font-sans text-[0.95rem] font-semibold tracking-[0.01em] text-bone"
               >
-                <WhatsAppIcon className="size-5" />
+                <WhatsAppGlyph className="size-5" />
                 {t.common.whatsappSaeid}
               </a>
-              <div className="flex items-center justify-between text-sm text-silver">
-                <a
-                  href={INSTAGRAM.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex min-h-11 items-center gap-2 hover:text-bone"
-                >
-                  <InstagramIcon className="size-4" />
-                  {INSTAGRAM.handle}
-                </a>
-                <span dir="ltr">{WHATSAPP.display}</span>
-              </div>
-            </motion.div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-between gap-4">
+              <a
+                href={INSTAGRAM.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${t.nav.instagram} (${t.common.newTab})`}
+                className="flex min-h-11 items-center gap-2 text-silver hover:text-bone"
+              >
+                <InstagramGlyph className="size-5" />
+                <span dir="ltr">{INSTAGRAM.handle}</span>
+              </a>
+              <LanguageSwitcher />
+            </div>
+            <p className="mt-2 text-sm text-silver" dir="ltr">
+              {WHATSAPP.display}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>

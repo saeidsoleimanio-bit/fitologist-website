@@ -1,4 +1,4 @@
-export const LOCALES = ["en", "ar", "ru"] as const;
+export const LOCALES = ["en", "ar"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
 
@@ -11,7 +11,6 @@ export const LOCALE_META: Record<
 > = {
   en: { dir: "ltr", label: "English", htmlLang: "en", ogLocale: "en_AE" },
   ar: { dir: "rtl", label: "العربية", htmlLang: "ar", ogLocale: "ar_AE" },
-  ru: { dir: "ltr", label: "Русский", htmlLang: "ru", ogLocale: "ru_RU" },
 };
 
 /** Site pages (locale-independent paths). */

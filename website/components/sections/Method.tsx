@@ -1,74 +1,35 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import Image from "next/image";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { ButtonLink } from "@/components/ui/Button";
 import { WhatsAppGlyph } from "@/components/ui/icons";
-import { AccentLine, BrandWord, LogoWatermark, Reveal } from "@/components/ui/primitives";
+import { AccentLine, BrandWord, Reveal } from "@/components/ui/primitives";
 import { EASE, VIEWPORT } from "@/lib/motion";
 import { START_PATH, whatsappLink } from "@/lib/site";
 
-/** Method page hero: the brand banner full-bleed, title set in its dark left third. */
+/** Method page hero — plain dark background (the composite banner image was removed, §2.5). */
 function MethodHero() {
   const { t } = useI18n();
   const m = t.method;
-  const ref = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
-
   return (
     <section
-      ref={ref}
       aria-labelledby="method-title"
-      className="relative isolate overflow-hidden bg-ink pt-[var(--header-h)] lg:flex lg:min-h-[min(100svh,1000px)] lg:items-center lg:pt-[var(--header-h)]"
+      className="relative isolate overflow-hidden bg-ink pb-2 pt-[calc(var(--header-compact)+2rem)] lg:pb-4 lg:pt-[calc(var(--header-h)+3rem)]"
     >
-      {/* Image: in flow on mobile (16:9), full-bleed behind the title on desktop */}
-      <div className="relative aspect-[1672/941] w-full overflow-hidden lg:absolute lg:inset-0 lg:aspect-auto">
-        <motion.div className="absolute inset-0" style={reduce ? undefined : { y }}>
-          <motion.div
-            className="absolute inset-0"
-            initial={{ scale: 1.05, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.8, ease: EASE }}
-          >
-            <Image
-              src="/images/brand-banner2.webp"
-              alt={m.imageAlt}
-              fill
-              preload
-              quality={90}
-              sizes="100vw"
-              className="object-cover object-[70%_50%] lg:object-center"
-            />
-          </motion.div>
-        </motion.div>
-        <div aria-hidden className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-ink/70 to-transparent lg:h-40" />
-        <div aria-hidden className="absolute inset-x-0 -bottom-px h-[30%] bg-linear-to-t from-ink to-transparent" />
-        <div
-          aria-hidden
-          className="absolute inset-0 hidden lg:block"
-          style={{ background: "linear-gradient(90deg, rgba(5,5,5,0.88) 0%, rgba(5,5,5,0.55) 28%, transparent 46%)" }}
-        />
-      </div>
-
-      {/* Title — physically on the left on desktop (the banner's dark area) in every language */}
-      <div className="relative z-10 -mt-10 px-5 pb-4 sm:px-8 lg:absolute lg:inset-y-0 lg:left-[max(3rem,calc((100vw-88rem)/2+3rem))] lg:mt-0 lg:flex lg:w-[min(34rem,36vw)] lg:flex-col lg:justify-center lg:px-0 lg:pb-0 lg:pt-[var(--header-h)]">
+      <div className="mx-auto max-w-[88rem] px-4 sm:px-8 lg:px-12">
         <Reveal className="eyebrow flex items-center gap-4">
           <AccentLine className="w-10" />
           <span className="text-ember">{m.eyebrow}</span>
         </Reveal>
         <Reveal delay={0.08}>
-          <h1 id="method-title" className="display mt-5 text-[clamp(3rem,10vw,6.5rem)] leading-[0.88] text-bone">
+          <h1 id="method-title" className="display mt-4 text-[clamp(2.5rem,9vw,5.5rem)] leading-[0.92] text-bone">
             {m.titleBefore} <BrandWord />
             {m.titleAfter && <> {m.titleAfter}</>}
           </h1>
         </Reveal>
         <Reveal delay={0.16}>
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-silver">{m.intro}</p>
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-silver">{m.intro}</p>
         </Reveal>
       </div>
     </section>
@@ -80,7 +41,6 @@ function MethodStages() {
   const { t } = useI18n();
   return (
     <section aria-label={t.method.eyebrow} className="section-y relative overflow-hidden bg-ink">
-      <LogoWatermark className="-right-[25%] top-[5%] w-[100vw] lg:-right-[8%] lg:w-[46vw]" opacity={0.025} />
       <motion.ol
         className="relative mx-auto grid max-w-[88rem] gap-x-10 gap-y-10 px-5 sm:grid-cols-2 sm:px-8 lg:px-12 xl:grid-cols-4 xl:gap-x-8"
         initial="hidden"
@@ -116,12 +76,6 @@ function MethodStages() {
               {s.title}
             </h2>
             <p className="mt-3 max-w-xs text-[1.02rem] leading-relaxed text-silver">{s.body}</p>
-            {i < 3 && (
-              <ArrowRight
-                aria-hidden
-                className="absolute end-0 top-8 hidden size-5 text-ember/50 xl:block rtl:-scale-x-100"
-              />
-            )}
           </motion.li>
         ))}
       </motion.ol>
@@ -148,7 +102,7 @@ function MethodCta() {
         <Reveal delay={0.15} className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
           <ButtonLink
             href={href(START_PATH)}
-            icon={<ArrowRight className="size-4 rtl:-scale-x-100" strokeWidth={2} />}
+            data-fab-hide
             className="w-full sm:w-auto"
           >
             {t.method.ctaButton}

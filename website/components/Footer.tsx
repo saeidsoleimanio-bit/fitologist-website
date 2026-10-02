@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { InstagramGlyph, WhatsAppGlyph } from "@/components/ui/icons";
-import { BMI_PATH, INSTAGRAM, NAV_ITEMS, SITE, START_PATH, WHATSAPP, whatsappLink } from "@/lib/site";
+import { INSTAGRAM, NAV_ITEMS, SITE, START_PATH, WHATSAPP, whatsappLink } from "@/lib/site";
 
 const contactCls =
-  "inline-flex min-h-7 items-center gap-2.5 text-base font-semibold leading-none text-bone transition-colors duration-300 hover:text-ember-soft";
+  "inline-flex min-h-11 items-center gap-2.5 text-base font-semibold leading-none text-bone transition-colors duration-300 hover:text-ember-soft";
 
 /** Compact closing band: brand · navigation + languages · contact. */
 export function Footer() {
@@ -17,8 +17,7 @@ export function Footer() {
   const year = new Date().getFullYear();
   const items = [
     ...NAV_ITEMS.map((n) => ({ key: n.key as string, path: n.path as string, label: t.nav[n.key] })),
-    { key: "bmi", path: BMI_PATH, label: t.nav.bmi },
-    { key: "start", path: START_PATH, label: t.nav.startTraining },
+    { key: "start", path: START_PATH, label: t.nav.cta },
   ];
 
   return (
@@ -51,12 +50,14 @@ export function Footer() {
         {/* Navigation + languages */}
         <div className="flex flex-col gap-1 md:[grid-column:5/9]">
           <nav aria-label={t.nav.footerLabel}>
-            <ul className="grid grid-cols-2 gap-x-6 min-[400px]:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-x-6 sm:grid-cols-3">
               {items.map((n) => (
                 <li key={n.key}>
                   <Link
                     href={href(n.path)}
-                    className="inline-flex min-h-7 items-center font-display text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-silver transition-colors duration-300 hover:text-ember-soft"
+                    className={`inline-flex min-h-11 items-center font-display text-[0.85rem] font-semibold uppercase tracking-[0.12em] transition-colors duration-300 hover:text-ember-soft ${
+                      n.key === "start" ? "text-ember" : "text-silver"
+                    }`}
                   >
                     {n.label}
                   </Link>
@@ -64,7 +65,7 @@ export function Footer() {
               ))}
             </ul>
           </nav>
-          <LanguageSwitcher className="-ms-2" size="sm" />
+          <LanguageSwitcher className="-ms-1.5" />
         </div>
 
         {/* Contact */}
@@ -92,7 +93,7 @@ export function Footer() {
               </span>
             </a>
           </li>
-          <li className="inline-flex min-h-7 items-center gap-2.5 text-base font-semibold leading-none text-bone">
+          <li className="inline-flex min-h-11 items-center gap-2.5 text-base font-semibold leading-none text-bone">
             <MapPin className="size-[1.05rem] text-ember" aria-hidden />
             {t.common.location}
           </li>

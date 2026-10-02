@@ -1,10 +1,9 @@
-import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 type Variant = "primary" | "ghost" | "outline";
 
 const base =
-  "group relative inline-flex min-h-12 items-center justify-center gap-2 min-[360px]:gap-3 overflow-hidden px-5 py-3 font-display text-[0.9rem] min-[360px]:px-6 min-[360px]:text-[0.95rem] font-semibold uppercase tracking-[0.12em] min-[360px]:tracking-[0.18em] transition-[color,background-color,border-color,transform] duration-300 ease-[var(--ease-premium)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60";
+  "group relative inline-flex min-h-12 items-center justify-center gap-2 min-[360px]:gap-3 overflow-hidden px-5 py-3 font-sans text-[0.95rem] min-[360px]:px-6 font-semibold tracking-[0.01em] transition-[color,background-color,border-color,transform] duration-300 ease-[var(--ease-premium)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60";
 
 const variants: Record<Variant, string> = {
   primary: "bg-ember text-ink hover:text-ink",
@@ -35,13 +34,10 @@ function Inner({ variant, icon, children }: Required<Pick<CommonProps, "variant"
     <>
       <Sweep variant={variant} />
       <span className="relative">{children}</span>
-      {icon !== false && (
-        <span
-          aria-hidden
-          className="relative transition-transform duration-300 ease-[var(--ease-premium)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:group-hover:-translate-x-0.5"
-        >
-          {/* Directional icons mirror in RTL; brand icons passed in (e.g. WhatsApp) never do. */}
-          {icon ?? <ArrowUpRight className="size-4 rtl:-scale-x-100" strokeWidth={2} />}
+      {/* No arrows on button text (spec §2.2) — only explicit icons, e.g. the WhatsApp glyph. */}
+      {icon && (
+        <span aria-hidden className="relative">
+          {icon}
         </span>
       )}
     </>

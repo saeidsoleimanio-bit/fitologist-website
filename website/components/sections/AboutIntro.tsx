@@ -6,6 +6,7 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 import { InstagramBrandIcon, WhatsAppGlyph } from "@/components/ui/icons";
 import { AccentLine, Reveal } from "@/components/ui/primitives";
 import { EASE } from "@/lib/motion";
+import { hasAnyCredential } from "@/config/site";
 import { COACH_NAME, CREDENTIALS, INSTAGRAM, whatsappLink } from "@/lib/site";
 
 /**
@@ -35,7 +36,7 @@ function SocialAction({
       aria-label={ariaLabel}
       className="group inline-flex flex-col items-start gap-2 py-1"
     >
-      <span className="font-sans text-[0.75rem] font-semibold uppercase tracking-[0.22em] text-steel transition-colors duration-300 group-hover:text-silver">
+      <span className="font-sans text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-steel transition-colors duration-300 group-hover:text-silver">
         {context}
       </span>
       <span className="relative inline-flex h-10 items-center gap-3">
@@ -115,26 +116,28 @@ export function AboutIntro() {
             </h1>
           </Reveal>
           <Reveal delay={0.12}>
-            <p className="mt-3 font-display text-lg font-semibold uppercase tracking-[0.16em] text-silver sm:text-xl">
-              {a.subtitle}
+            <p className="mt-3 font-display text-lg font-semibold uppercase tracking-[0.12em] text-silver sm:text-xl">
+              {hasAnyCredential ? a.subtitleCertified : a.subtitle}
             </p>
           </Reveal>
 
           {/* Human introduction → fitness experience, as one story */}
           <Reveal delay={0.18}>
             <blockquote className="relative mt-6 max-w-2xl border-s-2 border-ember ps-5 sm:ps-6">
-              <p className="font-display text-[1.45rem] font-semibold uppercase leading-[1.15] text-bone sm:text-[1.7rem]">
+              <p className="font-display text-[1.55rem] font-semibold leading-[1.15] text-bone sm:text-[1.8rem]">
                 {a.quote[0]}
               </p>
               <p className="mt-3 text-[1.05rem] leading-relaxed text-silver sm:text-lg">{a.quote[1]}</p>
             </blockquote>
-            <p className="mt-5 flex items-center gap-3 font-display text-lg font-bold uppercase tracking-[0.16em] text-bone">
+            <p className="mt-5 flex items-center gap-3 font-display text-lg font-bold uppercase tracking-[0.12em] text-bone">
               <span aria-hidden className="size-2 rounded-full bg-ember" />
               {a.fitnessExperience}
             </p>
           </Reveal>
 
           {/* Credentials — text first, logos proportional and secondary */}
+          {/* Credentials render only when enabled in config/site.ts */}
+          {CREDENTIALS.length > 0 && (
           <Reveal delay={0.24} className="mt-6 max-w-2xl">
             <h2 className="sr-only">{a.credentialsTitle}</h2>
             <ul className="grid gap-3 sm:grid-cols-2 sm:gap-4">
@@ -178,6 +181,7 @@ export function AboutIntro() {
               })}
             </ul>
           </Reveal>
+          )}
 
           {/* Social / contact actions */}
           {/* One social/contact group, centred under the credentials (same width as the cards above) */}

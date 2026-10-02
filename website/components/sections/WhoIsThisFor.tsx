@@ -61,7 +61,7 @@ export function WhoIsThisFor() {
                 hidden: { opacity: 0, y: 18 },
                 show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
               }}
-              className="group relative grid grid-cols-[2.5rem_1fr] overflow-hidden items-baseline gap-x-4 border-b hairline py-6 sm:grid-cols-[3.5rem_minmax(0,0.9fr)_minmax(0,1.1fr)] sm:gap-x-8 sm:py-7"
+              className="group relative grid grid-cols-[2.5rem_1fr] items-baseline gap-x-4 overflow-hidden border-b hairline py-6 sm:grid-cols-[3.5rem_minmax(0,0.9fr)_minmax(0,1.1fr)] sm:gap-x-8 sm:py-7 lg:grid-cols-[3.5rem_minmax(0,0.9fr)_minmax(0,1.1fr)_4rem]"
             >
               {(() => {
                 const Icon = PROFILE_ICONS[i];
@@ -69,7 +69,7 @@ export function WhoIsThisFor() {
                   <Icon
                     aria-hidden
                     strokeWidth={0.75}
-                    className="pointer-events-none absolute end-[4%] top-1/2 size-36 -translate-y-1/2 text-ember opacity-[0.1] transition-[opacity,scale] duration-700 ease-[var(--ease-premium)] [mask-image:radial-gradient(closest-side,#000_45%,transparent_100%)] group-hover:scale-105 group-hover:opacity-[0.18] sm:end-[8%] sm:size-48 lg:size-56"
+                    className="pointer-events-none hidden size-16 self-center text-ember opacity-[0.22] transition-opacity duration-500 group-hover:opacity-50 lg:col-start-4 lg:row-start-1 lg:block"
                   />
                 );
               })()}
@@ -77,7 +77,7 @@ export function WhoIsThisFor() {
                 aria-hidden
                 className="absolute bottom-0 start-0 h-px w-full origin-left scale-x-0 bg-ember transition-transform duration-500 ease-[var(--ease-premium)] group-hover:scale-x-100 rtl:origin-right"
               />
-              <span className="relative font-display text-sm font-semibold tracking-[0.24em] text-ember">0{i + 1}</span>
+              <span className="relative font-display text-sm font-semibold tracking-[0.12em] text-ember">0{i + 1}</span>
               <h3 className="display relative text-[clamp(1.6rem,4.4vw,2.4rem)] font-semibold text-bone transition-colors duration-300 group-hover:text-ember-soft">
                 {p.title}
               </h3>

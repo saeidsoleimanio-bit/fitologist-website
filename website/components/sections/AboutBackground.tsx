@@ -3,8 +3,8 @@
 import { motion } from "framer-motion";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { FragmentLayerGallery, type LayerSlide } from "@/components/ui/FragmentLayerGallery";
-import { LogoWatermark, SectionHeading } from "@/components/ui/primitives";
-import { JOURNEY_SLIDES } from "@/lib/journey";
+import { SectionHeading } from "@/components/ui/primitives";
+import { site } from "@/config/site";
 import { EASE, VIEWPORT } from "@/lib/motion";
 
 const row = {
@@ -25,15 +25,17 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
 export function AboutBackground() {
   const { t, dir } = useI18n();
   const a = t.about;
-  const gallery: LayerSlide[] = JOURNEY_SLIDES.map((s, i) => ({ ...s, alt: a.journeyAlts[i] }));
+  // Portrait-format placeholder dimensions; real photo sizes are set when the gallery is filled (Phase 3).
+  const gallery: LayerSlide[] = site.photos.gallery.map((src) => ({ src, alt: a.journeyLabel, width: 941, height: 1672 }));
 
   return (
     <section
       aria-labelledby="background-title"
-      className="section-y surface-deep relative isolate overflow-hidden [--glow-x:75%] [--glow-y:40%] [--section-pb:2rem] lg:flex lg:min-h-[min(92svh,52rem)] lg:items-center lg:[--section-pb:2.25rem]"
+      className="section-y surface-deep relative isolate overflow-hidden [--glow-x:75%] [--glow-y:40%] [--section-pb:2rem] lg:flex lg:items-center lg:[--section-pb:2.25rem]"
     >
-      <LogoWatermark className="-left-[25%] top-[10%] w-[100vw] lg:-left-[10%] lg:w-[50vw]" opacity={0.025} />
-
+      {/* Gallery renders only from config/site.ts → photos.gallery (real, non-composite photos). */}
+      {gallery.length > 0 && (
+        <>
       {/*
         Journey photographs as a large background layer: full section height on the left from lg
         (bleeding to the viewport edge), in flow on mobile. No frame, card or halo.
@@ -48,10 +50,12 @@ export function AboutBackground() {
           dotsClassName="bottom-0 lg:bottom-[10%]"
         />
       </div>
+        </>
+      )}
 
       {/* Layout pinned LTR so the text sits beside the photo layer in every language */}
       <div className="relative mx-auto grid w-full max-w-[88rem] gap-10 px-5 sm:px-8 lg:grid-cols-12 lg:items-center lg:gap-14 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]" dir="ltr">
-        <div className="lg:col-span-6 lg:col-start-7" dir={dir}>
+        <div className={gallery.length > 0 ? "lg:col-span-6 lg:col-start-7" : "lg:col-span-9"} dir={dir}>
           <SectionHeading label={a.backgroundEyebrow} title={a.backgroundTitle} id="background-title" />
 
           <motion.div

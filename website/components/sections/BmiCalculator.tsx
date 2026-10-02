@@ -195,7 +195,7 @@ function Segmented<T extends string>({
     <fieldset className={className} aria-describedby={describedBy} aria-invalid={error || undefined}>
       <legend className={compact ? "sr-only" : LABEL}>{legend}</legend>
       <div
-        className={`flex w-full border bg-[#0b0d0e]/75 p-1 ${compact ? "h-9" : "mt-1.5 h-12"} ${
+        className={`flex w-full border bg-[#0b0d0e]/75 p-1 ${compact ? "h-11" : "mt-1.5 h-12"} ${
           error ? "border-ember/80" : "border-silver/20"
         }`}
       >
@@ -230,7 +230,7 @@ function Segmented<T extends string>({
   );
 }
 
-const LABEL = "block font-display text-[0.88rem] font-bold uppercase tracking-[0.14em] text-bone";
+const LABEL = "block font-display text-[0.88rem] font-bold uppercase tracking-[0.12em] text-bone";
 
 export function BmiCalculator() {
   const { t, href, locale } = useI18n();
@@ -341,7 +341,7 @@ export function BmiCalculator() {
             <form noValidate onSubmit={onSubmit} aria-label={b.formLabel} className="relative">
               {/* Card header: title + units */}
               <div className="flex items-center justify-between gap-4">
-                <p className="flex min-w-0 items-center gap-3 font-display text-[0.8rem] font-bold uppercase tracking-[0.16em] text-bone sm:text-[0.9rem] sm:tracking-[0.2em]">
+                <p className="flex min-w-0 items-center gap-3 font-display text-[0.8rem] font-bold uppercase tracking-[0.12em] text-bone sm:text-[0.9rem] sm:tracking-[0.2em]">
                   <span aria-hidden className="h-px w-6 bg-ember" />
                   {t.nav.bmi}
                 </p>
@@ -479,10 +479,11 @@ export function BmiCalculator() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.55, ease: EASE }}
                     className="overflow-hidden"
+                    data-fab-hide
                   >
                     <div className="mt-3 grid grid-cols-[auto_1fr] items-center gap-x-5 gap-y-4 border-t border-silver/15 pt-4">
                       <div className="min-w-[6rem]">
-                        <p className="font-display text-[1.05rem] font-bold uppercase tracking-[0.14em] text-ember">
+                        <p className="font-display text-[1.05rem] font-bold uppercase tracking-[0.12em] text-ember">
                           {b.yourBmi}
                         </p>
                         <p className="display mt-1 text-[3.5rem] leading-none sm:text-[4rem]" style={{ color: toneColor }}>
@@ -547,7 +548,7 @@ export function BmiCalculator() {
 
                       <div className="col-span-2 flex flex-col gap-3 bg-ink/45 p-3.5 sm:flex-row sm:items-center sm:justify-between">
                         <p className="font-display text-[1.05rem] font-bold uppercase tracking-[0.1em] text-bone">{b.onlyStart}</p>
-                        <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto">
+                        <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto" data-fab-hide>
                           {b.startTraining}
                         </ButtonLink>
                       </div>

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
-import { COACHING_TYPES, GOALS, START_PATH, type CoachingType, type Goal } from "@/lib/site";
+import { COACHING_TYPES, GOALS, START_ID, START_PATH, type CoachingType, type Goal } from "@/lib/site";
 
 type Selection = { goal: Goal | ""; coaching: CoachingType | "" };
 
@@ -16,7 +16,6 @@ type ApplicationContextValue = Selection & {
 
 const ApplicationContext = createContext<ApplicationContextValue | null>(null);
 const STORAGE_KEY = "fitologist:application-selection";
-const START_ID = "start-training";
 
 export function scrollToSection(id: string) {
   const el = document.getElementById(id);

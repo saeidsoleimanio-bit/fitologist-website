@@ -1,18 +1,21 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
+import { scrollToSection } from "@/components/providers/ApplicationProvider";
 import { ButtonLink } from "@/components/ui/Button";
-import Link from "next/link";
+import { hasAnyCredential } from "@/config/site";
+import { stripLocale } from "@/lib/i18n/config";
 import { EASE } from "@/lib/motion";
-import { START_PATH } from "@/lib/site";
+import { BMI_PATH, START_PATH } from "@/lib/site";
 
 /*
  * Composition (photo 05 at every size — no art-directed swap):
- * - < 640px: 3:4 crop centred on Saeid (the wall logo falls outside the frame).
+ * - < 640px: shorter frame (~50svh) cropped to Saeid, copy directly below on its bottom gradient.
  * - 640–1023px: full 16:9 frame, copy below.
  * - ≥ 1024px: full-bleed; Saeid anchors the left, copy + CTAs share one right-hand column
  *   sitting over the area where the wall logo was.
@@ -21,37 +24,23 @@ import { START_PATH } from "@/lib/site";
  * never by dimming the whole image — Saeid stays at full strength.
  */
 
-const line = {
-  hidden: { y: "108%" },
-  show: (i: number) => ({
-    y: "0%",
-    transition: { duration: 1.1, ease: EASE, delay: 0.55 + i * 0.14 },
-  }),
-};
-
-const fade = {
-  hidden: { opacity: 0, y: 16 },
-  show: (d: number) => ({ opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE, delay: d } }),
-};
-
 export function Hero() {
-  const { t, href, locale } = useI18n();
+  const { t, href } = useI18n();
+  const pathname = stripLocale(usePathname() ?? "/");
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-16%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
     <section
       ref={ref}
       id="home"
       aria-labelledby="hero-title"
-      className="relative isolate overflow-hidden bg-ink pt-[var(--header-h)] lg:h-[100svh] lg:min-h-[640px] lg:max-h-[1100px] lg:pt-0"
+      className="relative isolate overflow-hidden bg-ink pt-[var(--header-compact)] lg:h-[100svh] lg:min-h-[640px] lg:max-h-[1100px] lg:pt-0"
     >
-      <div className="relative aspect-[3/4] w-full overflow-hidden sm:aspect-[1672/941] lg:absolute lg:inset-0 lg:aspect-auto lg:h-auto">
+      <div className="relative h-[min(50svh,30rem)] w-full overflow-hidden sm:h-auto sm:aspect-[1672/941] lg:absolute lg:inset-0 lg:aspect-auto">
         {/*
           Desktop image layer: nudged ~4% left and lowered so Saeid's hair clears the
           header with breathing room.
@@ -91,9 +80,10 @@ export function Hero() {
               alt={t.hero.alt}
               fill
               preload
+              fetchPriority="high"
               quality={90}
               sizes="100vw"
-              className="object-cover object-[31%_30%] sm:object-center lg:object-[70%_30%] xl:object-[50%_30%]"
+              className="object-cover object-[33%_0%] sm:object-center lg:object-[70%_30%] xl:object-[50%_30%]"
             />
             {/*
               Localized veil over the wall logo (travels with the photo). Masked so it only acts
@@ -137,79 +127,48 @@ export function Hero() {
         />
       </div>
 
-      {/* Copy + CTAs — one column (right-hand on desktop) */}
+      {/*
+        Copy + CTAs. Mobile: directly under the (shorter) photo, overlapping its bottom gradient, so
+        eyebrow, H1, subtitle and the primary button fit the first screen. Desktop: right-hand
+        column over the darker side of the photo. One page-load reveal only — no scroll fade.
+      */}
       <motion.div
-        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
-        className="relative z-10 -mt-[18vw] px-5 pb-14 sm:-mt-20 sm:px-8 md:pb-16 lg:absolute lg:inset-y-0 lg:right-[max(3rem,5vw)] rtl:pr-6 rtl:sm:pr-10 rtl:lg:right-[max(5rem,8vw)] rtl:lg:pr-0 lg:mt-0 lg:flex lg:w-[min(34rem,34vw)] lg:flex-col lg:justify-center lg:px-0 lg:pb-0 lg:pt-[var(--header-h)]"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease: EASE, delay: 0.35 }}
+        className="relative z-10 -mt-16 px-4 pb-6 sm:-mt-20 sm:px-8 md:pb-10 lg:absolute lg:inset-y-0 lg:right-[max(3rem,5vw)] lg:mt-0 lg:flex lg:w-[min(36rem,38vw)] lg:flex-col lg:justify-center lg:px-0 lg:pb-0 lg:pt-[var(--header-h)] rtl:pr-6 rtl:sm:pr-10 rtl:lg:right-[max(5rem,8vw)] rtl:lg:pr-0"
       >
+        <p className="eyebrow text-[0.78rem] text-ember">
+          {hasAnyCredential ? t.hero.eyebrowCertified : t.hero.eyebrow}
+        </p>
         <h1
           id="hero-title"
-          className={`display text-bone ${
-            locale === "ru"
-              ? // Cyrillic words are longer and carry diacritics (Й): smaller size, roomier lines.
-                "text-[clamp(2.3rem,10.6vw,4.5rem)] leading-[1.02] sm:text-[clamp(3.5rem,8vw,5rem)] lg:text-[clamp(2.75rem,min(4.3vw,8vh),5.5rem)]"
-              : "text-[clamp(3rem,15.5vw,5.75rem)] leading-[0.86] sm:text-[clamp(4.25rem,10vw,6.25rem)] lg:text-[clamp(3.5rem,min(5.6vw,9.6vh),7.25rem)]"
-          }`}
+          className="display mt-2.5 text-[clamp(2rem,8.4vw,2.6rem)] normal-case leading-[1.02] text-bone text-balance sm:text-[3rem] lg:mt-4 lg:text-[clamp(2.6rem,min(3.7vw,6.6vh),4.25rem)]"
         >
-          {t.hero.lines.map((word, i) => (
-            <span key={word} className="block overflow-hidden pb-[0.04em]">
-              <motion.span
-                className={`block ${i === 2 ? "text-ember" : ""}`}
-                initial="hidden"
-                animate="show"
-                custom={i}
-                variants={line}
-              >
-                {word}
-              </motion.span>
-            </span>
-          ))}
+          {t.hero.title}
         </h1>
+        <p className="mt-3 max-w-xl text-base leading-relaxed text-silver sm:text-lg lg:mt-5">{t.hero.sub}</p>
 
-        <motion.span
-          aria-hidden
-          className="mt-6 block h-px w-24 origin-left bg-ember sm:w-28 rtl:origin-right"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.2, ease: EASE, delay: 1.1 }}
-        />
-
-        <motion.p
-          initial="hidden"
-          animate="show"
-          custom={1.2}
-          variants={fade}
-          className="mt-5 font-display text-[1.05rem] font-semibold uppercase tracking-[0.08em] text-bone min-[360px]:text-[1.35rem] min-[360px]:tracking-[0.12em] lg:text-[1.5rem]"
-        >
-          {t.hero.sub}
-          <span className="mt-1.5 block text-[1.05rem] font-medium tracking-[0.24em] text-silver lg:text-lg">
-            {t.hero.location}
-          </span>
-        </motion.p>
-
-        <motion.div
-          initial="hidden"
-          animate="show"
-          custom={1.35}
-          variants={fade}
-          className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-6 lg:flex-col lg:items-start lg:gap-4"
-        >
-          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto">
+        <div className="mt-5 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-6 lg:mt-8 lg:flex-col lg:items-start lg:gap-4">
+          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto" data-fab-hide>
             {t.hero.primary}
           </ButtonLink>
           <Link
-            href={href("/coaching")}
-            className="group inline-flex min-h-11 items-center justify-center gap-2 font-display text-[0.95rem] font-semibold uppercase tracking-[0.18em] text-silver transition-colors duration-300 hover:text-ember-soft sm:justify-start"
+            href={href(BMI_PATH)}
+            onClick={(e) => {
+              if (pathname === "/") {
+                e.preventDefault();
+                scrollToSection("bmi");
+              }
+            }}
+            className="inline-flex min-h-11 items-center justify-center font-sans text-[0.95rem] font-semibold text-silver underline decoration-bone/30 underline-offset-[6px] transition-colors duration-300 hover:text-ember-soft hover:decoration-ember sm:justify-start"
           >
-            <span className="border-b border-bone/25 pb-0.5 transition-colors duration-300 group-hover:border-ember">
-              {t.hero.secondary}
-            </span>
-            <ArrowRight
-              aria-hidden
-              className="size-4 transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1"
-            />
+            {t.hero.secondary}
           </Link>
-        </motion.div>
+        </div>
+        <p aria-hidden className="mt-6 hidden font-display text-sm font-semibold uppercase tracking-[0.12em] text-steel lg:block">
+          {t.common.tagline.join(" · ")}
+        </p>
       </motion.div>
     </section>
   );

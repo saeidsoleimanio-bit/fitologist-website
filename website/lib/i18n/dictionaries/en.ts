@@ -11,7 +11,7 @@ const en = {
     about: {
       title: "Meet Your Coach — Saeid Soleimani | FITologist.me",
       description:
-        "Saeid Soleimani is a personal trainer in Dubai — Active IQ Level 3 Diploma in Gym Instructing and Personal Training, REPs UAE Category A Personal Trainer.",
+        "Meet Saeid Soleimani, a personal trainer in Dubai coaching busy professionals 1:1, online and hybrid.",
     },
     method: {
       title: "The FITologist Method | FITologist.me",
@@ -28,11 +28,12 @@ const en = {
 
   nav: {
     home: "Home",
-    about: "About",
-    method: "Method",
-    coaching: "Coaching",
-    bmi: "BMI Calculator",
-    startTraining: "Start Training",
+    method: "How It Works",
+    plans: "Training Plans",
+    about: "About Saeid",
+    bmi: "Free BMI Check",
+    cta: "Book a Free Consultation",
+    ctaShort: "Free Consultation",
     primaryLabel: "Primary",
     mobileLabel: "Mobile",
     footerLabel: "Footer",
@@ -42,38 +43,37 @@ const en = {
     skip: "Skip to content",
     backToTop: "back to top",
     language: "Language",
+    instagram: "FITologist on Instagram",
   },
 
   common: {
     location: "Dubai, UAE",
     tagline: ["Train", "Transform", "Transcend"],
     whatsappSaeid: "WhatsApp Saeid",
-    chatOnWhatsApp: "Chat on WhatsApp",
+    chatOnWhatsApp: "Chat with Saeid on WhatsApp",
     newTab: "opens in a new tab",
-    defaultWhatsAppMessage: "Hi Saeid, I found FITologist.me and I'd like to start training.",
+    defaultWhatsAppMessage: "Hi Saeid, I found you on fitologist.me and I'd like to know more.",
   },
 
   hero: {
-    lines: ["Train.", "Transform.", "Transcend."],
-    sub: "Personal Training by Saeid",
-    location: "Dubai, UAE",
-    primary: "Start your transformation",
-    secondary: "View coaching",
+    eyebrow: "Personal Trainer · Dubai",
+    eyebrowCertified: "Certified Personal Trainer · Dubai",
+    title: "Personal Training in Dubai, Built Around Your Schedule",
+    sub: "1:1, partner, online and hybrid coaching for busy professionals, at your home or in Al Jaddaf & nearby.",
+    primary: "Book a Free Consultation",
+    secondary: "Check your BMI in 30 seconds",
     alt: "Saeid, personal trainer, smiling with arms crossed in a Dubai gym",
   },
 
-  philosophy: {
-    eyebrow: "Philosophy",
-    headline: { before: "Training is about building a", accent: "stronger", after: "you." },
-    support: "With structure, consistency and purpose.",
-    goalsEyebrow: "Your goal",
-    goalsTitle: "What are you training for?",
-    chooseGoal: "Choose goal",
-    selected: "Selected",
-    cta: "This is my goal",
-    selectHint: "Select a goal to continue",
-    imageAlt: "FITologist.me brand visual: the logo above a dumbbell on a dark gym floor",
+  trust: {
+    label: "At a glance",
+    reps: "REPs UAE",
+    repsNo: "No.",
+    activeIq: "Active IQ Level 3",
+    area: "Al Jaddaf & nearby",
+    homeSessions: "Home sessions available",
   },
+
 
   goals: {
     muscle: { label: "Build Muscle", body: "Progressive, structured training to build lean muscle." },
@@ -99,7 +99,7 @@ const en = {
     eyebrow: "Start",
     title: "Ready to start?",
     body: ["Tell Saeid about your goals, it takes about a minute", "Or simply say hello on WhatsApp."],
-    primary: "Start training",
+    primary: "Book a Free Consultation",
   },
 
   bmi: {
@@ -130,7 +130,7 @@ const en = {
     srYourBmi: "Your BMI is",
     adultRange: "Adult range",
     onlyStart: "BMI is only the start.",
-    startTraining: "Start training",
+    startTraining: "Book a Free Consultation",
     categories: {
       under: "Underweight",
       healthy: "Healthy weight",
@@ -161,7 +161,8 @@ const en = {
 
   about: {
     eyebrow: "Meet your coach",
-    subtitle: "Certified Personal Trainer · Dubai",
+    subtitle: "Personal Trainer · Dubai",
+    subtitleCertified: "REPs UAE-Registered Personal Trainer · Dubai",
     quote: [
       "I don’t believe in one-size-fits-all training.",
       "My approach combines structure, technique and consistency to build results that last beyond the gym.",
@@ -216,7 +217,7 @@ const en = {
       },
     ],
     ctaTitle: "Ready to start?",
-    ctaButton: "Take the assessment",
+    ctaButton: "Book a Free Consultation",
     imageAlt: "FITologist.me brand visual: the logo above a dumbbell and towel on a dark gym floor",
   },
 
@@ -224,8 +225,8 @@ const en = {
     eyebrow: "Coaching",
     title: "Choose how you train",
     includesLabel: "What's included",
-    apply: "Apply now",
-    applyAria: "Apply now for",
+    apply: "Book a Free Consultation",
+    applyAria: "Book a Free Consultation:",
     options: {
       personal: {
         title: "1:1 Personal Training",
@@ -264,7 +265,7 @@ const en = {
     note: "Anything Saeid should know?",
     optional: "(optional)",
     notePlaceholder: "Training history, injuries, schedule…",
-    submit: "Apply to train",
+    submit: "Send to Saeid via WhatsApp",
     sending: "Sending…",
     privacy: "Your details are only used to contact you about coaching.",
     failure:

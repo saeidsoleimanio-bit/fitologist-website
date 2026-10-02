@@ -36,12 +36,12 @@
     /* Header height once scrolled (anchor targets always land in this state) */
     --header-compact: 4rem;
     /* Vertical rhythm for content sections (tightened for an editorial flow) */
-    --section-py: 2.75rem;
+    --section-py: 1.65rem;
   }
 
   @media (min-width: 640px) {
     :root {
-      --section-py: 3rem;
+      --section-py: 1.8rem;
     }
   }
 
@@ -106,6 +106,16 @@
   }
 
   /*
+   * Mobile: keep ~88px under the last element of every section so nothing ever rests beneath
+   * the floating WhatsApp button (spec §2.3). Desktop keeps the normal rhythm.
+   */
+  @media (max-width: 1023.98px) {
+    .section-y {
+      padding-bottom: max(var(--section-pb), 5.5rem);
+    }
+  }
+
+  /*
    * Photograph → gradually disappears → background.
    * Two intersected linear masks; fade sizes are set per use via CSS vars.
    */
@@ -156,7 +166,7 @@
     font-family: var(--font-display);
     font-size: 0.8125rem;
     font-weight: 600;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-silver);
   }
@@ -197,9 +207,6 @@ html[lang="ar"] body * {
 }
 html[lang="ar"] .display {
   line-height: 1.2 !important;
-}
-html[lang="ru"] .display {
-  line-height: 0.98;
 }
 
 /* Header BMI CTA — slow, elegant attention pulse */

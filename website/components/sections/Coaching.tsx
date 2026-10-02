@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import {
   ArrowLeftRight,
-  ArrowUpRight,
   Dumbbell,
   MonitorSmartphone,
   Smartphone,
@@ -11,7 +10,7 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { useApplication } from "@/components/providers/ApplicationProvider";
-import { AccentLine, LogoWatermark, Reveal } from "@/components/ui/primitives";
+import { AccentLine, Reveal } from "@/components/ui/primitives";
 import { EASE, VIEWPORT } from "@/lib/motion";
 import { COACHING_TYPES, type CoachingType } from "@/lib/site";
 
@@ -48,7 +47,6 @@ export function Coaching() {
       aria-labelledby="coaching-title"
       className="section-y surface-deep relative overflow-hidden pt-[calc(var(--header-h)+1.5rem)] [--glow-x:20%] [--glow-y:30%] lg:pt-[calc(var(--header-h)+2.5rem)]"
     >
-      <LogoWatermark className="-right-[35%] bottom-0 w-[110vw] lg:-right-[12%] lg:w-[55vw]" opacity={0.03} />
 
       <div className="relative mx-auto max-w-[88rem] px-5 sm:px-8 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]">
         <Reveal className="eyebrow flex items-center gap-4">
@@ -105,23 +103,24 @@ export function Coaching() {
                   }}
                 />
 
-                {/* Large background visual on the right */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -end-4 top-5 size-36 text-silver opacity-[0.16] transition-[opacity,scale,color] duration-400 ease-[var(--ease-premium)] [mask-image:linear-gradient(to_left,#000_50%,transparent_100%)] group-hover:scale-110 group-hover:text-ember group-hover:opacity-[0.42] group-focus-within:text-ember group-focus-within:opacity-[0.42] sm:size-44"
-                >
-                  <CoachingVisual kind={type} />
-                </span>
+                {/* Title row — the decorative visual sits beside the title on desktop only (never over text) */}
+                <div className="relative flex items-start justify-between gap-4">
+                  <h3 id={titleId} className="display text-[2.1rem] font-semibold text-bone sm:text-[2.3rem] lg:min-h-[1.8em] min-[1400px]:min-h-0">
+                    {o.title}
+                  </h3>
+                  <span
+                    aria-hidden
+                    className="pointer-events-none hidden size-16 shrink-0 text-silver opacity-30 transition-[opacity,color] duration-400 ease-[var(--ease-premium)] group-hover:text-ember group-hover:opacity-80 group-focus-within:text-ember group-focus-within:opacity-80 lg:block"
+                  >
+                    <CoachingVisual kind={type} />
+                  </span>
+                </div>
+                <p className="relative mt-2 text-base text-silver sm:text-lg">{o.tagline}</p>
 
-                <h3 id={titleId} className="display relative max-w-[78%] text-[2.1rem] font-semibold text-bone sm:text-[2.3rem] lg:min-h-[1.8em] min-[1400px]:min-h-0">
-                  {o.title}
-                </h3>
-                <p className="relative mt-2 max-w-[78%] text-base text-silver sm:text-lg">{o.tagline}</p>
-
-                <p className="eyebrow relative mt-5 border-t hairline pt-5 text-[0.7rem] text-bone/70">{c.includesLabel}</p>
+                <p className="eyebrow relative mt-5 border-t hairline pt-5 text-[0.75rem] text-bone/80">{c.includesLabel}</p>
                 <ul className="relative mt-3 space-y-2.5">
                   {o.includes.map((pt) => (
-                    <li key={pt} className="flex items-baseline gap-3 text-[0.95rem] text-bone/85">
+                    <li key={pt} className="flex items-baseline gap-3 text-base text-bone/85">
                       <span aria-hidden className="h-px w-4 shrink-0 -translate-y-1 bg-ember" />
                       {pt}
                     </li>
@@ -134,17 +133,14 @@ export function Coaching() {
                     type="button"
                     onClick={() => startApplication({ coaching: type })}
                     aria-label={`${c.applyAria} ${o.title}`}
-                    className="relative inline-flex min-h-12 w-full items-center justify-center gap-3 overflow-hidden border border-ember/60 px-5 font-display text-[0.95rem] font-semibold uppercase tracking-[0.18em] text-ember transition-[color,border-color,transform] duration-300 ease-[var(--ease-premium)] active:scale-[0.97] group-hover:border-ember group-hover:text-bone group-focus-within:border-ember group-focus-within:text-bone"
+                    data-fab-hide
+                    className="relative inline-flex min-h-12 w-full items-center justify-center gap-3 overflow-hidden border border-ember/60 px-5 font-sans text-[0.95rem] font-semibold tracking-[0.01em] text-ember transition-[color,border-color,transform] duration-300 ease-[var(--ease-premium)] active:scale-[0.97] group-hover:border-ember group-hover:text-bone group-focus-within:border-ember group-focus-within:text-bone"
                   >
                     <span
                       aria-hidden
                       className="absolute inset-0 origin-left rtl:origin-right scale-x-0 bg-ember/20 transition-transform duration-300 ease-[var(--ease-premium)] group-hover:scale-x-100 group-focus-within:scale-x-100"
                     />
                     <span className="relative">{c.apply}</span>
-                    <ArrowUpRight
-                      aria-hidden
-                      className="relative size-4 text-ember transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100"
-                    />
                   </button>
                 </div>
               </motion.li>
@@ -153,7 +149,7 @@ export function Coaching() {
         </motion.ul>
 
         <Reveal delay={0.15} className="mt-7 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-10">
-          <p className="max-w-xl font-display text-base font-semibold uppercase tracking-[0.12em] text-bone">
+          <p className="max-w-xl text-base font-semibold text-bone">
             {c.pricing}
           </p>
           <p className="max-w-md text-sm text-steel">{c.unsure}</p>

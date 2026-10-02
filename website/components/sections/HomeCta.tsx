@@ -3,7 +3,7 @@
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { ButtonLink } from "@/components/ui/Button";
 import { WhatsAppGlyph } from "@/components/ui/icons";
-import { AccentLine, LogoWatermark, Reveal } from "@/components/ui/primitives";
+import { AccentLine, Reveal } from "@/components/ui/primitives";
 import { START_PATH, whatsappLink } from "@/lib/site";
 
 /** Short closing call to action on the homepage: start the application, or say hello on WhatsApp. */
@@ -11,7 +11,6 @@ export function HomeCta({ className = "" }: { className?: string }) {
   const { t, href } = useI18n();
   return (
     <section aria-labelledby="home-cta-title" className={`grain section-y relative isolate overflow-hidden bg-ink ${className}`}>
-      <LogoWatermark className="-right-[30%] top-[-10%] w-[110vw] lg:-right-[8%] lg:w-[42vw]" opacity={0.035} />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10"
@@ -36,7 +35,7 @@ export function HomeCta({ className = "" }: { className?: string }) {
           </Reveal>
         </div>
         <Reveal delay={0.24} className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto">
+          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto" data-fab-hide>
             {t.homeCta.primary}
           </ButtonLink>
           <ButtonLink

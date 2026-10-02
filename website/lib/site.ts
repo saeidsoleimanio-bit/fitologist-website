@@ -1,22 +1,21 @@
+import { site } from "@/config/site";
+
 export const SITE = {
-  name: "FITologist.me",
+  name: site.brand,
   url: "https://fitologist.me",
-  title: "FITologist.me | Personal Training in Dubai",
-  description:
-    "Personal training in Dubai with Saeid. 1:1 personal training, online coaching and hybrid coaching — structured programs, accountability and coaching built around you.",
   location: "Dubai, UAE",
   tagline: ["Train", "Transform", "Transcend"] as const,
 };
 
 export const WHATSAPP = {
-  display: "+971 50 646 1816",
-  e164: "+971506461816",
-  number: "971506461816",
+  display: site.whatsappDisplay,
+  e164: `+${site.whatsappNumber}`,
+  number: site.whatsappNumber,
 };
 
 export const INSTAGRAM = {
-  handle: "fitologist.me",
-  url: "https://instagram.com/fitologist.me",
+  handle: site.instagramHandle,
+  url: site.instagramUrl,
 };
 
 export function whatsappLink(message?: string) {
@@ -24,16 +23,23 @@ export function whatsappLink(message?: string) {
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
 
-/** Site navigation. Labels come from the dictionary (`nav.<key>`); paths are locale-independent. */
+/**
+ * Site navigation, in the spec's order (§2.1). Labels come from the dictionary (`nav.<key>`).
+ * Interim targets until the new pages exist: Training Plans → /coaching (becomes /plans in
+ * Phase 3), Free BMI Check → /#bmi (becomes /bmi in Phase 2).
+ */
 export const NAV_ITEMS = [
   { key: "home", path: "/" },
-  { key: "about", path: "/about" },
   { key: "method", path: "/method" },
-  { key: "coaching", path: "/coaching" },
+  { key: "plans", path: "/coaching" },
+  { key: "about", path: "/about" },
+  { key: "bmi", path: "/#bmi" },
 ] as const;
 
 export const BMI_PATH = "/#bmi";
-export const START_PATH = "/coaching#start-training";
+/** Primary CTA target — the form (#start). Interim: the form lives on /coaching until Phase 3. */
+export const START_ID = "start";
+export const START_PATH = `/coaching#${START_ID}`;
 
 /** Goal keys — labels live in the dictionary (`goals.<key>`). */
 export const GOALS = ["muscle", "fat", "strength", "mobility", "confidence", "unsure"] as const;
@@ -47,18 +53,23 @@ export type CoachingType = (typeof COACHING_TYPES)[number];
  * Coach credentials — exact supplied logo files, never resized out of ratio.
  * One integrated Active IQ qualification (the Level 3 Diploma covers gym instructing) + REPs UAE.
  * Descriptive lines are translated in the dictionary (`about.credentials.<key>`).
+ * Rendered only when enabled in `config/site.ts` (`credentials.*.show`).
  */
-export const CREDENTIALS = [
+const ALL_CREDENTIALS = [
   {
     key: "aiq",
     org: "Active IQ",
     logo: { src: "/images/credentials/aiqLogo.png", width: 786, height: 180, alt: "Active IQ" },
+    show: site.credentials.activeIq.show,
   },
   {
     key: "reps",
     org: "REPs UAE",
     logo: { src: "/images/credentials/REPs-logo.webp", width: 261, height: 141, alt: "REPs UAE" },
+    show: site.credentials.reps.show,
   },
 ] as const;
 
-export const COACH_NAME = "Saeid Soleimani";
+export const CREDENTIALS = ALL_CREDENTIALS.filter((c) => c.show);
+
+export const COACH_NAME = site.coachName;
