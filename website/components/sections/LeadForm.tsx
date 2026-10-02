@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Loader2 } from "lucide-react";
+import { Check, ChevronDown, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
@@ -15,6 +15,7 @@ import {
   FREQUENCIES,
   GOALS,
   LIMITS,
+  SEXES,
   TIMES,
   TRAINING_TYPES,
   isInPerson,
@@ -46,7 +47,7 @@ function ErrorText({ id, children }: { id: string; children?: string }) {
   );
 }
 
-/** Compact chip group (single or multiple choice). 2 columns on mobile. */
+/** Pill chips (single or multiple choice) that wrap; state shown by fill and border. */
 function Chips<T extends string>({
   id,
   legend,
@@ -56,7 +57,6 @@ function Chips<T extends string>({
   onToggle,
   multiple,
   error,
-  columns = "grid-cols-2 sm:grid-cols-3",
 }: {
   id: string;
   legend: string;
@@ -66,7 +66,6 @@ function Chips<T extends string>({
   onToggle: (v: T) => void;
   multiple: boolean;
   error?: string;
-  columns?: string;
 }) {
   const errId = `${id}-error`;
   return (
@@ -74,18 +73,18 @@ function Chips<T extends string>({
       <legend className={LABEL}>
         {legend} {optional && <span className="font-sans text-[0.8rem] font-medium normal-case tracking-normal text-silver">{optional}</span>}
       </legend>
-      <div className={`mt-1.5 grid gap-1.5 ${columns}`}>
+      <div className="mt-2 flex flex-wrap gap-2">
         {options.map((o, i) => {
           const on = selected.includes(o.value);
           return (
             <label
               key={o.value}
-              className={`flex min-h-11 cursor-pointer items-center gap-2 border px-3 text-[0.92rem] font-medium leading-tight transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ember ${
+              className={`inline-flex min-h-11 cursor-pointer items-center rounded-full border px-4 text-[0.92rem] font-medium leading-tight transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ember ${
                 on
-                  ? "border-ember bg-ember/12 text-bone"
+                  ? "border-ember bg-ember/20 text-bone"
                   : error
                     ? "border-ember/50 bg-[#0b0d0e]/60 text-bone/85"
-                    : "border-silver/20 bg-[#0b0d0e]/60 text-bone/85 hover:border-silver/40 hover:text-bone"
+                    : "border-silver/25 bg-[#0b0d0e]/60 text-bone/85 hover:border-silver/45 hover:text-bone"
               }`}
             >
               <input
@@ -97,14 +96,7 @@ function Chips<T extends string>({
                 onChange={() => onToggle(o.value)}
                 className="sr-only"
               />
-              <span
-                aria-hidden
-                className={`flex size-4 shrink-0 items-center justify-center border ${multiple ? "" : "rounded-full"} ${
-                  on ? "border-ember bg-ember" : "border-bone/35"
-                }`}
-              >
-                {on && <Check className="size-3 text-ink" strokeWidth={3} />}
-              </span>
+              {on && multiple && <Check aria-hidden className="-ms-1 me-1.5 size-4 text-ember" strokeWidth={2.75} />}
               {o.label}
             </label>
           );
@@ -120,7 +112,7 @@ const isMobileDevice = () =>
   (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.matchMedia("(pointer: coarse)").matches);
 
 /**
- * Lead form (§6) — used on /coaching (and /plans later), /start and the home page (Phase 3).
+ * Lead form (§6) — used on the home page, /plans and /start.
  * One tap, two deliveries: the lead is POSTed to /api/lead (keepalive, not awaited) and WhatsApp
  * opens with the message ready, all inside the same click handler (iOS blocks it after an await).
  */
@@ -137,6 +129,7 @@ export function LeadForm({ titleId }: { titleId: string }) {
 
   const labels: LeadLabels = {
     goals: t.goals,
+    sexes: l.sexOptions,
     types: l.types,
     frequencies: l.frequencies,
     times: l.timesOptions,
@@ -154,6 +147,7 @@ export function LeadForm({ titleId }: { titleId: string }) {
     setData((d) => ({
       ...d,
       age: stored.age ?? d.age,
+      sex: stored.sex ?? d.sex,
       goals: stored.goals?.length ? stored.goals : d.goals,
       type: TRAINING_TYPES.includes(qType as TrainingType) ? (qType as TrainingType) : (stored.type ?? d.type),
       frequency: FREQUENCIES.includes(qFreq as Frequency) ? (qFreq as Frequency) : (stored.frequency ?? d.frequency),
@@ -167,6 +161,7 @@ export function LeadForm({ titleId }: { titleId: string }) {
     setData((d) => ({
       ...d,
       age: prefill.age ?? d.age,
+      sex: prefill.sex ?? d.sex,
       goals: prefill.goals?.length ? prefill.goals : d.goals,
       type: prefill.type ?? d.type,
       frequency: prefill.frequency ?? d.frequency,
@@ -257,8 +252,8 @@ export function LeadForm({ titleId }: { titleId: string }) {
             transition={{ duration: 0.35, ease: EASE }}
             className="space-y-4"
           >
-            {/* Name | WhatsApp | Age */}
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_5.5rem] lg:gap-3">
+            {/* Name | WhatsApp, then Age + Sex */}
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-3">
               <div>
                 <label htmlFor="lead-name" className={LABEL}>
                   {l.name}
@@ -281,23 +276,30 @@ export function LeadForm({ titleId }: { titleId: string }) {
                 <label htmlFor="lead-phone" className={LABEL}>
                   {l.phone}
                 </label>
-                <div className="flex gap-1.5" dir="ltr">
-                  <label htmlFor="lead-country" className="sr-only">
-                    {l.countryCode}
-                  </label>
-                  <select
-                    id="lead-country"
-                    name="countryCode"
-                    value={data.countryCode}
-                    onChange={(e) => update("countryCode", e.target.value)}
-                    className={`${INPUT} w-[6.5rem] shrink-0 cursor-pointer px-2 ${border("phone")}`}
+                <div className="flex min-w-0 gap-1.5" dir="ltr">
+                  {/* Closed: dial code only. Open: the native list with country names. */}
+                  <div
+                    className={`relative mt-1.5 flex h-12 w-[6.5rem] shrink-0 items-center justify-between gap-1 border bg-[#0b0d0e]/80 px-3 text-base text-bone transition-[border-color,box-shadow] duration-300 hover:border-silver/35 focus-within:border-ember focus-within:shadow-[0_0_0_3px_rgb(255_106_0/0.18)] ${border("phone")}`}
                   >
-                    {COUNTRY_CODES.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        +{c.code} {c.label}
-                      </option>
-                    ))}
-                  </select>
+                    <span aria-hidden className="tabular-nums">
+                      +{data.countryCode}
+                    </span>
+                    <ChevronDown aria-hidden className="size-4 shrink-0 text-silver" />
+                    <select
+                      id="lead-country"
+                      name="countryCode"
+                      aria-label={l.countryCode}
+                      value={data.countryCode}
+                      onChange={(e) => update("countryCode", e.target.value)}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    >
+                      {COUNTRY_CODES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.label} (+{c.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <input
                     id="lead-phone"
                     name="phone"
@@ -310,11 +312,14 @@ export function LeadForm({ titleId }: { titleId: string }) {
                     aria-describedby={describe("phone")}
                     aria-required
                     maxLength={20}
-                    className={`${INPUT} min-w-0 ${border("phone")}`}
+                    className={`${INPUT} min-w-0 flex-1 basis-0 ${border("phone")}`}
                   />
                 </div>
                 <ErrorText id="lead-phone-error">{errors.phone}</ErrorText>
               </div>
+            </div>
+
+            <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-3 lg:max-w-md">
               <div>
                 <label htmlFor="lead-age" className={LABEL}>
                   {l.age}
@@ -334,6 +339,36 @@ export function LeadForm({ titleId }: { titleId: string }) {
                 />
                 <ErrorText id="lead-age-error">{errors.age}</ErrorText>
               </div>
+              <fieldset className="min-w-0">
+                <legend className={LABEL}>
+                  {l.sex} <span className="font-sans text-[0.8rem] font-medium normal-case tracking-normal text-silver">{l.optional}</span>
+                </legend>
+                {/* Segmented control; tapping the selected option clears it (optional field). */}
+                <div className="mt-1.5 grid h-12 grid-cols-2 border border-silver/20 bg-[#0b0d0e]/80 p-1">
+                  {SEXES.map((v) => {
+                    const on = data.sex === v;
+                    return (
+                      <label
+                        key={v}
+                        className={`flex cursor-pointer items-center justify-center text-[0.92rem] font-semibold transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ember ${
+                          on ? "bg-ember text-ink" : "text-bone/80 hover:text-bone"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="lead-sex"
+                          value={v}
+                          checked={on}
+                          onChange={() => update("sex", v)}
+                          onClick={() => on && update("sex", "")}
+                          className="sr-only"
+                        />
+                        {l.sexOptions[v]}
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
             </div>
 
             <Chips
@@ -354,7 +389,6 @@ export function LeadForm({ titleId }: { titleId: string }) {
               onToggle={(v) => update("type", v)}
               multiple={false}
               error={errors.type}
-              columns="grid-cols-2 sm:grid-cols-5"
             />
 
             {inPerson && (
@@ -367,7 +401,6 @@ export function LeadForm({ titleId }: { titleId: string }) {
                   selected={data.frequency ? [data.frequency] : []}
                   onToggle={(v) => update("frequency", v)}
                   multiple={false}
-                  columns="grid-cols-2 sm:grid-cols-3"
                 />
                 <div>
                   <label htmlFor="lead-area" className={LABEL}>
@@ -395,7 +428,6 @@ export function LeadForm({ titleId }: { titleId: string }) {
               selected={data.times}
               onToggle={(v: Time) => update("times", data.times.includes(v) ? data.times.filter((x) => x !== v) : [...data.times, v])}
               multiple
-              columns="grid-cols-2 sm:grid-cols-3"
             />
 
             <div>

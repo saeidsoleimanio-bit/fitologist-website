@@ -27,6 +27,10 @@ const LOGO_EMBLEM = { left: 100, top: 268, width: 1072, height: 614 };
 const jobs = [
   { out: "hero-desktop.webp", from: "05-saeid-fitologist-gym-horizontal.png", q: 88 },
   { out: "hero-mobile.webp", from: "07-saeid-fitologist-fullbody.jpg", q: 88 },
+  // Small avatar for the form intro (§4.10): face crop of the hero portrait (05), crop + resize only.
+  { out: "avatar.webp", from: "05-saeid-fitologist-gym-horizontal.png", q: 86, extract: { left: 590, top: 30, width: 300, height: 300 }, resize: { width: 192 } },
+  // meet-saeid-cutout.webp (Home "Meet Saeid") is NOT generated here: background removed from 05 with
+  // rembg (isnet-general-use + alpha matting), crop (20,30)-(460,470) of a 480px crop at (500,0), 320px webp.
   { out: "about-portrait.webp", from: "saeid-original-01.PNG", q: 88 },
   // Full, uncropped frame (Method section shows it full-height).
   { out: "method-full.webp", from: "04-saeid-gym-back-fitologist.png", q: 88 },

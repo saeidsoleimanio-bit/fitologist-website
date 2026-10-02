@@ -3,12 +3,13 @@
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
-import { FREQUENCIES, GOALS, TRAINING_TYPES, type Frequency, type Goal, type TrainingType } from "@/lib/lead";
+import { FREQUENCIES, GOALS, SEXES, TRAINING_TYPES, type Frequency, type Goal, type Sex, type TrainingType } from "@/lib/lead";
 import { START_ID, START_PATH } from "@/lib/site";
 
 /** Values carried into the form (§3.5, §6.2). Stored in sessionStorage under `fit_prefill`. */
 export type Prefill = {
   age?: string;
+  sex?: Sex;
   goals?: Goal[];
   bmi?: string;
   type?: TrainingType;
@@ -40,6 +41,7 @@ function sanitize(v: Partial<Prefill> | null | undefined): Prefill {
   if (!v) return {};
   const out: Prefill = {};
   if (typeof v.age === "string" && /^\d{1,3}$/.test(v.age)) out.age = v.age;
+  if (SEXES.includes(v.sex as Sex)) out.sex = v.sex;
   if (Array.isArray(v.goals)) out.goals = v.goals.filter((g): g is Goal => GOALS.includes(g as Goal));
   if (typeof v.bmi === "string" && /^\d{1,2}(\.\d)?$/.test(v.bmi)) out.bmi = v.bmi;
   if (TRAINING_TYPES.includes(v.type as TrainingType)) out.type = v.type;

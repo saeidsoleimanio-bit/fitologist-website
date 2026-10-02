@@ -5,23 +5,23 @@
  */
 const en = {
   meta: {
-    siteTitle: "FITologist.me | Personal Training in Dubai",
+    siteTitle: "Personal Trainer in Dubai | Saeid Soleimani · FITologist.me",
     siteDescription:
-      "Personal training in Dubai with Saeid Soleimani. 1:1 personal training, online and hybrid coaching — structured programs, accountability and coaching built around you.",
+      "Personal trainer in Dubai for busy professionals. 1:1, partner, online and hybrid coaching at your home or in Al Jaddaf. Free 30-minute consultation.",
     about: {
-      title: "Meet Your Coach — Saeid Soleimani | FITologist.me",
+      title: "About Saeid Soleimani | FITologist.me",
       description:
-        "Meet Saeid Soleimani, a personal trainer in Dubai coaching busy professionals 1:1, online and hybrid.",
+        "Meet Saeid Soleimani, a personal trainer in Dubai coaching busy professionals 1:1, online and hybrid, in three languages.",
     },
     method: {
       title: "The FITologist Method | FITologist.me",
       description:
-        "Assess, Build, Transform, Transcend — the FITologist signature coaching method by Saeid Soleimani in Dubai.",
+        "Assess, Build, Transform, Transcend: the four-stage FITologist method, your first 30 days, progress tracking and nutrition.",
     },
-    coaching: {
-      title: "Coaching — 1:1, Online & Hybrid | FITologist.me",
+    plans: {
+      title: "Training Plans | FITologist.me",
       description:
-        "Choose how you train with Saeid: 1:1 personal training in Dubai, online coaching or hybrid coaching. Apply in a minute.",
+        "Foundation, Momentum, Accelerate and Elite: 60-minute personal training plans in Dubai, plus partner, online and hybrid coaching.",
     },
     bmi: {
       title: "Free BMI & Calorie Check | FITologist.me",
@@ -32,6 +32,14 @@ const en = {
       title: "Book a Free Consultation | FITologist.me",
       description:
         "Book a free 30-minute consultation with Saeid Soleimani, personal trainer in Dubai. Online or in person.",
+    },
+    terms: {
+      title: "Cancellation & Rescheduling | FITologist.me",
+      description: "Cancellation, rescheduling, plan validity and payment terms for personal training with Saeid Soleimani.",
+    },
+    privacy: {
+      title: "Privacy Policy | FITologist.me",
+      description: "How FITologist.me handles the details you share: what we collect, why, where it is stored and your rights.",
     },
     notFound: "Page not found | FITologist.me",
   },
@@ -52,6 +60,7 @@ const en = {
     menu: "Menu",
     skip: "Skip to content",
     backToTop: "back to top",
+    changeLanguage: "Change language",
     language: "Language",
     instagram: "FITologist on Instagram",
   },
@@ -112,11 +121,86 @@ const en = {
     ],
   },
 
-  homeCta: {
-    eyebrow: "Start",
-    title: "Ready to start?",
-    body: ["Tell Saeid about your goals, it takes about a minute", "Or simply say hello on WhatsApp."],
-    primary: "Book a Free Consultation",
+  howItWorks: {
+    title: "How It Works",
+    steps: [
+      { title: "Free consultation", body: "30 minutes, online or in person. Your goals, history and schedule." },
+      { title: "Your plan", body: "a program and nutrition targets built around you." },
+      { title: "Train & track", body: "sessions, support between them, progress checked every 4 weeks." },
+      { title: "Keep progressing", body: "you learn the why behind every exercise and build habits that last." },
+    ],
+    link: "See the full method",
+  },
+
+  plansPreview: {
+    title: "Training Plans",
+    items: [
+      { name: "Foundation", freq: "1× a week", recommended: false },
+      { name: "Momentum", freq: "2× a week", recommended: true },
+      { name: "Accelerate", freq: "3× a week", recommended: false },
+      { name: "Elite", freq: "4× a week", recommended: false },
+    ],
+    recommended: "Recommended",
+    line: "Every plan includes nutrition guidance and WhatsApp support. Partner, online and hybrid options available.",
+    faqLine: "Questions about location, pricing or cancellation?",
+    faqLink: "Read the FAQ",
+    link: "Compare plans",
+  },
+
+  meet: {
+    eyebrow: "Meet Saeid",
+    lead: "I train busy people the way I train myself: with structure, honesty and no wasted time.",
+    body: "Five years of training, twelve years in corporate life, and coaching in three languages.",
+    link: "More about Saeid",
+    photoAlt: "Portrait of Saeid Soleimani, personal trainer in Dubai",
+  },
+
+  testimonials: {
+    title: "What Clients Say",
+  },
+
+  faq: {
+    title: "Questions",
+    items: [
+      {
+        q: "Where do sessions take place?",
+        a: "At your home, your building's gym, or a gym in Al Jaddaf and nearby areas. Online coaching works anywhere.",
+      },
+      {
+        q: "How much does it cost?",
+        a: "Every plan is tailored to you. In your free 30-minute consultation, Saeid recommends the right plan and shares its price.",
+      },
+      {
+        q: "Do I need a gym membership?",
+        a: "Not necessarily. We can train at your home or in your building's gym.",
+      },
+      {
+        q: "How many sessions a week should I do?",
+        a: "Most busy professionals start with two a week (Momentum). You can choose one to four.",
+      },
+      {
+        q: "Is nutrition included?",
+        a: "Yes. Every plan includes nutrition guidance: calorie and protein targets and practical eating habits.",
+      },
+      {
+        q: "Can I train with a partner?",
+        a: "Yes. Partner Training is available on all four plans, with a special partner rate.",
+      },
+      {
+        q: "I'm a complete beginner. Is that OK?",
+        a: "Absolutely. You'll learn proper technique from your first session.",
+      },
+      { q: "What languages do you coach in?", a: "English, Persian and Azerbaijani." },
+      {
+        q: "What if I need to cancel?",
+        a: "Rescheduling is free with 24 hours' notice. See the full",
+        link: "cancellation policy",
+      },
+    ],
+  },
+
+  ctaBlock: {
+    title: "Your first step is free.",
   },
 
   bodyCheck: {
@@ -175,96 +259,139 @@ const en = {
     eyebrow: "Meet your coach",
     subtitle: "Personal Trainer · Dubai",
     subtitleCertified: "REPs UAE-Registered Personal Trainer · Dubai",
-    quote: [
-      "I don’t believe in one-size-fits-all training.",
-      "My approach combines structure, technique and consistency to build results that last beyond the gym.",
+    lead: "I train busy people the way I train myself: with structure, honesty and no wasted time.",
+    stats: [
+      { value: "5 years", label: "training" },
+      { value: "12+ years", label: "corporate" },
+      { value: "3", label: "languages" },
+    ],
+    storyTitle: "My story",
+    story: [
+      "I started training seriously five years ago, under the guidance of a coach, the same way I now work with my clients. Structure, proper technique and consistency changed how I look, how I feel, and how I handle a demanding career.",
+      "For more than twelve years I've worked in business development across Iran and the GCC. Long days, travel and pressure: I know exactly what a busy schedule does to good intentions. That's why my coaching is built for real life, with efficient sessions, clear plans and progress you can actually measure.",
+      "Before business, I spent five years teaching. It taught me to explain things simply and patiently, which is exactly what good technique coaching needs. For the past year I've been coaching clients one-to-one, and today I help busy professionals in Dubai build strength that lasts.",
+    ],
+    whyTitle: "Why train with me",
+    why: [
+      { title: "I've been where you are.", body: "12+ years in corporate business development, training around a demanding schedule." },
+      {
+        title: "I explain things clearly.",
+        body: "Five years of teaching (BA in English Literature) means step-by-step technique coaching you'll actually understand.",
+      },
+      { title: "Coaching in your language.", body: "English, Persian and Azerbaijani." },
     ],
     credentialsTitle: "Fitness credentials",
     credentials: {
       aiq: { lines: ["Level 3 Diploma", "Gym Instructing & Personal Training"] },
       reps: { lines: ["Category A Personal Trainer"] },
     },
-    fitnessExperience: "2+ years in fitness",
-    journeyLabel: "Saeid's professional journey",
-    journeyShow: "Show image",
-    journeyAlts: [
-      "Saeid from behind, arms raised, facing the illuminated FITologist.me sign in a gym",
-      "Saeid and another trainer flexing in front of an Active IQ sign in a gym",
-      "Saeid standing with another trainer beneath the MyPT Academy sign",
-      "Saeid standing beneath a wall sign reading “Every success story started with a DREAM”",
-    ],
-    backgroundEyebrow: "Background",
-    backgroundTitle: "Know Saeid more",
-    education: {
-      label: "Education",
-      items: ["BA in English Literature", "5+ Years Teaching English as a Second Language"],
-    },
-    professional: {
-      label: "Professional",
-      items: ["12+ Years in Business Development"],
-    },
-    multilingualLabel: "Multilingual",
-    languages: ["English", "Persian", "Azerbaijani", "Turkish"],
+    repsNo: "No.",
+    galleryLabel: "Photos of Saeid",
     portraitAlt:
       "Portrait of Saeid Soleimani, the coach behind FITologist, in a FITologist t-shirt with arms crossed",
-    caption: "Coach, FITologist",
-    followOn: "Follow on",
-    contactOn: "Contact on",
-    followAria: "Follow FITologist on Instagram",
-    contactAria: "Contact Saeid on WhatsApp",
   },
 
   method: {
-    eyebrow: "Signature method",
+    eyebrow: "How it works",
     titleBefore: "The",
     titleAfter: "Method",
-    intro: "Four stages. One clear process — so you always know where you are and what comes next.",
+    intro: "Four stages. One clear process, so you always know where you are and what comes next.",
     stages: [
-      { title: "Assess", body: "We understand your goals, movement, experience and lifestyle." },
-      { title: "Build", body: "Your training plan is built specifically around you." },
-      { title: "Transform", body: "Train consistently, track progress and adjust as you improve." },
       {
-        title: "Transcend",
-        body: "Build the strength, habits and confidence to keep progressing beyond the program.",
+        label: "Assess",
+        title: "Free consultation",
+        body: "A 30-minute conversation, online or in person: your goals, training history, injuries, schedule and where you'd like to train. In your first session we add a movement check and baseline measurements.",
+      },
+      {
+        label: "Build",
+        title: "Your plan",
+        body: "Your program and nutrition targets, built around your goal, level, schedule and equipment, plus the plan that fits how often you can train.",
+      },
+      {
+        label: "Transform",
+        title: "Train & track",
+        body: "We train together, you get support between sessions, and every 4 weeks we review measurements, photos and strength, then adjust.",
+      },
+      {
+        label: "Transcend",
+        title: "Keep progressing",
+        body: "You learn the why behind every exercise and build habits that last, so progress continues beyond the program.",
       },
     ],
-    ctaTitle: "Ready to start?",
-    ctaButton: "Book a Free Consultation",
-    imageAlt: "FITologist.me brand visual: the logo above a dumbbell and towel on a dark gym floor",
+    first30Title: "Your first 30 days",
+    first30: [
+      { when: "Day 1", what: "free consultation, then your plan recommendation." },
+      { when: "Week 1", what: "first session, movement check, baseline measurements and photos." },
+      { when: "Weeks 1–2", what: "learning technique and setting your training rhythm." },
+      { when: "Weeks 3–4", what: "progressive training and nutrition habits in place." },
+      { when: "Day 30", what: "progress review and your next 4-week block." },
+    ],
+    trackTitle: "How we track progress",
+    track: ["Body measurements", "Progress photos", "Strength numbers", "Consistency"],
+    nutritionTitle: "Nutrition, kept simple",
+    nutrition:
+      "Every plan includes nutrition guidance: calorie and protein targets and practical eating habits that fit your life. No extreme diets. If you have a medical condition, I'll work alongside your doctor or dietitian.",
   },
 
-  coaching: {
-    eyebrow: "Coaching",
-    title: "Choose how you train",
-    includesLabel: "What's included",
-    apply: "Book a Free Consultation",
-    applyAria: "Book a Free Consultation:",
-    options: {
-      personal: {
-        title: "1:1 Personal Training",
-        tagline: "Individual coaching and programming.",
-        includes: ["In-person sessions with Saeid in Dubai", "Technique coached rep by rep", "A program built around you"],
-      },
-      online: {
-        title: "Online Coaching",
-        tagline: "Structured training wherever you are.",
-        includes: ["Your individual training plan", "Regular check-ins and adjustments", "Train on your own schedule"],
-      },
-      hybrid: {
-        title: "Hybrid Coaching",
-        tagline: "In-person sessions + ongoing online support.",
-        includes: ["In-person sessions in Dubai", "Online programming between sessions", "Ongoing accountability"],
-      },
+  plans: {
+    eyebrow: "Training Plans",
+    title: "Training Plans",
+    intro: "Choose how often you train. Every plan is tailored to you. Saeid will recommend the right one and share pricing in your free consultation.",
+    whereTitle: "Where we train",
+    where: "At your home, your building's gym, or a gym in Al Jaddaf & nearby. Online coaching works anywhere.",
+    inPersonTitle: "In-person plans (1:1 or Partner)",
+    inPersonNote: "All sessions 60 minutes.",
+    columns: { plan: "Plan", freq: "How often", sessions: "Sessions / month", bestFor: "Best for" },
+    recommended: "Recommended",
+    perMonth: "sessions / month",
+    items: [
+      { key: "1", name: "Foundation", freq: "1× a week", sessions: "4", bestFor: "Learning technique and building the habit" },
+      { key: "2", name: "Momentum", freq: "2× a week", sessions: "8", bestFor: "Busy professionals who want steady progress" },
+      { key: "3", name: "Accelerate", freq: "3× a week", sessions: "12", bestFor: "Faster, visible body transformation" },
+      { key: "4", name: "Elite", freq: "4× a week", sessions: "16", bestFor: "Maximum results and accountability" },
+    ],
+    includesTitle: "Every plan includes",
+    includes: [
+      { title: "Personalised program", body: "built around your goals, level and schedule." },
+      { title: "Technique coaching", body: "coached rep by rep, safely progressed." },
+      { title: "Nutrition guidance", body: "calorie and protein targets with practical eating habits." },
+      { title: "Progress check every 4 weeks", body: "measurements, photos and strength." },
+      { title: "WhatsApp support", body: "questions answered within 24 hours." },
+    ],
+    partner: {
+      title: "Partner Training",
+      lead: "Train together.",
+      body: "Train with your partner, friend or colleague. Two people, same session, special partner rate. Available on all four plans, and best when you share a similar goal and schedule.",
     },
-    pricing: "Pricing depends on the plan you choose — ask Saeid on WhatsApp for details.",
-    unsure: "Not sure which option fits? Choose the closest one — you can discuss it with Saeid before you start.",
+    online: {
+      title: "Online Coaching",
+      body: "Train anywhere. Your program in a dedicated coaching app with exercise videos, weekly check-ins, video form reviews and nutrition guidance. A new training block every 4 weeks.",
+    },
+    hybrid: {
+      title: "Hybrid Coaching",
+      body: "Foundation or Momentum sessions in person, plus an online program for the days you train alone and weekly check-ins. Built for busy professionals.",
+    },
+    firstStep: {
+      title: "Your first step is free",
+      consultation: "30-minute consultation",
+      free: "Free",
+      mode: "Online or in person",
+      intro: "We'll talk about where you are, where you want to go, and the right plan to get you there:",
+      points: [
+        "Your goals and priorities",
+        "Your current fitness level, training history and any injuries",
+        "Your schedule and where you'd like to train",
+        "Your questions, answered",
+        "The plan we recommend, and its price",
+      ],
+      outro: "No pressure. Just a conversation.",
+    },
   },
 
   start: {
-    eyebrow: "Apply",
-    title: "Ready to start?",
-    body: "Tell Saeid a little about you and what you want to achieve. It takes about a minute.",
-    imageAlt: "Saeid, full length, arms crossed, standing in front of a textured wall with the FITologist.me sign",
+    title: "Your First Step Is Free",
+    body: "A 30-minute consultation, online or in person. No pressure, just a conversation.",
+    reply: "Saeid replies personally within a few hours.",
   },
 
   lead: {
@@ -272,6 +399,8 @@ const en = {
     phone: "WhatsApp number",
     countryCode: "Country code",
     age: "Age",
+    sex: "Sex",
+    sexOptions: { male: "Male", female: "Female" },
     goals: "Goals",
     type: "Training type",
     frequency: "How often",
@@ -301,7 +430,7 @@ const en = {
     sending: "Opening WhatsApp…",
     success: {
       title: "Request sent ✓",
-      bodyBefore: "Saeid has received your details and will reply within 24 hours. WhatsApp is open so you can chat with him directly. Just press",
+      bodyBefore: "Saeid has received your details and will reply within a few hours. WhatsApp is open so you can chat with him directly. Just press",
       send: "Send",
       again: "Open WhatsApp again",
       edit: "Edit details",
@@ -317,6 +446,7 @@ const en = {
       intro: "Hi Saeid, I'd like to book a free consultation.",
       name: "Name",
       age: "Age",
+      sex: "Sex",
       goals: "Goals",
       type: "Training type",
       frequency: "How often",
@@ -327,9 +457,50 @@ const en = {
     },
   },
 
+  terms: {
+    title: "Cancellation & Rescheduling",
+    items: [
+      { title: "24-hour notice", body: "Reschedule or cancel at least 24 hours before your session at no cost." },
+      { title: "Late cancellation or no-show", body: "Cancellations within 24 hours, or missed sessions, count as used." },
+      { title: "Running late", body: "Sessions end at the scheduled time." },
+      { title: "If Saeid cancels", body: "Your session is rescheduled at no cost." },
+      {
+        title: "Plan validity",
+        body: "Sessions are valid for 30 days from your first session. Sessions cancelled with proper notice can be carried over once, up to 2 sessions.",
+      },
+      { title: "Pause", body: "For travel or illness, your plan can be paused once per cycle for up to 14 days, with 48 hours' notice." },
+      { title: "Partner training", body: "If one partner cancels late, the session goes ahead for the other at the partner rate." },
+      { title: "Payment", body: "Plans are paid in advance, before the first session of each cycle." },
+      {
+        title: "Health",
+        body: "Please tell Saeid about any injury or medical condition before training. Coaching is not a substitute for medical advice.",
+      },
+    ],
+  },
+
+  privacy: {
+    title: "Privacy Policy",
+    who: { title: "Who we are", body: "FITologist.me, personal training by Saeid Soleimani, Dubai, UAE. Contact: WhatsApp" },
+    collect: {
+      title: "What we collect",
+      body: "the details you enter in the form (name, WhatsApp number, age, goals, training preferences, area, notes), and Body Check inputs only if you choose to send them. Notes may include health information you choose to share, such as injuries.",
+    },
+    why: { title: "Why", body: "to reply to you and arrange coaching. We don't sell your data or use it for anything else." },
+    stored: {
+      title: "Where it's stored",
+      body: "form submissions are sent to Saeid via a private Telegram notification and logged in a private Google Sheet.",
+    },
+    analytics: { title: "Analytics", body: "we use Google Analytics and Meta Pixel to understand how the site is used." },
+    howLong: { title: "How long", body: "if you don't become a client, your details are deleted within 12 months." },
+    rights: { title: "Your rights", body: "message Saeid on WhatsApp to see, correct or delete your data." },
+    updated: "Last updated",
+  },
+
   footer: {
+    terms: "Terms",
+    privacy: "Privacy",
     line1: "Personal Training by Saeid",
-    line2: "1:1 PT, Online and Hybrid Coaching",
+    line2: "1:1, Partner, Online and Hybrid Coaching",
   },
 
   notFound: {

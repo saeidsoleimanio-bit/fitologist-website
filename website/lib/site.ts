@@ -23,22 +23,28 @@ export function whatsappLink(message?: string) {
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
 
-/**
- * Site navigation, in the spec's order (§2.1). Labels come from the dictionary (`nav.<key>`).
- * Interim target until the new page exists: Training Plans → /coaching (becomes /plans in Phase 3).
- */
+/** Site navigation, in the spec's order (§2.1). Labels come from the dictionary (`nav.<key>`). */
 export const NAV_ITEMS = [
   { key: "home", path: "/" },
   { key: "method", path: "/method" },
-  { key: "plans", path: "/coaching" },
+  { key: "plans", path: "/plans" },
   { key: "about", path: "/about" },
   { key: "bmi", path: "/bmi" },
 ] as const;
 
 export const BMI_PATH = "/#bmi";
-/** Primary CTA target — the form (#start). Interim: the form lives on /coaching until Phase 3. */
+/** Primary CTA target — the form (#start): on Home and on /plans; every other page links to /#start (§2.2). */
 export const START_ID = "start";
-export const START_PATH = `/coaching#${START_ID}`;
+export const START_PATH = `/#${START_ID}`;
+export const PLANS_START_PATH = `/plans#${START_ID}`;
+/** Where the primary CTA goes from a given (locale-free) path. */
+export const startPathFor = (path: string) => (path === "/plans" ? PLANS_START_PATH : START_PATH);
+
+/**
+ * Pages whose hero has a photo behind the header: on mobile the header is transparent at the top
+ * there (owner revision of §2.1). Every other page keeps the solid header.
+ */
+export const HERO_PHOTO_PATHS: readonly string[] = ["/"];
 
 /** Coaching keys — labels live in the dictionary (`coaching.options.<key>`). */
 export const COACHING_TYPES = ["personal", "online", "hybrid"] as const;

@@ -83,6 +83,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     sameAs: [INSTAGRAM.url],
     founder: { "@type": "Person", name: "Saeid Soleimani", jobTitle: "Personal Trainer" },
     inLanguage: meta.htmlLang,
+    availableLanguage: ["English", "Persian", "Azerbaijani"],
   };
 
   return (

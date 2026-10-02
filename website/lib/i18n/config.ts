@@ -18,9 +18,11 @@ export const PAGES = {
   home: "/",
   about: "/about",
   method: "/method",
-  coaching: "/coaching",
+  plans: "/plans",
   bmi: "/bmi",
   start: "/start",
+  terms: "/terms",
+  privacy: "/privacy",
 } as const;
 
 /**

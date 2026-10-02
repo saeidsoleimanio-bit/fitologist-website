@@ -19,8 +19,11 @@ export const site = {
   sessionLengthMin: 60,
   consultationMin: 30,
   progressCheckWeeks: 4,
-  replyWithinHours: 24,
-  languagesSpoken: ["English", "فارسی", "Türkçe", "Azərbaycanca"],
+  /** Promise shown next to the lead form and in the success message (owner revision). */
+  replyPromise: "within a few hours",
+  /** Client support response time (Plans → "WhatsApp support") — unchanged. */
+  supportReplyHours: 24,
+  languagesSpoken: ["English", "فارسی", "Azərbaycanca"],
 
   credentials: {
     // {{ACTIVEIQ}} — set show: true once issued
@@ -37,7 +40,9 @@ export const site = {
     hero: "/images/hero-desktop.webp",
     about: "/images/about-portrait.webp",
     gallery: [] as string[], // real, non-composite photos only
-    avatar: "", // crop of hero portrait — supplied later
+    avatar: "/images/avatar.webp", // face crop of the hero portrait (scripts/optimize-images.mjs) — currently unused
+    /** Home "Meet Saeid": head-and-shoulders cut-out of photo 05 on a transparent background (rembg). */
+    meetCutout: "/images/meet-saeid-cutout.webp",
   },
   homeEquipmentNote: "", // {{EQUIPMENT_NOTE}} e.g. "I bring the equipment we need."
 

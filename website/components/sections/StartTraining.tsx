@@ -1,20 +1,20 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { Clock } from "lucide-react";
 import { useI18n } from "@/components/i18n/I18nProvider";
-import { AccentLine, Reveal } from "@/components/ui/primitives";
-import { EASE, VIEWPORT } from "@/lib/motion";
+import { Reveal } from "@/components/ui/primitives";
 import { START_ID } from "@/lib/site";
 import { LeadForm } from "./LeadForm";
 
 /**
- * Coaching page — "Ready to start?" + the application form. Anchor: #start.
- * The photo in front of the lit logo wall was removed (§2.5); plain dark background.
+ * The form section (§4.10) — anchor #start. Used on Home, /plans and /start (h1 there).
+ * "Your First Step Is Free" + intro + avatar with the reply promise, then the lead form.
  */
 export function StartTraining({ headingLevel = "h2", standalone = false }: { headingLevel?: "h1" | "h2"; standalone?: boolean }) {
   const { t } = useI18n();
-  const titleId = "apply-title";
-  const Heading = headingLevel === "h1" ? motion.h1 : motion.h2;
+  const s = t.start;
+  const titleId = "start-title";
+  const Heading = headingLevel;
 
   return (
     <section
@@ -23,28 +23,19 @@ export function StartTraining({ headingLevel = "h2", standalone = false }: { hea
       className={`section-y relative isolate overflow-hidden bg-ink ${standalone ? "pt-[calc(var(--header-compact)+1.5rem)] lg:pt-[calc(var(--header-h)+2rem)]" : ""}`}
     >
       <div className="mx-auto max-w-3xl px-4 sm:px-8 rtl:pr-6 rtl:sm:pr-10">
-        <Reveal className="eyebrow flex items-center gap-4">
-          <AccentLine className="w-10" />
-          <span className="text-ember">{t.start.eyebrow}</span>
+        <Reveal>
+          <Heading id={titleId} className="display text-[clamp(2.4rem,8vw,4rem)] leading-[0.95] text-bone text-balance">
+            {s.title}
+          </Heading>
         </Reveal>
-        {/* Observe the (unclipped) heading; the line starts hidden inside an overflow-hidden mask. */}
-        <Heading
-          id={titleId}
-          className="display mt-4 text-[clamp(2.5rem,9vw,4.25rem)] leading-[0.9] text-bone"
-          initial="hidden"
-          whileInView="show"
-          viewport={VIEWPORT}
-        >
-          <span className="block overflow-hidden pb-[0.05em]">
-            <motion.span
-              className="block"
-              variants={{ hidden: { y: "105%" }, show: { y: "0%", transition: { duration: 1.1, ease: EASE } } }}
-            >
-              {t.start.title}
-            </motion.span>
-          </span>
-        </Heading>
-        <p className="mt-3 text-lg leading-relaxed text-silver lg:text-base">{t.start.body}</p>
+        <Reveal delay={0.08}>
+          <p className="mt-3 text-lg leading-relaxed text-silver">{s.body}</p>
+          {/* Always one line: the size scales with the viewport (14.4px at 360 → 16px from 400px; never below 14px). */}
+          <p className="mt-4 flex items-center gap-2 whitespace-nowrap text-[clamp(0.875rem,4vw,1rem)] font-medium">
+            <Clock aria-hidden className="size-[1.15em] shrink-0 text-ember" strokeWidth={2.25} />
+            <span className="reply-shimmer">{s.reply}</span>
+          </p>
+        </Reveal>
         <div className="mt-6">
           <LeadForm titleId={titleId} />
         </div>

@@ -7,19 +7,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
-import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { LanguageMenu, LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { scrollToSection } from "@/components/providers/ApplicationProvider";
 import { InstagramGlyph, WhatsAppGlyph } from "@/components/ui/icons";
 import { stripLocale } from "@/lib/i18n/config";
 import { EASE } from "@/lib/motion";
-import { INSTAGRAM, NAV_ITEMS, SITE, START_PATH, WHATSAPP, whatsappLink } from "@/lib/site";
+import { HERO_PHOTO_PATHS, INSTAGRAM, NAV_ITEMS, SITE, WHATSAPP, startPathFor, whatsappLink } from "@/lib/site";
 
 /**
  * Header (§2.1).
  * - Desktop (xl+): logo · menu · primary button · Instagram · text language switcher. Transparent at
  *   the very top of the page, glass once scrolled; the logo compacts on scroll.
  * - Below xl: always solid; compact 40px logo (same size at top and on scroll); short primary button
- *   (hidden below 360px); hamburger. Instagram and the language switcher live in the drawer.
+ *   (hidden below 360px); language button; hamburger. Instagram and the text switcher live in the drawer.
  */
 export function Header() {
   const { t, href } = useI18n();
@@ -107,7 +107,8 @@ export function Header() {
    * Home, below xl, at the very top: transparent header over the hero (with a top gradient for
    * legibility), larger logo, no header CTA (the hero shows it). Solid once scrolled or menu open.
    */
-  const homeOverlay = pathname === "/" && !scrolled && !open;
+  const homeOverlay = HERO_PHOTO_PATHS.includes(pathname) && !scrolled && !open;
+  const startPath = startPathFor(pathname);
   const isActive = (path: string) => !path.includes("#") && pathname === path;
 
   return (
@@ -202,8 +203,8 @@ export function Header() {
           <div className="flex items-center gap-1.5 sm:gap-2 xl:gap-0">
             {/* Primary button — full label on desktop, short label below xl (hidden under 360px) */}
             <Link
-              href={href(START_PATH)}
-              onClick={(e) => onNavigate(e, START_PATH)}
+              href={href(startPath)}
+              onClick={(e) => onNavigate(e, startPath)}
               aria-hidden={homeOverlay ? true : undefined}
               tabIndex={homeOverlay ? -1 : undefined}
               className={`group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 transition-[opacity,visibility] duration-[240ms] ease-out xl:visible xl:pointer-events-auto xl:opacity-100 ${
@@ -231,6 +232,9 @@ export function Header() {
               <span aria-hidden className="mx-1 h-4 w-px bg-bone/15" />
               <LanguageSwitcher />
             </div>
+
+            {/* Mobile language button — left of the hamburger, both header states */}
+            <LanguageMenu className="xl:hidden" />
 
             <button
               ref={toggleRef}
@@ -293,8 +297,8 @@ export function Header() {
 
             <div className="mt-6 space-y-3">
               <Link
-                href={href(START_PATH)}
-                onClick={(e) => onNavigate(e, START_PATH)}
+                href={href(startPath)}
+                onClick={(e) => onNavigate(e, startPath)}
                 className="flex min-h-13 items-center justify-center bg-ember px-5 font-sans text-[0.95rem] font-semibold tracking-[0.01em] text-ink"
               >
                 {t.nav.cta}

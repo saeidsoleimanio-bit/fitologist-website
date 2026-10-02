@@ -13,6 +13,10 @@ export type TrainingType = (typeof TRAINING_TYPES)[number];
 export const FREQUENCIES = ["1", "2", "3", "4", "unsure"] as const;
 export type Frequency = (typeof FREQUENCIES)[number];
 
+/** Optional "Sex" on the form (prefilled from the Body Check). */
+export const SEXES = ["male", "female"] as const;
+export type Sex = (typeof SEXES)[number];
+
 export const TIMES = ["mornings", "evenings", "weekends"] as const;
 export type Time = (typeof TIMES)[number];
 
@@ -53,6 +57,7 @@ export type LeadInput = {
   countryCode: string;
   phone: string;
   age: string;
+  sex: Sex | "";
   goals: Goal[];
   type: TrainingType | "";
   frequency: Frequency | "";
@@ -69,6 +74,7 @@ export const EMPTY_LEAD: LeadInput = {
   countryCode: "971",
   phone: "",
   age: "",
+  sex: "",
   goals: [],
   type: "",
   frequency: "",
@@ -144,6 +150,7 @@ export function sanitizeLead(raw: unknown): LeadInput {
     countryCode: str(r.countryCode, 4),
     phone: str(r.phone, 24),
     age: str(r.age, 3),
+    sex: one(r.sex, SEXES),
     goals: list(r.goals, GOALS),
     type: one(r.type, TRAINING_TYPES),
     frequency: one(r.frequency, FREQUENCIES),
@@ -158,6 +165,7 @@ export function sanitizeLead(raw: unknown): LeadInput {
 /** Labels needed to write messages in the visitor's language. */
 export type LeadLabels = {
   goals: Record<Goal, string>;
+  sexes: Record<Sex, string>;
   types: Record<TrainingType, string>;
   frequencies: Record<Frequency, string>;
   times: Record<Time, string>;
@@ -165,6 +173,7 @@ export type LeadLabels = {
     intro: string;
     name: string;
     age: string;
+    sex: string;
     goals: string;
     type: string;
     frequency: string;
@@ -184,6 +193,7 @@ export function leadMessage(d: LeadInput, l: LeadLabels): string {
     m.intro,
     `${m.name}: ${clean(d.name)}`,
     `${m.age}: ${clean(d.age)}`,
+    d.sex !== "" && `${m.sex}: ${l.sexes[d.sex]}`,
     d.goals.length > 0 && `${m.goals}: ${d.goals.map((g) => l.goals[g]).join(", ")}`,
     d.type !== "" && `${m.type}: ${l.types[d.type]}`,
     inPerson && d.frequency !== "" && `${m.frequency}: ${l.frequencies[d.frequency]}`,

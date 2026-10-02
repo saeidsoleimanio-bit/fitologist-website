@@ -24,6 +24,7 @@ var COLUMNS = [
   "bmi",
   "utm_source",
   "utm_campaign",
+  "sex", // added later: appended at the end so existing rows keep their columns
 ];
 
 var SHEET_NAME = "Leads";
@@ -36,10 +37,16 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
 
-    // Header row on first use
+    // Header row on first use; on an existing sheet, add any header cells that are missing
+    // (e.g. a column appended to COLUMNS later) without touching existing rows.
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(COLUMNS);
       sheet.setFrozenRows(1);
+    } else {
+      var header = sheet.getRange(1, 1, 1, COLUMNS.length).getValues()[0];
+      COLUMNS.forEach(function (key, i) {
+        if (header[i] === "" || header[i] === null) sheet.getRange(1, i + 1).setValue(key);
+      });
     }
 
     var row = COLUMNS.map(function (key) {

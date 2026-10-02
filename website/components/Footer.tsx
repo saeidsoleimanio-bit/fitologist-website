@@ -6,7 +6,9 @@ import Link from "next/link";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { InstagramGlyph, WhatsAppGlyph } from "@/components/ui/icons";
-import { INSTAGRAM, NAV_ITEMS, SITE, START_PATH, WHATSAPP, whatsappLink } from "@/lib/site";
+import { usePathname } from "next/navigation";
+import { stripLocale } from "@/lib/i18n/config";
+import { INSTAGRAM, NAV_ITEMS, SITE, WHATSAPP, startPathFor, whatsappLink } from "@/lib/site";
 
 const contactCls =
   "inline-flex min-h-11 items-center gap-2.5 text-base font-semibold leading-none text-bone transition-colors duration-300 hover:text-ember-soft";
@@ -14,10 +16,13 @@ const contactCls =
 /** Compact closing band: brand · navigation + languages · contact. */
 export function Footer() {
   const { t, href } = useI18n();
+  const path = stripLocale(usePathname() ?? "/");
   const year = new Date().getFullYear();
   const items = [
     ...NAV_ITEMS.map((n) => ({ key: n.key as string, path: n.path as string, label: t.nav[n.key] })),
-    { key: "start", path: START_PATH, label: t.nav.cta },
+    { key: "start", path: startPathFor(path), label: t.nav.cta },
+    { key: "terms", path: "/terms", label: t.footer.terms },
+    { key: "privacy", path: "/privacy", label: t.footer.privacy },
   ];
 
   return (

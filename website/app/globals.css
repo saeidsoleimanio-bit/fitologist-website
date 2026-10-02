@@ -35,13 +35,13 @@
     --header-h: 4.25rem;
     /* Header height once scrolled (anchor targets always land in this state) */
     --header-compact: 4rem;
-    /* Vertical rhythm for content sections (tightened for an editorial flow) */
-    --section-py: 1.65rem;
+    /* Vertical rhythm for content sections: ~60px between sections on mobile (owner revision) */
+    --section-py: 1.875rem;
   }
 
   @media (min-width: 640px) {
     :root {
-      --section-py: 1.8rem;
+      --section-py: 1.875rem;
     }
   }
 
@@ -106,12 +106,12 @@
   }
 
   /*
-   * Mobile: keep ~88px under the last element of every section so nothing ever rests beneath
-   * the floating WhatsApp button (spec §2.3). Desktop keeps the normal rhythm.
+   * Mobile: extra room only at the end of the page, above the footer, so the last element never
+   * rests beneath the floating WhatsApp button (spec §2.3). Sections keep the normal rhythm.
    */
   @media (max-width: 1023.98px) {
-    .section-y {
-      padding-bottom: max(var(--section-pb), 5.5rem);
+    #main > :last-child {
+      padding-bottom: max(var(--section-pb, 0px), 5.5rem);
     }
   }
 
@@ -228,6 +228,78 @@ html[lang="ar"] .display {
 
 @media (prefers-reduced-motion: reduce) {
   .cta-pulse {
+    animation: none;
+  }
+}
+
+/* Meet Saeid — irregular orange glow behind the cut-out photo, slow calm "heartbeat" (~3.8s). */
+@keyframes glow-beat {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  14% {
+    opacity: 0.95;
+    transform: scale(1.06);
+  }
+  28% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+  42% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  70% {
+    opacity: 0.75;
+    transform: scale(1.01);
+  }
+}
+
+.glow-beat {
+  animation: glow-beat 3.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Form reply promise — soft orange glow + a light sweep across the text every ~5s. */
+@keyframes text-shimmer {
+  0% {
+    background-position: 130% 0;
+  }
+  30%,
+  100% {
+    background-position: -30% 0;
+  }
+}
+
+.reply-shimmer {
+  color: var(--color-bone);
+  filter: drop-shadow(0 0 7px rgb(255 106 0 / 0.38));
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .reply-shimmer {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-bone) 0%,
+      var(--color-bone) 42%,
+      #fff7ef 50%,
+      var(--color-bone) 58%,
+      var(--color-bone) 100%
+    );
+    background-size: 250% 100%;
+    background-position: 130% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: text-shimmer 5s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-beat,
+  .reply-shimmer {
     animation: none;
   }
 }

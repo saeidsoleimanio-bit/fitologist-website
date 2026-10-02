@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { AboutBackground } from "@/components/sections/AboutBackground";
 import { AboutIntro } from "@/components/sections/AboutIntro";
-import { HomeCta } from "@/components/sections/HomeCta";
+import { AboutStory } from "@/components/sections/AboutStory";
+import { CtaBlock } from "@/components/sections/CtaBlock";
 import { isLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
 
@@ -14,8 +14,8 @@ export default function AboutPage() {
   return (
     <>
       <AboutIntro />
-      <AboutBackground />
-      <HomeCta className="[--section-pt:1rem] lg:[--section-pt:1.25rem]" />
+      <AboutStory />
+      <CtaBlock />
     </>
   );
 }

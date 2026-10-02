@@ -35,8 +35,9 @@ export const site = {
   sessionLengthMin: 60,
   consultationMin: 30,
   progressCheckWeeks: 4,
-  replyWithinHours: 24,
-  languagesSpoken: ["English", "فارسی", "Türkçe", "Azərbaycanca"],
+  replyPromise: "within a few hours",   // lead form + success message (owner revision)
+  supportReplyHours: 24,               // Plans → "WhatsApp support" only
+  languagesSpoken: ["English", "فارسی", "Azərbaycanca"],   // Turkish removed (owner revision)
 
   credentials: {
     activeIq: { show: false, title: "Level 3 Diploma in Gym Instructing & Personal Training" }, // {{ACTIVEIQ}} set show:true once issued
@@ -99,11 +100,13 @@ Secrets (bot token etc.) are **env vars**, never in this config (Section 6.4).
 
 **Desktop header:** logo · menu · primary button · Instagram icon · text language switcher `EN | فا | ع` (no flags).
 
-**Mobile header:** compact logo (~40px when scrolled, no tagline) · short primary button `Free Consultation` · hamburger. Instagram and the language switcher move into the drawer. If the button does not fit at 360px width, hide it below 360px only. Respect the top safe area (`viewport-fit=cover` + `env(safe-area-inset-top)`).
+**Mobile header:** compact logo (~40px when scrolled, no tagline) · short primary button `Free Consultation` · hamburger. Instagram and the text language switcher move into the drawer. If the button does not fit at 360px width, hide it below 360px only.
+- **Mobile language button (owner revision, mobile review):** left of the hamburger, a compact button showing the current code (`EN` / `ع`; `فا` added with Phase 4) that opens a small dropdown of languages (full names). Visible in both header states (transparent and solid), 44px tap target, `aria-label="Change language"` (localized). Closes on outside tap / Escape. Must fit at 360px with the logo, `Free Consultation` and the hamburger (verified: it fits); if a future change breaks that, hide the `Free Consultation` button below 375px — never the language button. No language popup on page load. Respect the top safe area (`viewport-fit=cover` + `env(safe-area-inset-top)`).
 - **Home page only (owner revision, Oct 2026):** at the top of the page (scrollY < ~20px) the header is **transparent over the hero** (hero starts at the very top, behind it) with a subtle top gradient (black ~60% → transparent) for legibility; the logo is larger (~64–72px, via transform/scale — no layout shift); the header `Free Consultation` button is hidden (the hero shows the same CTA). After scrolling: solid black, logo ~40px, button fades in. Transition ~200–250ms. The §4.1 hero criterion must still pass.
+- **Rule (Phase 3):** this transparent-at-top behaviour applies only to pages whose hero has a photo behind the header (`HERO_PHOTO_PATHS` in `lib/site.ts`, currently Home only). Pages without a hero photo (Method, Plans, About — photo sits below the header per §8 —, BMI, Start, Terms, Privacy) keep the solid header.
 - **All other pages:** header always solid (never transparent over photos).
 
-Footer: keep current structure; update link labels to the menu above; add `Terms` and `Privacy`; replace flags with the text switcher.
+Footer: second line reads **1:1, Partner, Online and Hybrid Coaching** (Arabic: *تدريب فردي، وثنائي، وأونلاين، وهجين*). Keep current structure; update link labels to the menu above; add `Terms` and `Privacy`; replace flags with the text switcher.
 
 ### 2.2 One action, one name
 
@@ -120,7 +123,8 @@ Footer: keep current structure; update link labels to the menu above; add `Terms
 - Opens `wa.me/{number}?text=` with: `Hi Saeid, I found you on fitologist.me and I'd like to know more.` (localized).
 - **Owner revision (Oct 2026):** fixed bottom corner and **visible at all times** while scrolling, on all pages (mobile and desktop). No hiding near inline CTAs, the footer or other controls. Only two exceptions: (a) hidden while any text input / textarea is focused (keyboard open); (b) hidden only when it would sit directly over the form's submit button, the Body Check "Check my numbers" button, or the Body Check result buttons (`data-fab-avoid`).
 - Respect `env(safe-area-inset-bottom)`.
-- Keep the bottom padding (~88px) on the last element of each section on mobile.
+- **Mobile spacing (owner revision, mobile review — supersedes the earlier ~88px rule):** sections no longer carry the 88px bottom padding. Only the last section of each page keeps extra bottom space (~88px) above the footer, so nothing rests under the button.
+- **Section rhythm (mobile):** ~56–64px from the end of one section's content to the next section's first element (`--section-py` = 1.875rem on mobile/tablet). Spacing inside sections unchanged.
 
 ### 2.4 Visual restraint & typography
 
@@ -224,6 +228,8 @@ Estimates only, not medical advice. For adults 18+.
 
 Remove from Home: the "Philosophy" section, the six goal cards, the "Built for real life / Experienced lifters" block, the mid-page "Ready to start?" repeat.
 
+**Final Home order (owner revision, mobile review):** Hero · Trust strip · Who I work with · Free Body Check · How it works · Training plans preview + FAQ link · Meet Saeid (compact) · Testimonials (hidden while empty) · Form (`#start`) · Footer. No FAQ on Home.
+
 ### 4.1 Hero
 **Mobile acceptance criterion:** at 390×844 the eyebrow, H1, subtitle and primary button are fully visible on first load without scrolling; at 375×667 at least H1 and the primary button. Use a shorter image (~50–55svh, `object-position: top`) with the text on a bottom gradient or directly below.
 
@@ -238,13 +244,13 @@ Remove from Home: the "Philosophy" section, the six goal cards, the "Built for r
 **Owner revision (supersedes the list below):** no boxes, no borders, no horizontal scroll. Exactly three centered lines, icon at the start of each:
 - [pin] **Dubai, Al Jaddaf & Nearby**
 - [home] **Home & Gym Sessions Available**
-- [languages] **English, فارسی, Türkçe, Azərbaycanca**: one line, never wrapped (font shrinks slightly at narrow widths, minimum 14px); each language wrapped in `<bdi>` so commas keep their order; Arabic page uses the Arabic comma.
+- [languages] **English, فارسی, Azərbaycanca** (Turkish removed site-wide — owner revision): one line, never wrapped (font shrinks slightly at narrow widths, minimum 14px); each language wrapped in `<bdi>` so commas keep their order; Arabic page uses the Arabic comma.
 Credentials (when enabled) appear above these in the same style. Original items for reference:
 - REPs UAE `{category}` `No. {number}` *(only if reps.show)*
 - Active IQ Level 3 *(only if activeIq.show)*
 - Al Jaddaf & nearby
 - Home sessions available
-- English · فارسی · Türkçe · Azərbaycanca
+- English · فارسی · Azərbaycanca
 
 ### 4.3 Who I work with (owner revision — replaces the earlier 4.3)
 Keep the three-row editorial structure (no cards).
@@ -279,24 +285,27 @@ H2: **Training Plans** · four compact items:
 
 Line: *Every plan includes nutrition guidance and WhatsApp support. Partner, online and hybrid options available.*
 Link: **Compare plans** → `/plans`
+Below it, one line (owner revision): *Questions about location, pricing or cancellation?* **Read the FAQ** → `/plans#faq`.
 
 ### 4.7 Meet Saeid (short)
-Photo (`photos.about`) + text:
+**Compact (owner revision):** photo on the left (mirrored on Arabic), lead line on the right, then the one-sentence summary and the link. The large portrait stays on `/about` only.
+- **Photo (owner revision 2):** no circular frame or border; ~88px (≈35% larger than the old 64px avatar). Head-and-shoulders cut-out of photo 05 on a transparent background (`photos.meetCutout` = `/images/meet-saeid-cutout.webp`, made with rembg isnet + alpha matting; hair edges checked at 2×; original untouched). Bottom/left edges of the shirt fade out with a CSS mask.
+- **Glow:** irregular orange glow behind the photo (three offset, blurred, uneven shapes; medium strength), pulsing slowly like a calm heartbeat (~3.8s cycle, slight opacity + scale). The photo itself never moves. No animation under `prefers-reduced-motion`.
 - **I train busy people the way I train myself: with structure, honesty and no wasted time.**
-- *Five years of training, twelve years in corporate life, and coaching in four languages.*
+- *Five years of training, twelve years in corporate life, and coaching in three languages.*
 - Link: **More about Saeid** → `/about`
 
 ### 4.8 Testimonials
-Render only if `testimonials.length > 0`. Card: quote, first name, goal. Build the component now; it stays hidden.
+Render only if `testimonials.length > 0`. Card: quote, first name, goal. Build the component now; it stays hidden. Sits directly before the form.
 
 ### 4.9 FAQ
-Accordion, content from Section 9.1.
+**Removed from Home (owner revision).** The FAQ lives on `/plans` (`id="faq"`); Home links to it from 4.6.
 
 ### 4.10 Start (form)
 Anchor `#start`. Above the form:
 - **H2: Your First Step Is Free**
 - *A 30-minute consultation, online or in person. No pressure, just a conversation.*
-- Small avatar (`photos.avatar`) + *Saeid replies personally within 24 hours.*
+- *Saeid replies personally within a few hours.* — **no avatar** (owner revision 2). Small orange clock icon at the start; always one line (font scales 14.4px at 360 → 16px; never below 14px — the full sentence fits at 360, so "personally" is kept). Attention effect: soft orange glow on the text + a slow light shimmer sweeping across it every ~5s. No green dot / "online" indicator. No motion under `prefers-reduced-motion`. Same on Arabic.
 - Form component (Section 6).
 
 ---
@@ -354,7 +363,12 @@ Today the success screen says "Application received / Your information has been 
 | Consent | checkbox: *I agree to be contacted on WhatsApp about coaching.* + link Privacy Policy | ✔ |
 | Honeypot | hidden field `company`; if filled, silently drop | — |
 
-Chips: 2 columns on mobile, compact height (no full-width checkbox rows). Pre-fill age and goals from `sessionStorage.fit_prefill` (Section 3.5); pre-select training type if arriving from a plan card (`?type=hybrid` etc.).
+**Mobile layout (owner revision, mobile review):**
+- **WhatsApp number:** country select and number on one row. The select is narrow (~104px) and shows only the dial code (`+971`) when closed; the open list shows country names. Nothing overflows the card (number input `min-w-0 flex-1`).
+- **Age + Sex on one row:** Age ~40%, **Sex** ~60% as a Male / Female segmented control — optional, prefilled from the Body Check (`fit_prefill.sex`); tapping the selected option clears it. Sex is included in the WhatsApp message, the Telegram message and the Sheet (`sex` column, appended last).
+- **Goals, Training type, How often, Preferred time:** pill chips that wrap (flex-wrap, ~44px tall, rounded), state shown by fill and border (no separate box indicator). Multi-select / single-select behaviour unchanged.
+
+Pre-fill age, sex and goals from `sessionStorage.fit_prefill` (Section 3.5); pre-select training type if arriving from a plan card (`?type=hybrid` etc.).
 
 Submit button: **Send to Saeid via WhatsApp** (WhatsApp icon) with helper text below: *Opens WhatsApp with your details ready. Just press Send.*
 
@@ -383,7 +397,7 @@ Notes: {notes}
 - Validate server-side (same rules), length-limit every field, drop if honeypot filled, basic rate limit (e.g. 5 requests / 10 min per IP).
 - **Deliver to two places:**
   1. **Telegram** (instant notification): `POST https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage` with `chat_id={TELEGRAM_CHAT_ID}`. Message = all fields + language + source page + BMI (if present) + UTM params + timestamp (Asia/Dubai). Include a tap-to-chat link `https://wa.me/{lead number}`.
-  2. **Google Sheet** (lead log): `POST` JSON to `{SHEETS_WEBHOOK_URL}` (a Google Apps Script web app that appends a row). Columns: timestamp, name, whatsapp, age, goals, type, frequency, area, times, notes, language, source, bmi, utm_source, utm_campaign.
+  2. **Google Sheet** (lead log): `POST` JSON to `{SHEETS_WEBHOOK_URL}` (a Google Apps Script web app that appends a row). Columns: timestamp, name, whatsapp, age, goals, type, frequency, area, times, notes, language, source, bmi, utm_source, utm_campaign, sex (added last so existing rows keep their columns; the script writes any missing header cells).
 - Return `200 {ok:true}` if **at least one** delivery succeeded; otherwise `502`.
 - Env vars: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SHEETS_WEBHOOK_URL`. Never exposed to the client. Provide `.env.example`.
 - Also provide the Apps Script code (`scripts/sheets-webhook.gs`) and a short `SETUP_LEADS.md` for the owner: create bot with @BotFather → get token; message the bot, get chat id; create Sheet → Extensions → Apps Script → paste → Deploy as web app (Anyone) → copy URL; add the three env vars to the host; redeploy; send a test lead.
@@ -392,7 +406,7 @@ Notes: {notes}
 - **Sending:** *Opening WhatsApp…*
 - **Success** (API ok):
   > **Request sent ✓**
-  > Saeid has received your details and will reply within 24 hours. WhatsApp is open so you can chat with him directly. Just press **Send**.
+  > Saeid has received your details and will reply within a few hours. WhatsApp is open so you can chat with him directly. Just press **Send**.
   > [Open WhatsApp again] · Edit details
 - **Fallback** (API failed or offline):
   > **Almost done**
@@ -459,6 +473,7 @@ Remove the old Coaching-page note "Pricing depends on the plan you choose — as
 ## 8. About page (`/about`)
 
 - Header solid; photo sits below it (icons must not overlap the face). Remove the vertical Train/Transform/Transcend stack on mobile.
+  - **Status (Phase 3):** the "Train / Transform / Transcend" text is baked into the supplied portrait (x 8–25%, y 21–34% of the image). It cannot be cropped out cleanly (a crop would cut Saeid's arm or head), so the portrait is kept as supplied until a replacement photo arrives in `photos.about`.
 - Eyebrow: `Meet your coach` · **H1: Saeid Soleimani** · Subtitle: `Personal Trainer · Dubai` (or `REPs UAE-Registered Personal Trainer · Dubai` when `reps.show`).
 - Lead line (replaces "I don't believe in one-size-fits-all training"): **I train busy people the way I train myself: with structure, honesty and no wasted time.**
 - Stats (separate items; replaces "2+ Years in Fitness"): **5 years** training · **12+ years** corporate · **4** languages.
@@ -473,7 +488,7 @@ Remove the old Coaching-page note "Pricing depends on the plan you choose — as
 ### 8.2 Why train with me (replaces "Know Saeid More" + Education/Professional/Multilingual list)
 - **I've been where you are.** 12+ years in corporate business development, training around a demanding schedule.
 - **I explain things clearly.** Five years of teaching (BA in English Literature) means step-by-step technique coaching you'll actually understand.
-- **Coaching in your language.** English, Persian, Turkish and Azerbaijani.
+- **Coaching in your language.** English, Persian and Azerbaijani. (About stats: **3** languages.)
 
 ### 8.3 Credentials
 Keep the existing two cards, rendered only per `credentials.*.show`. REPs card shows `No. {number}` when set.
@@ -488,7 +503,7 @@ Replace the centered "Follow on / Contact on" block with the standard left-align
 
 ## 9. FAQ, Terms, Privacy
 
-### 9.1 FAQ (accordion — Home, Plans)
+### 9.1 FAQ (accordion — Plans only, `id="faq"`)
 1. **Where do sessions take place?** At your home, your building's gym, or a gym in Al Jaddaf and nearby areas. Online coaching works anywhere.
 2. **How much does it cost?** Every plan is tailored to you. In your free 30-minute consultation, Saeid recommends the right plan and shares its price.
 3. **Do I need a gym membership?** Not necessarily. We can train at your home or in your building's gym. `{homeEquipmentNote}`
@@ -496,7 +511,7 @@ Replace the centered "Follow on / Contact on" block with the standard left-align
 5. **Is nutrition included?** Yes. Every plan includes nutrition guidance: calorie and protein targets and practical eating habits.
 6. **Can I train with a partner?** Yes. Partner Training is available on all four plans, with a special partner rate.
 7. **I'm a complete beginner. Is that OK?** Absolutely. You'll learn proper technique from your first session.
-8. **What languages do you coach in?** English, Persian, Turkish and Azerbaijani.
+8. **What languages do you coach in?** English, Persian and Azerbaijani.
 9. **What if I need to cancel?** Rescheduling is free with 24 hours' notice. See the full [cancellation policy](/terms).
 
 ### 9.2 `/terms` — Cancellation & Rescheduling
@@ -537,7 +552,7 @@ Replace the centered "Follow on / Contact on" block with the standard left-align
 - `/` title: **Personal Trainer in Dubai | Saeid Soleimani · FITologist.me**
 - `/` description: *Personal trainer in Dubai for busy professionals. 1:1, partner, online and hybrid coaching at your home or in Al Jaddaf. Free 30-minute consultation.*
 - Unique title, description and single H1 per page (`/plans`: Training Plans | …; `/method`: The FITologist Method | …; `/about`: About Saeid Soleimani | …; `/bmi`: Free BMI & Calorie Check | …).
-- JSON-LD: `Person` (Saeid) + `ProfessionalService` (`areaServed`: Dubai; `availableLanguage`; `hasCredential` only for credentials with `show:true`). No price fields.
+- JSON-LD: `Person` (Saeid) + `ProfessionalService` (`areaServed`: Dubai; `availableLanguage`: English, Persian, Azerbaijani; `hasCredential` only for credentials with `show:true`). No price fields.
 - OG/Twitter image 1200×630 (hero portrait + H1). `sitemap.xml`, `robots.txt`, canonical URLs, 301s from Section 2.1.
 
 ### 10.3 Tracking (load only if IDs are set)

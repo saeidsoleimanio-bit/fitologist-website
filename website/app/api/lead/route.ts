@@ -60,6 +60,7 @@ function describe(lead: LeadInput) {
   const inPerson = isInPerson(lead.type);
   return {
     whatsapp: `+${fullNumber(lead.countryCode, lead.phone)}`,
+    sex: lead.sex ? l.sexOptions[lead.sex] : "",
     goals: lead.goals.map((g) => en.goals[g]).join(", "),
     type: lead.type ? l.types[lead.type] : "",
     frequency: inPerson && lead.frequency ? l.frequencies[lead.frequency] : "",
@@ -80,6 +81,7 @@ async function sendTelegram(lead: LeadInput, meta: Meta, timestamp: string): Pro
     `Name: ${lead.name.trim()}`,
     `WhatsApp: ${d.whatsapp}`,
     `Age: ${lead.age}`,
+    d.sex && `Sex: ${d.sex}`,
     `Goals: ${d.goals}`,
     `Training type: ${d.type}`,
     d.frequency && `How often: ${d.frequency}`,
@@ -127,6 +129,7 @@ async function sendSheet(lead: LeadInput, meta: Meta, timestamp: string): Promis
     bmi: meta.bmi,
     utm_source: meta.utm_source,
     utm_campaign: meta.utm_campaign,
+    sex: d.sex,
   };
   const res = await fetch(url, {
     method: "POST",

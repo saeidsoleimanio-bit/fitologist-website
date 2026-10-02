@@ -542,7 +542,7 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                           className="w-full bg-[#1b1d20]! backdrop-blur-none sm:w-auto"
                           data-fab-avoid
                          
-                          onClick={() => startApplication({ age: String(result.age), goals: result.goals, bmi: fmt(result.bmi) })}
+                          onClick={() => startApplication({ age: String(result.age), ...(sex ? { sex } : {}), goals: result.goals, bmi: fmt(result.bmi) })}
                         >
                           {b.book}
                         </Button>
