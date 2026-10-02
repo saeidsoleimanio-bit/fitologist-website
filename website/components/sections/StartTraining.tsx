@@ -5,25 +5,30 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 import { AccentLine, Reveal } from "@/components/ui/primitives";
 import { EASE, VIEWPORT } from "@/lib/motion";
 import { START_ID } from "@/lib/site";
-import { ApplicationForm } from "./Application";
+import { LeadForm } from "./LeadForm";
 
 /**
  * Coaching page — "Ready to start?" + the application form. Anchor: #start.
  * The photo in front of the lit logo wall was removed (§2.5); plain dark background.
  */
-export function StartTraining() {
+export function StartTraining({ headingLevel = "h2", standalone = false }: { headingLevel?: "h1" | "h2"; standalone?: boolean }) {
   const { t } = useI18n();
   const titleId = "apply-title";
+  const Heading = headingLevel === "h1" ? motion.h1 : motion.h2;
 
   return (
-    <section id={START_ID} aria-labelledby={titleId} className="section-y relative isolate overflow-hidden bg-ink">
+    <section
+      id={START_ID}
+      aria-labelledby={titleId}
+      className={`section-y relative isolate overflow-hidden bg-ink ${standalone ? "pt-[calc(var(--header-compact)+1.5rem)] lg:pt-[calc(var(--header-h)+2rem)]" : ""}`}
+    >
       <div className="mx-auto max-w-3xl px-4 sm:px-8 rtl:pr-6 rtl:sm:pr-10">
         <Reveal className="eyebrow flex items-center gap-4">
           <AccentLine className="w-10" />
           <span className="text-ember">{t.start.eyebrow}</span>
         </Reveal>
         {/* Observe the (unclipped) heading; the line starts hidden inside an overflow-hidden mask. */}
-        <motion.h2
+        <Heading
           id={titleId}
           className="display mt-4 text-[clamp(2.5rem,9vw,4.25rem)] leading-[0.9] text-bone"
           initial="hidden"
@@ -38,10 +43,10 @@ export function StartTraining() {
               {t.start.title}
             </motion.span>
           </span>
-        </motion.h2>
+        </Heading>
         <p className="mt-3 text-lg leading-relaxed text-silver lg:text-base">{t.start.body}</p>
         <div className="mt-6" data-fab-hide>
-          <ApplicationForm titleId={titleId} />
+          <LeadForm titleId={titleId} />
         </div>
       </div>
     </section>

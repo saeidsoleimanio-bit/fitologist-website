@@ -36,6 +36,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Skip Next internals, public images and any file with an extension (robots.txt, icon.png…).
-  matcher: ["/((?!_next|images|.*\\..*).*)"],
+  // Skip API routes, Next internals, public images and any file with an extension (robots.txt, icon.png…).
+  matcher: ["/((?!api|_next|images|.*\\..*).*)"],
 };

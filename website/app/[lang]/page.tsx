@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BmiCalculator } from "@/components/sections/BmiCalculator";
+import { BodyCheck } from "@/components/sections/BodyCheck";
 import { Hero } from "@/components/sections/Hero";
 import { HomeCta } from "@/components/sections/HomeCta";
 import { TrustStrip } from "@/components/sections/TrustStrip";
@@ -18,7 +18,7 @@ export default function HomePage() {
     <>
       <Hero />
       <TrustStrip />
-      <BmiCalculator />
+      <BodyCheck />
       <WhoIsThisFor />
       <HomeCta />
     </>

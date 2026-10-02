@@ -12,7 +12,11 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 import { useApplication } from "@/components/providers/ApplicationProvider";
 import { AccentLine, Reveal } from "@/components/ui/primitives";
 import { EASE, VIEWPORT } from "@/lib/motion";
+import type { TrainingType } from "@/lib/lead";
 import { COACHING_TYPES, type CoachingType } from "@/lib/site";
+
+/** Coaching card → form training type. */
+const CARD_TO_TYPE: Record<CoachingType, TrainingType> = { personal: "1to1", online: "online", hybrid: "hybrid" };
 
 /** Large background visual per coaching mode, composed from line icons (one family with Goals). */
 function CoachingVisual({ kind }: { kind: CoachingType }) {
@@ -39,7 +43,7 @@ function CoachingVisual({ kind }: { kind: CoachingType }) {
 export function Coaching() {
   const { t } = useI18n();
   const c = t.coaching;
-  const { startApplication, coaching: selected } = useApplication();
+  const { startApplication } = useApplication();
 
   return (
     <section
@@ -73,7 +77,6 @@ export function Coaching() {
         >
           {COACHING_TYPES.map((type, i) => {
             const o = c.options[type];
-            const isSelected = selected === type;
             const titleId = `coaching-${i}`;
             return (
               <motion.li
@@ -83,9 +86,7 @@ export function Coaching() {
                   hidden: { opacity: 0, y: 40 },
                   show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE } },
                 }}
-                className={`group relative flex flex-col overflow-hidden border bg-carbon p-6 transition-[border-color,background-color,translate,box-shadow] duration-300 ease-[var(--ease-premium)] hover:-translate-y-1 hover:bg-graphite hover:shadow-[0_24px_60px_-30px_rgba(255,106,0,0.35)] focus-within:bg-graphite sm:p-7 ${
-                  isSelected ? "border-ember/70" : "hairline hover:border-ember/40 focus-within:border-ember/40"
-                }`}
+                className={`group relative flex flex-col overflow-hidden border bg-carbon p-6 transition-[border-color,background-color,translate,box-shadow] duration-300 ease-[var(--ease-premium)] hover:-translate-y-1 hover:bg-graphite hover:shadow-[0_24px_60px_-30px_rgba(255,106,0,0.35)] focus-within:bg-graphite sm:p-7 hairline hover:border-ember/40 focus-within:border-ember/40`}
               >
                 <span
                   aria-hidden
@@ -94,9 +95,7 @@ export function Coaching() {
                 {/* Orange atmosphere rising from the bottom (~45%) on hover / focus / selected */}
                 <span
                   aria-hidden
-                  className={`pointer-events-none absolute inset-x-0 bottom-0 h-[46%] [mask-image:linear-gradient(to_top,#000_55%,transparent)] transition-[opacity,translate] duration-400 ease-[var(--ease-premium)] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 ${
-                    isSelected ? "translate-y-0 opacity-100" : "translate-y-[30%] opacity-0"
-                  }`}
+                  className={`pointer-events-none absolute inset-x-0 bottom-0 h-[46%] [mask-image:linear-gradient(to_top,#000_55%,transparent)] transition-[opacity,translate] duration-400 ease-[var(--ease-premium)] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 translate-y-[30%] opacity-0`}
                   style={{
                     background:
                       "radial-gradient(95% 75% at 50% 100%, rgba(255,106,0,0.3) 0%, rgba(255,106,0,0.1) 45%, transparent 78%), linear-gradient(to top, rgba(255,106,0,0.2) 0%, rgba(255,106,0,0.06) 50%, transparent 100%)",
@@ -131,7 +130,7 @@ export function Coaching() {
                 <div className="relative mt-auto pt-7">
                   <button
                     type="button"
-                    onClick={() => startApplication({ coaching: type })}
+                    onClick={() => startApplication({ type: CARD_TO_TYPE[type] })}
                     aria-label={`${c.applyAria} ${o.title}`}
                     data-fab-hide
                     className="relative inline-flex min-h-12 w-full items-center justify-center gap-3 overflow-hidden border border-ember/60 px-5 font-sans text-[0.95rem] font-semibold tracking-[0.01em] text-ember transition-[color,border-color,transform] duration-300 ease-[var(--ease-premium)] active:scale-[0.97] group-hover:border-ember group-hover:text-bone group-focus-within:border-ember group-focus-within:text-bone"

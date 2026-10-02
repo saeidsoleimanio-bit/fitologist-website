@@ -3,19 +3,29 @@
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
-import { COACHING_TYPES, GOALS, START_ID, START_PATH, type CoachingType, type Goal } from "@/lib/site";
+import { FREQUENCIES, GOALS, TRAINING_TYPES, type Frequency, type Goal, type TrainingType } from "@/lib/lead";
+import { START_ID, START_PATH } from "@/lib/site";
 
-type Selection = { goal: Goal | ""; coaching: CoachingType | "" };
-
-type ApplicationContextValue = Selection & {
-  setGoal: (goal: Goal) => void;
-  setCoaching: (coaching: CoachingType) => void;
-  /** Pre-selects options and brings the application form into view (navigating to /coaching if needed). */
-  startApplication: (preset?: Partial<Selection>) => void;
+/** Values carried into the form (§3.5, §6.2). Stored in sessionStorage under `fit_prefill`. */
+export type Prefill = {
+  age?: string;
+  goals?: Goal[];
+  bmi?: string;
+  type?: TrainingType;
+  frequency?: Frequency;
 };
 
-const ApplicationContext = createContext<ApplicationContextValue | null>(null);
-const STORAGE_KEY = "fitologist:application-selection";
+type Ctx = {
+  prefill: Prefill;
+  /** Increments whenever a new preset arrives, so a mounted form can merge it. */
+  version: number;
+  /** Saves a preset and brings the form (#start) into view, navigating to it if needed. */
+  startApplication: (preset?: Prefill) => void;
+};
+
+const ApplicationContext = createContext<Ctx | null>(null);
+const PREFILL_KEY = "fit_prefill";
+const UTM_KEY = "fit_utm";
 
 export function scrollToSection(id: string) {
   const el = document.getElementById(id);
@@ -26,67 +36,78 @@ export function scrollToSection(id: string) {
   return true;
 }
 
-function readStored(): Selection {
+function sanitize(v: Partial<Prefill> | null | undefined): Prefill {
+  if (!v) return {};
+  const out: Prefill = {};
+  if (typeof v.age === "string" && /^\d{1,3}$/.test(v.age)) out.age = v.age;
+  if (Array.isArray(v.goals)) out.goals = v.goals.filter((g): g is Goal => GOALS.includes(g as Goal));
+  if (typeof v.bmi === "string" && /^\d{1,2}(\.\d)?$/.test(v.bmi)) out.bmi = v.bmi;
+  if (TRAINING_TYPES.includes(v.type as TrainingType)) out.type = v.type;
+  if (FREQUENCIES.includes(v.frequency as Frequency)) out.frequency = v.frequency;
+  return out;
+}
+
+export function readPrefill(): Prefill {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) return { goal: "", coaching: "" };
-    const v = JSON.parse(raw) as Partial<Selection>;
-    return {
-      goal: GOALS.includes(v.goal as Goal) ? (v.goal as Goal) : "",
-      coaching: COACHING_TYPES.includes(v.coaching as CoachingType) ? (v.coaching as CoachingType) : "",
-    };
+    return sanitize(JSON.parse(sessionStorage.getItem(PREFILL_KEY) ?? "null"));
   } catch {
-    return { goal: "", coaching: "" };
+    return {};
   }
 }
 
-/**
- * Goal / coaching choices made anywhere on the site (homepage goals, coaching cards) carry into
- * the application form. Lives in the layout and mirrors to sessionStorage, so the choice survives
- * page navigation and language switches.
- */
+/** First-touch UTM parameters (§6.4), captured once per session. */
+export function readUtm(): { utm_source: string; utm_campaign: string } {
+  try {
+    const v = JSON.parse(sessionStorage.getItem(UTM_KEY) ?? "null") as Record<string, string> | null;
+    return { utm_source: v?.utm_source ?? "", utm_campaign: v?.utm_campaign ?? "" };
+  } catch {
+    return { utm_source: "", utm_campaign: "" };
+  }
+}
+
 export function ApplicationProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { href } = useI18n();
-  const [selection, setSelection] = useState<Selection>({ goal: "", coaching: "" });
-  const [hydrated, setHydrated] = useState(false);
+  const [prefill, setPrefill] = useState<Prefill>({});
+  const [version, setVersion] = useState(0);
 
-  // Restore after mount (sessionStorage is not available during SSR).
+  // Restore prefill and capture UTM parameters after mount (sessionStorage is client-only).
   useEffect(() => {
-    const stored = readStored();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from storage
-    setSelection((s) => ({ goal: s.goal || stored.goal, coaching: s.coaching || stored.coaching }));
-    setHydrated(true);
+    setPrefill(readPrefill());
+    try {
+      const q = new URLSearchParams(window.location.search);
+      const source = q.get("utm_source");
+      const campaign = q.get("utm_campaign");
+      if ((source || campaign) && !sessionStorage.getItem(UTM_KEY)) {
+        sessionStorage.setItem(
+          UTM_KEY,
+          JSON.stringify({ utm_source: (source ?? "").slice(0, 100), utm_campaign: (campaign ?? "").slice(0, 100) }),
+        );
+      }
+    } catch {
+      /* storage unavailable */
+    }
   }, []);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(selection));
-    } catch {
-      /* storage unavailable — selection still works for this page */
-    }
-  }, [selection, hydrated]);
-
-  const setGoal = useCallback((goal: Goal) => setSelection((s) => ({ ...s, goal })), []);
-  const setCoaching = useCallback(
-    (coaching: CoachingType) => setSelection((s) => ({ ...s, coaching })),
-    [],
-  );
-
   const startApplication = useCallback(
-    (preset?: Partial<Selection>) => {
-      if (preset) setSelection((s) => ({ ...s, ...preset }));
+    (preset?: Prefill) => {
+      if (preset) {
+        const next = { ...readPrefill(), ...sanitize(preset) };
+        try {
+          sessionStorage.setItem(PREFILL_KEY, JSON.stringify(next));
+        } catch {
+          /* storage unavailable — the in-memory prefill still works on this page */
+        }
+        setPrefill(next);
+        setVersion((v) => v + 1);
+      }
       if (!scrollToSection(START_ID)) router.push(href(START_PATH));
     },
     [router, href],
   );
 
-  const value = useMemo(
-    () => ({ ...selection, setGoal, setCoaching, startApplication }),
-    [selection, setGoal, setCoaching, startApplication],
-  );
-
+  const value = useMemo(() => ({ prefill, version, startApplication }), [prefill, version, startApplication]);
   return <ApplicationContext.Provider value={value}>{children}</ApplicationContext.Provider>;
 }
 

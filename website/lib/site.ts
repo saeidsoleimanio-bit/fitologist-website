@@ -25,25 +25,20 @@ export function whatsappLink(message?: string) {
 
 /**
  * Site navigation, in the spec's order (§2.1). Labels come from the dictionary (`nav.<key>`).
- * Interim targets until the new pages exist: Training Plans → /coaching (becomes /plans in
- * Phase 3), Free BMI Check → /#bmi (becomes /bmi in Phase 2).
+ * Interim target until the new page exists: Training Plans → /coaching (becomes /plans in Phase 3).
  */
 export const NAV_ITEMS = [
   { key: "home", path: "/" },
   { key: "method", path: "/method" },
   { key: "plans", path: "/coaching" },
   { key: "about", path: "/about" },
-  { key: "bmi", path: "/#bmi" },
+  { key: "bmi", path: "/bmi" },
 ] as const;
 
 export const BMI_PATH = "/#bmi";
 /** Primary CTA target — the form (#start). Interim: the form lives on /coaching until Phase 3. */
 export const START_ID = "start";
 export const START_PATH = `/coaching#${START_ID}`;
-
-/** Goal keys — labels live in the dictionary (`goals.<key>`). */
-export const GOALS = ["muscle", "fat", "strength", "mobility", "confidence", "unsure"] as const;
-export type Goal = (typeof GOALS)[number];
 
 /** Coaching keys — labels live in the dictionary (`coaching.options.<key>`). */
 export const COACHING_TYPES = ["personal", "online", "hybrid"] as const;

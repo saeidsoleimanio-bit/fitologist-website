@@ -19,6 +19,8 @@ export const PAGES = {
   about: "/about",
   method: "/method",
   coaching: "/coaching",
+  bmi: "/bmi",
+  start: "/start",
 } as const;
 
 /**
