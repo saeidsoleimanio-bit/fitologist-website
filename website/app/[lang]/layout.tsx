@@ -60,6 +60,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
 export const viewport: Viewport = {
   themeColor: "#050505",
   colorScheme: "dark",
+  // Lets the Home hero sit under the transparent header; safe-area insets are respected in CSS.
+  viewportFit: "cover",
 };
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[lang]">) {

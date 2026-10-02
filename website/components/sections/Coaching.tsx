@@ -132,7 +132,7 @@ export function Coaching() {
                     type="button"
                     onClick={() => startApplication({ type: CARD_TO_TYPE[type] })}
                     aria-label={`${c.applyAria} ${o.title}`}
-                    data-fab-hide
+                   
                     className="relative inline-flex min-h-12 w-full items-center justify-center gap-3 overflow-hidden border border-ember/60 px-5 font-sans text-[0.95rem] font-semibold tracking-[0.01em] text-ember transition-[color,border-color,transform] duration-300 ease-[var(--ease-premium)] active:scale-[0.97] group-hover:border-ember group-hover:text-bone group-focus-within:border-ember group-focus-within:text-bone"
                   >
                     <span

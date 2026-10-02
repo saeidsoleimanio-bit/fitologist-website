@@ -1,17 +1,18 @@
 "use client";
 
 import { BadgeCheck, House, Languages, MapPin, type LucideIcon } from "lucide-react";
+import { Fragment } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { site } from "@/config/site";
 
 type Item = { key: string; icon: LucideIcon; label: React.ReactNode };
 
 /**
- * Trust strip under the hero (§4.2): separate chips, horizontally scrollable on mobile.
+ * Trust strip under the hero (§4.2): three centered lines (area · home & gym sessions · languages).
  * Every item comes from `config/site.ts`; credentials render only when enabled there.
  */
 export function TrustStrip() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { reps, activeIq } = site.credentials;
 
   const items: Item[] = [
@@ -37,31 +38,33 @@ export function TrustStrip() {
     ...(activeIq.show ? [{ key: "aiq", icon: BadgeCheck, label: t.trust.activeIq }] : []),
     { key: "area", icon: MapPin, label: t.trust.area },
     ...(site.homeSessions ? [{ key: "home", icon: House, label: t.trust.homeSessions }] : []),
-    {
-      key: "languages",
-      icon: Languages,
-      label: (
-        <span className="flex items-center gap-2.5">
-          {site.languagesSpoken.map((l) => (
-            <span key={l}>{l}</span>
-          ))}
-        </span>
-      ),
-    },
   ];
 
+  const separator = locale === "ar" ? "، " : ", ";
+
   return (
-    <section aria-label={t.trust.label} className="relative bg-ink">
-      <ul className="mx-auto flex max-w-[88rem] snap-x gap-2.5 overflow-x-auto px-4 pb-6 pt-1 [scrollbar-width:none] sm:px-8 lg:flex-wrap lg:overflow-visible lg:px-12 lg:py-6 [&::-webkit-scrollbar]:hidden rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]">
+    <section aria-label={t.trust.label} className="relative bg-ink px-4 pb-8 pt-2 sm:px-8 lg:py-8">
+      {/* Three centered lines, icon at the start of each (credentials, when enabled, use the same style) */}
+      <ul className="flex flex-col items-center gap-2.5">
         {items.map(({ key, icon: Icon, label }) => (
-          <li
-            key={key}
-            className="flex min-h-11 shrink-0 snap-start items-center gap-2 border hairline bg-carbon px-3.5 text-[0.9rem] font-medium text-bone"
-          >
-            <Icon aria-hidden className="size-4 shrink-0 text-ember" strokeWidth={1.75} />
-            {label}
+          <li key={key} className="flex min-h-7 items-center gap-2 text-center text-base font-medium text-bone">
+            <Icon aria-hidden className="size-[1.1rem] shrink-0 text-ember" strokeWidth={1.75} />
+            <span>{label}</span>
           </li>
         ))}
+        {/* Languages: one line, never wrapped; each name isolated so mixed scripts keep comma order */}
+        <li className="flex min-h-7 max-w-full items-center gap-2 whitespace-nowrap text-[clamp(14px,4.2vw,16px)] font-medium text-bone">
+          <Languages aria-hidden className="size-[1.1rem] shrink-0 text-ember" strokeWidth={1.75} />
+          <span className="sr-only">{t.trust.languages}: </span>
+          <span>
+            {site.languagesSpoken.map((l, i) => (
+              <Fragment key={l}>
+                {i > 0 && separator}
+                <bdi>{l}</bdi>
+              </Fragment>
+            ))}
+          </span>
+        </li>
       </ul>
     </section>
   );

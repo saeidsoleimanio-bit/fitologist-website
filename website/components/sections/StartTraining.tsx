@@ -45,7 +45,7 @@ export function StartTraining({ headingLevel = "h2", standalone = false }: { hea
           </span>
         </Heading>
         <p className="mt-3 text-lg leading-relaxed text-silver lg:text-base">{t.start.body}</p>
-        <div className="mt-6" data-fab-hide>
+        <div className="mt-6">
           <LeadForm titleId={titleId} />
         </div>
       </div>

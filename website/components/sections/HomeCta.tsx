@@ -35,7 +35,7 @@ export function HomeCta({ className = "" }: { className?: string }) {
           </Reveal>
         </div>
         <Reveal delay={0.24} className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto" data-fab-hide>
+          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto">
             {t.homeCta.primary}
           </ButtonLink>
           <ButtonLink

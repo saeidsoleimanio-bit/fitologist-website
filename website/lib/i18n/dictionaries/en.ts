@@ -69,7 +69,7 @@ const en = {
     eyebrow: "Personal Trainer · Dubai",
     eyebrowCertified: "Certified Personal Trainer · Dubai",
     title: "Personal Training in Dubai, Built Around Your Schedule",
-    sub: "1:1, partner, online and hybrid coaching for busy professionals, at your home or in Al Jaddaf & nearby.",
+    sub: "1:1, Partner (Couples & Friends), Online and Hybrid Coaching for busy professionals, at your home or in Al Jaddaf & nearby.",
     primary: "Book a Free Consultation",
     secondary: "Check your BMI in 30 seconds",
     alt: "Saeid, personal trainer, smiling with arms crossed in a Dubai gym",
@@ -77,11 +77,12 @@ const en = {
 
   trust: {
     label: "At a glance",
+    languages: "Languages spoken",
     reps: "REPs UAE",
     repsNo: "No.",
     activeIq: "Active IQ Level 3",
-    area: "Al Jaddaf & nearby",
-    homeSessions: "Home sessions available",
+    area: "Dubai, Al Jaddaf & Nearby",
+    homeSessions: "Home & Gym Sessions Available",
   },
 
 
@@ -95,13 +96,19 @@ const en = {
   },
 
   who: {
-    eyebrow: "Who is this for?",
-    title: "Built for real life.",
+    eyebrow: "Who I work with",
+    title: "Built for Real Life",
     intro: "For people who want serious results without making fitness their entire life.",
     profiles: [
-      { title: "Busy Professionals", body: "Train effectively around a demanding schedule." },
+      {
+        title: "Busy Professionals",
+        body: "Train around a demanding schedule: 60-minute sessions at your home, your building's gym or nearby.",
+      },
       { title: "Beginners", body: "Learn proper technique and build confidence from day one." },
-      { title: "Experienced Lifters", body: "Break plateaus with structured progression." },
+      {
+        title: "Already Training",
+        body: "Training without a clear plan? Get structured programming and steady progression.",
+      },
     ],
   },
 

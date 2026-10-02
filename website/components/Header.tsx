@@ -30,7 +30,7 @@ export function Header() {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -103,17 +103,31 @@ export function Header() {
   }, [open, close]);
 
   const solid = scrolled || open;
+  /**
+   * Home, below xl, at the very top: transparent header over the hero (with a top gradient for
+   * legibility), larger logo, no header CTA (the hero shows it). Solid once scrolled or menu open.
+   */
+  const homeOverlay = pathname === "/" && !scrolled && !open;
   const isActive = (path: string) => !path.includes("#") && pathname === path;
 
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 border-b bg-ink transition-[background-color,border-color,backdrop-filter] duration-400 ease-[var(--ease-premium)] ${
+        className={`fixed inset-x-0 top-0 z-50 border-b pt-[env(safe-area-inset-top)] transition-[background-color,border-color,backdrop-filter] duration-[240ms] ease-out xl:pt-0 xl:duration-400 ${
+          homeOverlay ? "border-transparent bg-transparent" : "border-white/[0.08] bg-ink"
+        } ${
           solid
-            ? "border-white/[0.08] xl:bg-[rgb(5_5_5/0.72)] xl:backdrop-blur-[14px]"
-            : "border-white/[0.06] xl:border-transparent xl:bg-transparent"
+            ? "xl:border-white/[0.08] xl:bg-[rgb(5_5_5/0.72)] xl:backdrop-blur-[14px]"
+            : "xl:border-transparent xl:bg-transparent"
         }`}
       >
+        {/* Home top state (mobile): black → transparent gradient keeps logo and menu readable over the photo */}
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-x-0 top-0 h-[calc(100%+1.5rem)] bg-linear-to-b from-black/60 to-transparent transition-opacity duration-[240ms] ease-out xl:hidden ${
+            homeOverlay ? "opacity-100" : "opacity-0"
+          }`}
+        />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-ember focus:px-4 focus:py-2 focus:text-ink"
@@ -125,7 +139,7 @@ export function Header() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: EASE }}
-          className={`mx-auto flex h-[var(--header-compact)] max-w-[88rem] items-center justify-between gap-3 px-4 transition-[height] duration-500 ease-[var(--ease-premium)] sm:px-8 xl:px-12 rtl:lg:px-[clamp(3.5rem,4.2vw,4.25rem)] ${
+          className={`relative mx-auto flex h-[var(--header-compact)] max-w-[88rem] items-center justify-between gap-3 px-4 transition-[height] duration-500 ease-[var(--ease-premium)] sm:px-8 xl:px-12 rtl:lg:px-[clamp(3.5rem,4.2vw,4.25rem)] ${
             solid ? "xl:h-[var(--header-compact)]" : "xl:h-[var(--header-h)]"
           }`}
         >
@@ -138,8 +152,9 @@ export function Header() {
             aria-label={`${SITE.name} — ${t.nav.home}`}
           >
             {/*
-              Below xl: one compact size (40px), never scaled. Desktop keeps the large-at-top logo
-              that compacts on scroll (transform only — asset untouched).
+              Layout size is always 40px below xl; on the Home top state it is scaled up (~68px) by
+              transform only, so nothing shifts. Desktop keeps the large-at-top logo that compacts
+              on scroll (transform only — asset untouched).
             */}
             <Image
               src="/images/logo-emblem.png"
@@ -147,10 +162,10 @@ export function Header() {
               width={640}
               height={367}
               preload
-              sizes="(min-width: 1280px) 168px, 72px"
-              className={`h-10 w-auto origin-top-left drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] transition-[scale] duration-500 ease-[var(--ease-premium)] motion-reduce:transition-none rtl:origin-top-right xl:h-[92px] ${
-                solid ? "xl:scale-[0.7]" : "xl:scale-100"
-              }`}
+              sizes="(min-width: 1280px) 168px, 120px"
+              className={`h-10 w-auto origin-top-left drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] transition-[scale] duration-[240ms] ease-out motion-reduce:transition-none rtl:origin-top-right xl:h-[92px] xl:duration-500 ${
+                homeOverlay ? "scale-[1.7]" : "scale-100"
+              } ${solid ? "xl:scale-[0.7]" : "xl:scale-100"}`}
             />
           </Link>
 
@@ -189,7 +204,11 @@ export function Header() {
             <Link
               href={href(START_PATH)}
               onClick={(e) => onNavigate(e, START_PATH)}
-              className="group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 font-sans text-[0.8rem] font-semibold tracking-[0.01em] text-ink min-[360px]:inline-flex sm:px-4 sm:text-[0.85rem] xl:ms-4 xl:px-5"
+              aria-hidden={homeOverlay ? true : undefined}
+              tabIndex={homeOverlay ? -1 : undefined}
+              className={`group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 transition-[opacity,visibility] duration-[240ms] ease-out xl:visible xl:pointer-events-auto xl:opacity-100 ${
+                homeOverlay ? "pointer-events-none invisible opacity-0" : "visible opacity-100"
+              } font-sans text-[0.8rem] font-semibold tracking-[0.01em] text-ink min-[360px]:inline-flex sm:px-4 sm:text-[0.85rem] xl:ms-4 xl:px-5`}
             >
               <span
                 aria-hidden
@@ -251,7 +270,7 @@ export function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: EASE }}
-            className="fixed inset-x-0 bottom-0 top-[var(--header-compact)] z-40 flex flex-col overflow-y-auto bg-ink px-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-8 xl:hidden"
+            className="fixed inset-x-0 bottom-0 top-[calc(var(--header-compact)+env(safe-area-inset-top))] z-40 flex flex-col overflow-y-auto bg-ink px-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-8 xl:hidden"
           >
             <nav aria-label={t.nav.mobileLabel} className="pt-4">
               <ul className="border-t hairline">

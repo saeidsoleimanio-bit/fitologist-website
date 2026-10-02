@@ -38,15 +38,17 @@ export function Hero() {
       ref={ref}
       id="home"
       aria-labelledby="hero-title"
-      className="relative isolate overflow-hidden bg-ink pt-[var(--header-compact)] lg:h-[100svh] lg:min-h-[640px] lg:max-h-[1100px] lg:pt-0"
+      className="relative isolate overflow-hidden bg-ink lg:h-[100svh] lg:min-h-[640px] lg:max-h-[1100px] lg:pt-0"
     >
-      <div className="relative h-[min(50svh,30rem)] w-full overflow-hidden sm:h-auto sm:aspect-[1672/941] lg:absolute lg:inset-0 lg:aspect-auto">
+      {/* Mobile: the photo starts at the very top, behind the (transparent) header; it is taller by
+          exactly the header height so the copy below keeps its position (§4.1 criterion). */}
+      <div className="relative h-[calc(min(50svh,30rem)+var(--header-compact)+env(safe-area-inset-top))] w-full overflow-hidden sm:h-auto sm:aspect-[1672/941] sm:mt-[var(--header-compact)] lg:absolute lg:inset-0 lg:mt-0 lg:aspect-auto">
         {/*
           Desktop image layer: nudged ~4% left and lowered so Saeid's hair clears the
           header with breathing room.
         */}
         <motion.div
-          className="absolute inset-0 [--hero-drop:clamp(84px,15vh,140px)] lg:-left-[4%] lg:top-[var(--hero-drop)] lg:-bottom-[var(--hero-drop)]"
+          className="absolute inset-0 [--hero-drop:clamp(84px,15vh,140px)] max-sm:top-[7%] max-sm:-bottom-[7%] lg:-left-[4%] lg:top-[var(--hero-drop)] lg:-bottom-[var(--hero-drop)]"
           style={reduce ? undefined : { y: imgY, scale: imgScale }}
         >
           {/*
@@ -70,7 +72,7 @@ export function Hero() {
             </div>
           </div>
           <motion.div
-            className="absolute inset-0 [--veil-x:74%] lg:[mask-image:linear-gradient(to_bottom,transparent_0,#000_140px)] lg:[--veil-x:75%] xl:[--veil-x:74%]"
+            className="absolute inset-0 [--veil-x:74%] max-sm:[container-type:size] max-sm:[mask-image:linear-gradient(to_bottom,transparent_0,#000_12%)] lg:[mask-image:linear-gradient(to_bottom,transparent_0,#000_140px)] lg:[--veil-x:75%] xl:[--veil-x:74%]"
             initial={{ scale: 1.06 }}
             animate={{ scale: 1 }}
             transition={{ duration: 2.2, ease: EASE }}
@@ -97,6 +99,41 @@ export function Hero() {
                   "radial-gradient(ellipse 34% 36% at var(--veil-x) 26%, rgba(5,5,5,0.99) 0%, rgba(5,5,5,0.97) 62%, rgba(5,5,5,0.7) 82%, transparent 100%)",
               }}
             />
+            {/*
+              Mobile: the same idea for the wall sign at the right edge. This box matches the
+              photo's rendered area exactly (object-cover by height, x at 33%), computed with
+              container units, so the veil tracks the sign at every phone size. Dark wall tone +
+              soft blur, feathered; hard cut-off left of 56.5% of the photo keeps Saeid untouched.
+            */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 sm:hidden"
+              style={{
+                width: "calc(100cqh * 1672 / 941)",
+                left: "calc((100cqw - 100cqh * 1672 / 941) * 0.33)",
+              }}
+            >
+              <div
+                className="absolute inset-0 backdrop-blur-[10px]"
+                style={{
+                  maskImage:
+                    "radial-gradient(ellipse 25% 32% at 74% 27%, #000 60%, transparent 100%), linear-gradient(to right, transparent 56.5%, #000 58.5%)",
+                  WebkitMaskImage:
+                    "radial-gradient(ellipse 25% 32% at 74% 27%, #000 60%, transparent 100%), linear-gradient(to right, transparent 56.5%, #000 58.5%)",
+                  maskComposite: "intersect",
+                  WebkitMaskComposite: "source-in",
+                }}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 25% 32% at 74% 27%, rgb(30,29,31) 0%, rgb(30,29,31) 64%, rgba(30,29,31,0.75) 82%, transparent 100%)",
+                  maskImage: "linear-gradient(to right, transparent 56.5%, #000 58.5%)",
+                  WebkitMaskImage: "linear-gradient(to right, transparent 56.5%, #000 58.5%)",
+                }}
+              />
+            </div>
           </motion.div>
           {/* Fade-from-black veil (keeps the LCP image itself fully opaque) */}
           <motion.div
@@ -150,7 +187,7 @@ export function Hero() {
         <p className="mt-3 max-w-xl text-base leading-relaxed text-silver sm:text-lg lg:mt-5">{t.hero.sub}</p>
 
         <div className="mt-5 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-6 lg:mt-8 lg:flex-col lg:items-start lg:gap-4">
-          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto" data-fab-hide>
+          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto">
             {t.hero.primary}
           </ButtonLink>
           <Link

@@ -8,131 +8,98 @@ import { WHATSAPP_GREEN, WhatsAppGlyph } from "@/components/ui/icons";
 import { EASE } from "@/lib/motion";
 import { whatsappLink } from "@/lib/site";
 
-/**
- * Elements that make the floating button redundant while visible (§2.3): inline WhatsApp links,
- * primary CTAs (`[data-fab-hide]`), the form and the BMI result card (also `[data-fab-hide]`),
- * and the footer.
- */
-const HIDE_SELECTOR = 'a[href^="https://wa.me"]:not([data-fab]), [data-fab-hide], footer';
-/** Interactive controls the button must never sit on top of (links, buttons, inputs, chips). */
-const CONTROL_SELECTOR = "a, button, input, label, select, textarea, summary, [role='button']";
+/** Buttons the floating button must never sit on: the form submit, "Check my numbers" and the Body Check result buttons. */
+const AVOID_SELECTOR = "[data-fab-avoid]";
+/** Fields that open the on-screen keyboard. */
+const TEXT_ENTRY =
+  "textarea, select, input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=range])";
 
 /**
- * Floating "Chat with Saeid on WhatsApp" button — 56px, reading-end corner, safe-area aware.
- * Visible by default. Hidden while any HIDE_SELECTOR element is in
- * view, or when it would sit over an interactive control (it may pass over plain text and photos).
- * Reappears after a short settle delay so it doesn't flicker while scrolling.
+ * Floating "Chat with Saeid on WhatsApp" button — 56px, fixed bottom corner, safe-area aware,
+ * visible at all times while scrolling. Only two exceptions (owner revision of §2.3):
+ * (a) hidden while a text input / textarea is focused (keyboard open);
+ * (b) hidden while it would sit directly over the form submit, the Body Check "Check my numbers"
+ *     button or the Body Check result buttons.
  */
 export function FloatingWhatsApp() {
   const { t } = useI18n();
   const pathname = usePathname();
-  const ref = useRef<HTMLAnchorElement>(null);
   const footprint = useRef<HTMLSpanElement>(null);
-  const [blockingInView, setBlockingInView] = useState(false);
-  const [overControl, setOverControl] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [overButton, setOverButton] = useState(false);
 
-  // Observe every hide-trigger element; re-collect when the page or its content changes.
+  // (a) Keyboard open
   useEffect(() => {
-    const visible = new Set<Element>();
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) visible.add(e.target);
-          else visible.delete(e.target);
-        }
-        setBlockingInView(visible.size > 0);
-      },
-      { threshold: 0 },
-    );
-    const collect = () => {
-      io.disconnect();
-      visible.clear();
-      document.querySelectorAll(HIDE_SELECTOR).forEach((el) => io.observe(el));
-    };
-    collect();
     let raf = 0;
-    const mo = new MutationObserver(() => {
+    const update = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(collect);
-    });
-    mo.observe(document.body, { childList: true, subtree: true });
+      // after focusout, activeElement settles on the next frame
+      raf = requestAnimationFrame(() => setTyping(!!document.activeElement?.matches?.(TEXT_ENTRY)));
+    };
+    document.addEventListener("focusin", update);
+    document.addEventListener("focusout", update);
     return () => {
-      io.disconnect();
-      mo.disconnect();
       cancelAnimationFrame(raf);
+      document.removeEventListener("focusin", update);
+      document.removeEventListener("focusout", update);
     };
-  }, [pathname]);
+  }, []);
 
-  // Scroll position + "is an interactive control underneath the button's footprint?"
+  // (b) Overlap with the protected buttons — checked on scroll, resize and DOM changes
   useEffect(() => {
     let raf = 0;
-    let settle = 0;
     const check = () => {
-      // Footprint = an invisible sentinel with the button's exact position (incl. safe area).
-      const r = footprint.current?.getBoundingClientRect();
-      if (!r) return;
-      const pts = [
-        [r.left + r.width / 2, r.top + r.height / 2],
-        [r.left + 4, r.top + 4],
-        [r.right - 4, r.top + 4],
-        [r.left + 4, r.bottom - 4],
-        [r.right - 4, r.bottom - 4],
-      ];
-      const hit = pts.some(([x, y]) =>
-        document.elementsFromPoint(x, y).some((el) => {
-          if (ref.current?.contains(el) || el.closest("[data-fab]")) return false;
-          return !!el.closest(CONTROL_SELECTOR);
-        }),
-      );
-      // Hide immediately; reappear only once the spot has stayed clear briefly (no flicker).
-      window.clearTimeout(settle);
-      if (hit) setOverControl(true);
-      else settle = window.setTimeout(() => setOverControl(false), 250);
+      const f = footprint.current?.getBoundingClientRect();
+      if (!f) return;
+      const hit = Array.from(document.querySelectorAll(AVOID_SELECTOR)).some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.left < f.right && r.right > f.left && r.top < f.bottom && r.bottom > f.top;
+      });
+      setOverButton(hit);
     };
-    const onScroll = () => {
+    const schedule = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(check);
     };
-    check();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    schedule();
+    const mo = new MutationObserver(schedule);
+    mo.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
     return () => {
       cancelAnimationFrame(raf);
-      window.clearTimeout(settle);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      mo.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
     };
   }, [pathname]);
 
-  const visible = !blockingInView && !overControl;
-
-  const position =
-    "fixed bottom-[max(1rem,env(safe-area-inset-bottom))] end-4 z-30 size-14 rounded-full sm:end-6";
+  const visible = !typing && !overButton;
+  const position = "fixed bottom-[max(1rem,env(safe-area-inset-bottom))] end-4 z-30 size-14 rounded-full sm:end-6";
 
   return (
     <>
-    <span ref={footprint} aria-hidden className={`pointer-events-none invisible ${position}`} />
-    <AnimatePresence>
-      {visible && (
-        <motion.a
-          key="wa-fab"
-          ref={ref}
-          data-fab
-          href={whatsappLink(t.common.defaultWhatsAppMessage)}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t.common.chatOnWhatsApp}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.35, ease: EASE }}
-          className={`${position} flex items-center justify-center text-white shadow-[0_10px_30px_-8px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)]`}
-          style={{ backgroundColor: WHATSAPP_GREEN }}
-        >
-          <WhatsAppGlyph className="size-8" color="#fff" handset={WHATSAPP_GREEN} />
-        </motion.a>
-      )}
-    </AnimatePresence>
+      <span ref={footprint} aria-hidden className={`pointer-events-none invisible ${position}`} />
+      <AnimatePresence>
+        {visible && (
+          <motion.a
+            key="wa-fab"
+            data-fab
+            href={whatsappLink(t.common.defaultWhatsAppMessage)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t.common.chatOnWhatsApp}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.25, ease: EASE }}
+            className={`${position} flex items-center justify-center text-white shadow-[0_10px_30px_-8px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)]`}
+            style={{ backgroundColor: WHATSAPP_GREEN }}
+          >
+            <WhatsAppGlyph className="size-8" color="#fff" handset={WHATSAPP_GREEN} />
+          </motion.a>
+        )}
+      </AnimatePresence>
     </>
   );
 }

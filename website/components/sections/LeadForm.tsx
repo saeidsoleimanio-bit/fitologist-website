@@ -453,6 +453,7 @@ export function LeadForm({ titleId }: { titleId: string }) {
               <Button
                 type="submit"
                 className="w-full sm:w-auto"
+                data-fab-avoid
                 disabled={status === "sending"}
                 icon={status === "sending" ? <Loader2 className="size-4 animate-spin" /> : <WhatsAppGlyph className="size-5" color="#050505" handset="#FF6A00" />}
               >

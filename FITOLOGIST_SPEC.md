@@ -99,7 +99,9 @@ Secrets (bot token etc.) are **env vars**, never in this config (Section 6.4).
 
 **Desktop header:** logo · menu · primary button · Instagram icon · text language switcher `EN | فا | ع` (no flags).
 
-**Mobile header:** compact logo (fixed height ~40px, the same size at top and on scroll — no large variant, no tagline) · short primary button `Free Consultation` · hamburger. Instagram and the language switcher move into the drawer. Header background always solid (never transparent over photos). If the button does not fit at 360px width, hide it below 360px only.
+**Mobile header:** compact logo (~40px when scrolled, no tagline) · short primary button `Free Consultation` · hamburger. Instagram and the language switcher move into the drawer. If the button does not fit at 360px width, hide it below 360px only. Respect the top safe area (`viewport-fit=cover` + `env(safe-area-inset-top)`).
+- **Home page only (owner revision, Oct 2026):** at the top of the page (scrollY < ~20px) the header is **transparent over the hero** (hero starts at the very top, behind it) with a subtle top gradient (black ~60% → transparent) for legibility; the logo is larger (~64–72px, via transform/scale — no layout shift); the header `Free Consultation` button is hidden (the hero shows the same CTA). After scrolling: solid black, logo ~40px, button fades in. Transition ~200–250ms. The §4.1 hero criterion must still pass.
+- **All other pages:** header always solid (never transparent over photos).
 
 Footer: keep current structure; update link labels to the menu above; add `Terms` and `Privacy`; replace flags with the text switcher.
 
@@ -116,9 +118,9 @@ Footer: keep current structure; update link labels to the menu above; add `Terms
 
 - Keep, 56px, `aria-label="Chat with Saeid on WhatsApp"`.
 - Opens `wa.me/{number}?text=` with: `Hi Saeid, I found you on fitologist.me and I'd like to know more.` (localized).
-- **Hide it** (IntersectionObserver) whenever any of these is in view: an inline WhatsApp/primary CTA, the form, the Body Check result card, the footer.
+- **Owner revision (Oct 2026):** fixed bottom corner and **visible at all times** while scrolling, on all pages (mobile and desktop). No hiding near inline CTAs, the footer or other controls. Only two exceptions: (a) hidden while any text input / textarea is focused (keyboard open); (b) hidden only when it would sit directly over the form's submit button, the Body Check "Check my numbers" button, or the Body Check result buttons (`data-fab-avoid`).
 - Respect `env(safe-area-inset-bottom)`.
-- Add bottom padding (~88px) to the last element of each section on mobile so no content ever sits under it. Known collisions to verify fixed: BMI "Female" button, Method step 04 text, form rows, footer, "I'm not sure yet" card.
+- Keep the bottom padding (~88px) on the last element of each section on mobile.
 
 ### 2.4 Visual restraint & typography
 
@@ -146,7 +148,7 @@ All images: WebP/AVIF, responsive `srcset`, `loading="lazy"` below the fold, her
 
 ### 2.6 Decorative icons & false affordances
 
-- Decorative line icons on cards: remove on mobile; on desktop move them so they never overlap text or links.
+- Decorative line icons on cards: remove on mobile; on desktop move them so they never overlap text or links. **Exception (owner revision):** the "Who I work with" rows (§4.3) show their neon line-art icons on mobile too, in their own column so they never overlap titles or text.
 - Remove arrows that are not links (Method step arrows).
 
 ### 2.7 Accessibility baseline
@@ -162,6 +164,10 @@ Replaces the current BMI calculator. Purpose: give a useful result instantly, th
 ### 3.1 Copy
 - Title: **Free Body Check**
 - Subtitle: *30 seconds. See your BMI, a healthy weight range for your height, and an estimate of your daily calories.*
+
+**Background art (owner revision):** 5–7 faint orange line-art vectors (protein shaker, protein tub, flexed arm, barbell squat, dumbbell, stopwatch) scattered irregularly behind the card content at ~10% opacity, varied sizes and rotations; `aria-hidden`, no pointer events. **Placement (mobile):** each vector sits mostly (≈70–80%+) in the empty space of the card (gaps between label rows and field groups, side margins, space above the button); only small edges may tuck behind fields, never mostly hidden behind an input, chip or button. Verify at 375, 390 and 430px. Inputs, chips and buttons have fully opaque backgrounds so the art never shows inside them; text contrast unaffected.
+
+**Card size (owner revision):** keep the card compact. Tight vertical spacing between fields, labels and rows (about 10–15% shorter than the first build). The units toggle sits under the subtitle, outside the card. Inputs stay ≥44px tall and 16px.
 
 ### 3.2 Inputs
 | Field | Details |
@@ -223,26 +229,34 @@ Remove from Home: the "Philosophy" section, the six goal cards, the "Built for r
 
 - Eyebrow: `Personal Trainer · Dubai` (or `Certified Personal Trainer · Dubai` per Section 1 rule)
 - **H1: Personal Training in Dubai, Built Around Your Schedule**
-- Subtitle: *1:1, partner, online and hybrid coaching for busy professionals, at your home or in Al Jaddaf & nearby.*
+- Subtitle: *1:1, Partner (Couples & Friends), Online and Hybrid Coaching for busy professionals, at your home or in Al Jaddaf & nearby.*
 - Primary: **Book a Free Consultation** · Secondary text link: **Check your BMI in 30 seconds** (→ Body Check section)
 - "Train. Transform. Transcend." may stay only as a small tagline, never as the H1.
+- **Mobile photo (owner revision):** photo shifted down ~7% (offset, not scaled) with a soft top fade, so there is clear room between Saeid's head and the top of the screen/header. The half-visible wall sign ("FIT… / TRAIN • TR…") at the right edge is removed with a localized overlay only on that area (dark wall tone + soft blur, feathered edges, positioned in photo coordinates so it tracks the sign at every phone size), never touching Saeid — as clean as the desktop treatment. Check at 375×667, 390×844, 430×932.
 
 ### 4.2 Trust strip
-Separate items (chips / icon + text), horizontally scrollable on mobile:
+**Owner revision (supersedes the list below):** no boxes, no borders, no horizontal scroll. Exactly three centered lines, icon at the start of each:
+- [pin] **Dubai, Al Jaddaf & Nearby**
+- [home] **Home & Gym Sessions Available**
+- [languages] **English, فارسی, Türkçe, Azərbaycanca**: one line, never wrapped (font shrinks slightly at narrow widths, minimum 14px); each language wrapped in `<bdi>` so commas keep their order; Arabic page uses the Arabic comma.
+Credentials (when enabled) appear above these in the same style. Original items for reference:
 - REPs UAE `{category}` `No. {number}` *(only if reps.show)*
 - Active IQ Level 3 *(only if activeIq.show)*
 - Al Jaddaf & nearby
 - Home sessions available
 - English · فارسی · Türkçe · Azərbaycanca
 
-### 4.3 Who I work with
-- **H2: Built for Busy Professionals**
-- Body: *You work long hours, travel, and still want to look and feel strong. I spent 12+ years in corporate business development, so I know what a demanding schedule does to your training. My job is to make every session count.*
-- Three points:
-  - 60-minute sessions at your home, your building's gym or nearby
-  - Plans that adapt when you travel or get busy
-  - Progress checked every 4 weeks, so you always see where you stand
-- Small line: *New to the gym? You'll learn proper technique from day one.*
+### 4.3 Who I work with (owner revision — replaces the earlier 4.3)
+Keep the three-row editorial structure (no cards).
+- Eyebrow: `Who I work with`
+- **H2: Built for Real Life**
+- Sub: *For people who want serious results without making fitness their entire life.*
+- Rows:
+  - **01 Busy Professionals** — Train around a demanding schedule: 60-minute sessions at your home, your building's gym or nearby.
+  - **02 Beginners** — Learn proper technique and build confidence from day one.
+  - **03 Already Training** — Training without a clear plan? Get structured programming and steady progression.
+- One orange line-art vector per row, on the right side: 01 briefcase, 02 footsteps, 03 dumbbell. Bright neon orange with a soft glow, clearly visible, **shown on mobile too** (exception to §2.6), never overlapping titles; body text must meet WCAG AA.
+- Arabic copy translated to match (`// needs native review`).
 
 ### 4.4 Free Body Check
 Component from Section 3, anchor `#bmi`.
@@ -544,7 +558,7 @@ Meta Pixel: `Lead` on `form_submit`, `Contact` on WhatsApp clicks. Capture UTM p
 
 ### Phase 1 — Foundations & mobile fixes
 Sections 0 (inspection report), 1 (config), 2 (all of it), Home hero 4.1 + trust strip 4.2, removal of Philosophy/goal cards/composite images. Keep existing pages working.
-**Done when:** hero criterion 4.1 passes on all three mobile sizes; no element is ever covered by the floating button; no scroll-fade on CTA; nav labels and CTA labels match 2.1/2.2 everywhere; RU removed with redirects; no horizontal scroll at 360px.
+**Done when:** hero criterion 4.1 passes on all three mobile sizes; the floating button stays visible except while typing or over the form submit / "Check my numbers" / Body Check result buttons (§2.3 owner revision); no scroll-fade on CTA; nav labels and CTA labels match 2.1/2.2 everywhere; RU removed with redirects; no horizontal scroll at 360px.
 
 ### Phase 2 — Lead flow & Body Check
 Sections 3 and 6, `/bmi`, `/start`, `.env.example`, `scripts/sheets-webhook.gs`, `SETUP_LEADS.md`.
@@ -562,7 +576,7 @@ Section 10 + Section 12 checklist.
 ## 12. Final QA checklist
 - [ ] Lighthouse mobile: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 95
 - [ ] 360, 375, 390, 430 px and 1440 px: no overlap, no horizontal scroll
-- [ ] Floating WhatsApp never covers content and hides near inline CTAs/form/footer
+- [ ] Floating WhatsApp always visible; hidden only while typing or over the form submit / "Check my numbers" / Body Check result buttons
 - [ ] All CTAs use the names in 2.2; no leftover old labels (search the codebase)
 - [ ] FA and AR: mirrored layout, no broken alignment, phone numbers LTR
 - [ ] Every input has a label, 16px font, correct `inputmode`/`autocomplete`

@@ -102,7 +102,7 @@ function MethodCta() {
         <Reveal delay={0.15} className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
           <ButtonLink
             href={href(START_PATH)}
-            data-fab-hide
+           
             className="w-full sm:w-auto"
           >
             {t.method.ctaButton}

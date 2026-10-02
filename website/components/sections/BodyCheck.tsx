@@ -6,6 +6,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { useApplication } from "@/components/providers/ApplicationProvider";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { GymVectors } from "@/components/ui/GymVectors";
 import { WhatsAppGlyph } from "@/components/ui/icons";
 import { Reveal } from "@/components/ui/primitives";
 import {
@@ -99,8 +100,8 @@ function Field({
         {label}
       </label>
       <div
-        className={`flex h-12 items-center border bg-[#0b0d0e]/75 px-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] transition-[border-color,box-shadow] duration-300 focus-within:border-ember focus-within:shadow-[0_0_0_3px_rgb(255_106_0/0.18)] ${
-          hideLabel ? "" : "mt-1.5"
+        className={`flex h-11 items-center border bg-[#0b0d0e] px-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] transition-[border-color,box-shadow] duration-300 focus-within:border-ember focus-within:shadow-[0_0_0_3px_rgb(255_106_0/0.18)] ${
+          hideLabel ? "" : "mt-1"
         } ${error ? "border-ember/80" : "border-silver/20 hover:border-silver/40"}`}
       >
         <input
@@ -150,7 +151,7 @@ function RadioChips<T extends string>({
   return (
     <fieldset aria-describedby={describedBy} aria-invalid={error || undefined}>
       <legend className={hideLegend ? "sr-only" : LABEL}>{legend}</legend>
-      <div className={`grid gap-1.5 ${hideLegend ? "" : "mt-1.5"} ${columns}`}>
+      <div className={`grid gap-1.5 ${hideLegend ? "" : "mt-1"} ${columns}`}>
         {options.map((o, i) => {
           const checked = value === o.value;
           return (
@@ -160,8 +161,8 @@ function RadioChips<T extends string>({
                 checked
                   ? "border-transparent bg-linear-to-b from-[#e4e5e7] to-silver text-ink"
                   : error
-                    ? "border-ember/70 bg-[#0b0d0e]/60 text-bone/85"
-                    : "border-silver/20 bg-[#0b0d0e]/60 text-bone/85 hover:border-silver/45 hover:text-bone"
+                    ? "border-ember/70 bg-[#0b0d0e] text-bone/85"
+                    : "border-silver/20 bg-[#0b0d0e] text-bone/85 hover:border-silver/45 hover:text-bone"
               }`}
             >
               <input
@@ -270,7 +271,7 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
   const errId = (k: keyof Errors) => `${uid}-${k}-err`;
   const described = (k: keyof Errors) => (errors[k] ? errId(k) : undefined);
   const errorLine = (k: keyof Errors) => (
-    <p id={errId(k)} className={`mt-1 min-h-[1.25rem] text-[0.8rem] font-medium leading-tight ${ERR}`} aria-live="polite">
+    <p id={errId(k)} className={`mt-0.5 min-h-[1rem] text-[0.8rem] font-medium leading-tight ${ERR}`} aria-live="polite">
       {errors[k]}
     </p>
   );
@@ -310,13 +311,28 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
             </Heading>
           </Reveal>
           <Reveal delay={0.08}>
-            <p className="mt-4 max-w-md text-[1.05rem] leading-relaxed text-silver lg:text-[1.15rem]">{b.subtitle}</p>
+            <p className="mt-3 max-w-md text-[1.05rem] leading-relaxed text-silver lg:text-[1.15rem]">{b.subtitle}</p>
           </Reveal>
+          {/* Units live outside the card to keep the card compact (§3, owner revision) */}
+          <div className="mt-4 w-48">
+            <RadioChips
+              name={`${uid}-units`}
+              legend={b.units}
+              options={[
+                { value: "metric", label: b.metric },
+                { value: "imperial", label: b.imperial },
+              ]}
+              value={units}
+              onChange={switchUnits}
+              columns="grid-cols-2"
+              hideLegend
+            />
+          </div>
         </div>
 
         <Reveal delay={0.12} className="min-w-0 lg:col-span-8">
           <div
-            className="relative mx-auto w-full max-w-[44rem] overflow-hidden border border-silver/30 p-4 shadow-[0_40px_90px_-45px_rgba(0,0,0,0.95),inset_0_1px_0_rgb(255_255_255/0.14)] sm:p-6"
+            className="relative mx-auto w-full max-w-[44rem] overflow-hidden border border-silver/30 p-4 sm:p-5 lg:p-6 shadow-[0_40px_90px_-45px_rgba(0,0,0,0.95),inset_0_1px_0_rgb(255_255_255/0.14)] "
             style={{
               backgroundImage: [
                 "radial-gradient(90% 70% at 0% 0%, rgb(191 192 194 / 0.2) 0%, rgb(191 192 194 / 0.05) 50%, transparent 75%)",
@@ -326,25 +342,9 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
             }}
           >
             <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-logo-silver-hi to-transparent" />
+            <GymVectors />
 
-            <form noValidate onSubmit={onSubmit} aria-label={b.formLabel} className="relative space-y-3">
-              <div className="flex justify-end">
-                <div className="w-48">
-                  <RadioChips
-                    name={`${uid}-units`}
-                    legend={b.units}
-                    options={[
-                      { value: "metric", label: b.metric },
-                      { value: "imperial", label: b.imperial },
-                    ]}
-                    value={units}
-                    onChange={switchUnits}
-                    columns="grid-cols-2"
-                    hideLegend
-                  />
-                </div>
-              </div>
-
+            <form noValidate onSubmit={onSubmit} aria-label={b.formLabel} className="relative space-y-2 lg:space-y-3">
               <div className="grid grid-cols-2 gap-x-3 sm:grid-cols-3 [&>div]:min-w-0">
                 <div className="col-span-2 sm:col-span-1">
                   {units === "metric" ? (
@@ -352,7 +352,7 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                   ) : (
                     <fieldset aria-describedby={described("height")}>
                       <legend className={LABEL}>{b.height}</legend>
-                      <div className="mt-1.5 flex gap-1.5">
+                      <div className="mt-1 flex gap-1.5">
                         <Field id={`${uid}-ft`} label={`${b.height} (${b.unitFt})`} unit={b.unitFt} value={fields.ft} onChange={set("ft")} error={!!errors.height} inputMode="numeric" hideLabel />
                         <Field id={`${uid}-in`} label={`${b.height} (${b.unitIn})`} unit={b.unitIn} value={fields.inch} onChange={set("inch")} error={!!errors.height} hideLabel />
                       </div>
@@ -428,14 +428,14 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                 <legend className={LABEL}>
                   {b.goals} <span className="font-sans text-[0.8rem] font-medium normal-case tracking-normal text-silver">{b.optional}</span>
                 </legend>
-                <div className="mt-1.5 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                <div className="mt-1 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
                   {GOALS.map((g) => {
                     const on = goals.includes(g);
                     return (
                       <label
                         key={g}
                         className={`flex min-h-11 cursor-pointer items-center gap-2 border px-3 text-[0.9rem] font-semibold leading-tight transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ember ${
-                          on ? "border-ember bg-ember/15 text-bone" : "border-silver/20 bg-[#0b0d0e]/60 text-bone/85 hover:border-silver/45 hover:text-bone"
+                          on ? "border-ember bg-[#2e1a0c] text-bone" : "border-silver/20 bg-[#0b0d0e] text-bone/85 hover:border-silver/45 hover:text-bone"
                         }`}
                       >
                         <input type="checkbox" checked={on} onChange={() => setGoals((gs) => toggleGoal(gs, g))} className="sr-only" />
@@ -449,8 +449,8 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                 </div>
               </fieldset>
 
-              <div className="pt-2">
-                <Button type="submit" className="w-full sm:w-auto" icon={false}>
+              <div className="pt-2.5">
+                <Button type="submit" className="w-full sm:w-auto" icon={false} data-fab-avoid>
                   {b.calculate}
                 </Button>
               </div>
@@ -467,7 +467,7 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.55, ease: EASE }}
                     className="overflow-hidden"
-                    data-fab-hide
+                   
                   >
                     <div className="mt-5 border-t border-silver/15 pt-5">
                       <p className="font-display text-[1.05rem] font-bold uppercase tracking-[0.12em] text-ember">{b.yourBmi}</p>
@@ -533,13 +533,15 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                           rel="noopener noreferrer"
                           icon={<WhatsAppGlyph className="size-5" color="#050505" handset="#FF6A00" />}
                           className="w-full sm:w-auto"
+                          data-fab-avoid
                         >
                           {b.sendResult}
                         </ButtonLink>
                         <Button
                           variant="ghost"
-                          className="w-full sm:w-auto"
-                          data-fab-hide
+                          className="w-full bg-[#1b1d20]! backdrop-blur-none sm:w-auto"
+                          data-fab-avoid
+                         
                           onClick={() => startApplication({ age: String(result.age), goals: result.goals, bmi: fmt(result.bmi) })}
                         >
                           {b.book}
