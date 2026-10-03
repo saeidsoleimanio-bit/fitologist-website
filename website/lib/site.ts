@@ -2,7 +2,7 @@ import { site } from "@/config/site";
 
 export const SITE = {
   name: site.brand,
-  url: "https://fitologist.me",
+  url: "https://www.fitologist.me", // canonical domain (Vercel redirects the apex to www)
   location: "Dubai, UAE",
   tagline: ["Train", "Transform", "Transcend"] as const,
 };
