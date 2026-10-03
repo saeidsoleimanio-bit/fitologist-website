@@ -626,6 +626,7 @@ The printed card's QR code points to **https://www.fitologist.me/c**.
 - Unique title, description and single H1 per page (`/plans`: Training Plans | …; `/method`: The FITologist Method | …; `/about`: About Saeid Soleimani | …; `/bmi`: Free BMI & Calorie Check | …).
 - JSON-LD: `Person` (Saeid) + `ProfessionalService` (`areaServed`: Dubai; `availableLanguage`: English, Persian, Azerbaijani; `hasCredential` only for credentials with `show:true`). No price fields.
 - OG/Twitter image 1200×630 (hero portrait + H1) — one per language: `/images/og-en.jpg`, `og-fa.jpg`, `og-ar.jpg` (rendered from `hero-desktop.webp` + the localized eyebrow/H1; Saeid unaltered). Re-rendered for the new hero copy ("Hi, I'm Saeid" / "Your Personal Trainer in Dubai"); they use the non-certified H1 — re-render when a credential is enabled. `sitemap.xml`, `robots.txt`, canonical URLs, 301s from Section 2.1.
+- Canonical domain: **https://www.fitologist.me** (`SITE.url` in `lib/site.ts`). Canonical tags, hreflang alternates, sitemap, robots.txt, JSON-LD and share-image URLs all use www; Vercel redirects the apex `fitologist.me` to www.
 
 ### 10.3 Tracking (load only if IDs are set)
 GA4 + Meta Pixel. Events:
