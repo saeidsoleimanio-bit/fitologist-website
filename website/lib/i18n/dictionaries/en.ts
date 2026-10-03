@@ -1,13 +1,14 @@
 /**
  * English dictionary — the source of truth for the dictionary shape.
- * `ar.ts` and `ru.ts` must satisfy `Dictionary`, so a missing key fails the build.
+ * `fa.ts` and `ar.ts` must satisfy `Dictionary`, so a missing key fails the build.
  * Brand names (FITologist, Saeid Soleimani, Active IQ, REPs UAE) are never translated.
  */
 const en = {
   meta: {
-    siteTitle: "Personal Trainer in Dubai | Saeid Soleimani · FITologist.me",
+    siteTitle: "Your Personal Trainer in Dubai | Saeid Soleimani · FITologist.me",
+    siteTitleCertified: "Your Certified Personal Trainer in Dubai | Saeid Soleimani · FITologist.me",
     siteDescription:
-      "Personal trainer in Dubai for busy professionals. 1:1, partner, online and hybrid coaching at your home or in Al Jaddaf. Free 30-minute consultation.",
+      "Hi, I'm Saeid, your personal trainer in Dubai. Training built around your busy schedule: 1:1, partner, online and hybrid coaching at your home or in Al Jaddaf. Free 30-minute consultation.",
     about: {
       title: "About Saeid Soleimani | FITologist.me",
       description:
@@ -75,10 +76,13 @@ const en = {
   },
 
   hero: {
-    eyebrow: "Personal Trainer · Dubai",
-    eyebrowCertified: "Certified Personal Trainer · Dubai",
-    title: "Personal Training in Dubai, Built Around Your Schedule",
-    sub: "1:1, Partner (Couples & Friends), Online and Hybrid Coaching for busy professionals, at your home or in Al Jaddaf & nearby.",
+    eyebrow: "Hi, I'm Saeid",
+    /** H1 as two controlled lines (credentials off) */
+    titleLines: ["Your Personal Trainer", "in Dubai"],
+    /** H1 as two controlled lines when the Active IQ certificate is on (§1) */
+    titleCertifiedLines: ["Your Certified", "Personal Trainer in Dubai"],
+    subLead: "Training built around your busy schedule:",
+    sub: "1:1 & Partner Training (Couples & Friends), Online and Hybrid Coaching.",
     primary: "Book a Free Consultation",
     secondary: "Check your BMI in 30 seconds",
     alt: "Saeid, personal trainer, smiling with arms crossed in a Dubai gym",
@@ -88,6 +92,8 @@ const en = {
     label: "At a glance",
     languages: "Languages spoken",
     reps: "REPs UAE",
+    /** Short trust-strip line (one line, matches "Active IQ Level 3") */
+    repsRegistered: "REPs UAE Registered",
     repsNo: "No.",
     activeIq: "Active IQ Level 3",
     area: "Dubai, Al Jaddaf & Nearby",
@@ -111,7 +117,7 @@ const en = {
     profiles: [
       {
         title: "Busy Professionals",
-        body: "Train around a demanding schedule: 60-minute sessions at your home, your building's gym or nearby.",
+        body: "Train around a demanding schedule, with sessions that fit your week.",
       },
       { title: "Beginners", body: "Learn proper technique and build confidence from day one." },
       {
@@ -119,32 +125,6 @@ const en = {
         body: "Training without a clear plan? Get structured programming and steady progression.",
       },
     ],
-  },
-
-  howItWorks: {
-    title: "How It Works",
-    steps: [
-      { title: "Free consultation", body: "30 minutes, online or in person. Your goals, history and schedule." },
-      { title: "Your plan", body: "a program and nutrition targets built around you." },
-      { title: "Train & track", body: "sessions, support between them, progress checked every 4 weeks." },
-      { title: "Keep progressing", body: "you learn the why behind every exercise and build habits that last." },
-    ],
-    link: "See the full method",
-  },
-
-  plansPreview: {
-    title: "Training Plans",
-    items: [
-      { name: "Foundation", freq: "1× a week", recommended: false },
-      { name: "Momentum", freq: "2× a week", recommended: true },
-      { name: "Accelerate", freq: "3× a week", recommended: false },
-      { name: "Elite", freq: "4× a week", recommended: false },
-    ],
-    recommended: "Recommended",
-    line: "Every plan includes nutrition guidance and WhatsApp support. Partner, online and hybrid options available.",
-    faqLine: "Questions about location, pricing or cancellation?",
-    faqLink: "Read the FAQ",
-    link: "Compare plans",
   },
 
   meet: {
@@ -258,44 +238,60 @@ const en = {
   about: {
     eyebrow: "Meet your coach",
     subtitle: "Personal Trainer · Dubai",
-    subtitleCertified: "REPs UAE-Registered Personal Trainer · Dubai",
+    subtitleRegistered: "REPs UAE-Registered Personal Trainer",
+    subtitleCertified: "Certified Personal Trainer · Dubai",
+    languagesLine: {
+      before: "Coaching in",
+      and: "and",
+    },
     lead: "I train busy people the way I train myself: with structure, honesty and no wasted time.",
     stats: [
-      { value: "5 years", label: "training" },
-      { value: "12+ years", label: "corporate" },
-      { value: "3", label: "languages" },
+      {
+        value: "5 years",
+        label: "training",
+      },
+      {
+        value: "12+ years",
+        label: "corporate",
+      },
+      {
+        value: "3",
+        label: "languages",
+      },
     ],
     storyTitle: "My story",
     story: [
-      "I started training seriously five years ago, under the guidance of a coach, the same way I now work with my clients. Structure, proper technique and consistency changed how I look, how I feel, and how I handle a demanding career.",
-      "For more than twelve years I've worked in business development across Iran and the GCC. Long days, travel and pressure: I know exactly what a busy schedule does to good intentions. That's why my coaching is built for real life, with efficient sessions, clear plans and progress you can actually measure.",
-      "Before business, I spent five years teaching. It taught me to explain things simply and patiently, which is exactly what good technique coaching needs. For the past year I've been coaching clients one-to-one, and today I help busy professionals in Dubai build strength that lasts.",
+      "Five years ago I started training seriously, with a coach, a structure and a plan, the same way I now work with my clients. It changed more than my body: it changed how I feel, how I focus and how I handle a demanding career. Along the way, training became more than a habit. I studied it properly and",
+      "For more than twelve years I've worked in business development across Iran and the GCC, and before that I spent five years teaching. I know what long days, travel and pressure do to good intentions, and I know how to explain things simply. That's what I bring to every client: efficient sessions, a clear plan and progress you can measure, built around the life you actually have.",
     ],
-    whyTitle: "Why train with me",
-    why: [
-      { title: "I've been where you are.", body: "12+ years in corporate business development, training around a demanding schedule." },
-      {
-        title: "I explain things clearly.",
-        body: "Five years of teaching (BA in English Literature) means step-by-step technique coaching you'll actually understand.",
-      },
-      { title: "Coaching in your language.", body: "English, Persian and Azerbaijani." },
-    ],
+    aiqPending: "I'm completing the Level 3 Diploma in Gym Instructing & Personal Training with Active IQ, a UK-regulated qualification.",
+    aiqEarned: "earned the Level 3 Diploma in Gym Instructing & Personal Training from Active IQ, a UK-regulated qualification.",
     credentialsTitle: "Fitness credentials",
     credentials: {
-      aiq: { lines: ["Level 3 Diploma", "Gym Instructing & Personal Training"] },
-      reps: { lines: ["Category A Personal Trainer"] },
+      /** Card: title · line · note (own line, smaller, muted) */
+      aiq: { title: "Level 3 Diploma", line: "Gym Instructing & Personal Training", note: "UK-regulated qualification" },
+      /** Card: title · subline "[flag] {country} · {level} · {config category}" (category only when set) */
+      reps: { title: "Registered Personal Trainer", country: "UAE", level: "Level 3" },
     },
+    /** Accessible names for the inline flag icons on the credential cards */
+    flags: { uk: "United Kingdom", uae: "United Arab Emirates" },
     repsNo: "No.",
     galleryLabel: "Photos of Saeid",
-    portraitAlt:
-      "Portrait of Saeid Soleimani, the coach behind FITologist, in a FITologist t-shirt with arms crossed",
+    portraitAlt: "Portrait of Saeid Soleimani, the coach behind FITologist, in a FITologist t-shirt with arms crossed",
+    dictionary: {
+      label: "A torn page from a dictionary, defining fit, fitness and FITologist",
+      note: "that's me!",
+      translation: "",
+    },
   },
+
 
   method: {
     eyebrow: "How it works",
     titleBefore: "The",
     titleAfter: "Method",
     intro: "Four stages. One clear process, so you always know where you are and what comes next.",
+    heroAlt: "A dark gym with a bench, a towel and a dumbbell in the evening light",
     stages: [
       {
         label: "Assess",
@@ -327,7 +323,7 @@ const en = {
       { when: "Day 30", what: "progress review and your next 4-week block." },
     ],
     trackTitle: "How we track progress",
-    track: ["Body measurements", "Progress photos", "Strength numbers", "Consistency"],
+    track: ["Body Measurements", "Consistency", "Progress Photos", "Strength Numbers"],
     nutritionTitle: "Nutrition, kept simple",
     nutrition:
       "Every plan includes nutrition guidance: calorie and protein targets and practical eating habits that fit your life. No extreme diets. If you have a medical condition, I'll work alongside your doctor or dietitian.",
@@ -335,13 +331,26 @@ const en = {
 
   plans: {
     eyebrow: "Training Plans",
-    title: "Training Plans",
-    intro: "Choose how often you train. Every plan is tailored to you. Saeid will recommend the right one and share pricing in your free consultation.",
-    whereTitle: "Where we train",
-    where: "At your home, your building's gym, or a gym in Al Jaddaf & nearby. Online coaching works anywhere.",
-    inPersonTitle: "In-person plans (1:1 or Partner)",
-    inPersonNote: "All sessions 60 minutes.",
-    columns: { plan: "Plan", freq: "How often", sessions: "Sessions / month", bestFor: "Best for" },
+    title: "Build Your Plan",
+    intro: "Choose how you train and how often. Saeid will confirm the right plan and share pricing in your free consultation.",
+    heroAlt: "Saeid, personal trainer, writing a training plan on a FITologist clipboard in a gym",
+    step1: "Step 1",
+    step2: "Step 2",
+    typeTitle: "How do you want to train?",
+    bestForLabel: "Best for:",
+    types: [
+      { key: "1to1", name: "1:1 Personal Training", line: "Private sessions with Saeid. At your home, your building's gym, or a gym in Al Jaddaf & nearby.", bestFor: "hands-on coaching and beginners." },
+      { key: "partner", name: "Partner Training (Couples & Friends)", line: "Two people, same session, special partner rate. Same locations as 1:1.", bestFor: "training together and staying motivated." },
+      { key: "online", name: "Online Coaching", line: "Your program in a coaching app, weekly check-ins and video form reviews. Works anywhere.", bestFor: "training on your own with expert guidance." },
+      { key: "hybrid", name: "Hybrid Coaching", line: "In-person sessions plus an online program for the days you train alone.", bestFor: "busy professionals who want both." },
+    ],
+    freqTitle: "How often?",
+    freqNote: "All sessions 60 minutes.",
+    onlineNote: "Online coaching is monthly: weekly check-ins and a new training block every 4 weeks.",
+    hybridNote: "Hybrid combines up to 2 sessions a week with online training.",
+    summaryLabel: "Your plan:",
+    summaryNone: "Not sure yet? That's what the consultation is for.",
+    monthly: "monthly",
     recommended: "Recommended",
     perMonth: "sessions / month",
     items: [
@@ -358,19 +367,6 @@ const en = {
       { title: "Progress check every 4 weeks", body: "measurements, photos and strength." },
       { title: "WhatsApp support", body: "questions answered within 24 hours." },
     ],
-    partner: {
-      title: "Partner Training",
-      lead: "Train together.",
-      body: "Train with your partner, friend or colleague. Two people, same session, special partner rate. Available on all four plans, and best when you share a similar goal and schedule.",
-    },
-    online: {
-      title: "Online Coaching",
-      body: "Train anywhere. Your program in a dedicated coaching app with exercise videos, weekly check-ins, video form reviews and nutrition guidance. A new training block every 4 weeks.",
-    },
-    hybrid: {
-      title: "Hybrid Coaching",
-      body: "Foundation or Momentum sessions in person, plus an online program for the days you train alone and weekly check-ins. Built for busy professionals.",
-    },
     firstStep: {
       title: "Your first step is free",
       consultation: "30-minute consultation",
@@ -392,6 +388,13 @@ const en = {
     title: "Your First Step Is Free",
     body: "A 30-minute consultation, online or in person. No pressure, just a conversation.",
     reply: "Saeid replies personally within a few hours.",
+    /** Home "What happens next" (above the form): step 1, step 2 = `reply`, step 3; then links. */
+    next: {
+      send: "Send your details. It takes about a minute.",
+      consultation: "Free 30-minute consultation, online or in person. No pressure, just a conversation.",
+      details: "Want the details first?",
+      links: { method: "How it works", plans: "Training plans", faq: "FAQ" },
+    },
   },
 
   lead: {

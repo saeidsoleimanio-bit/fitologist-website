@@ -1,14 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const PREFIXED = ["ar"];
+const PREFIXED = ["fa", "ar"];
+/** Set by the language switcher; remembers the visitor's choice (§10.1). */
+const LANG_COOKIE = "fit_lang";
 /** Locales that were removed — permanently redirected to the English home page. */
 const REMOVED = ["ru"];
 
 /**
  * Locale routing:
- * - `/ar/...`              → served as-is (`app/[lang]`).
+ * - `/fa/...`, `/ar/...`  → served as-is (`app/[lang]`).
+ * - unprefixed URL + `fit_lang` cookie = fa/ar → 307 to that language (the visitor chose it).
  * - `/ru`, `/ru/...`      → 301 to `/` (Russian was removed).
- * - `/coaching`, `/ar/coaching` → 301 to `/plans`, `/ar/plans`.
+ * - `/coaching`, `/fa|ar/coaching` → 301 to `/plans`, `/fa|ar/plans`.
  * - `/en/...`             → 308 to the clean unprefixed URL (English is the default).
  * - everything else       → internally rewritten to `/en/...` (URL stays clean).
  */
@@ -24,7 +27,7 @@ export function proxy(request: NextRequest) {
   }
 
   // /coaching was replaced by /plans (301, query kept).
-  const coaching = pathname.match(/^(\/ar)?\/coaching(?=\/|$)/);
+  const coaching = pathname.match(/^(\/(?:fa|ar))?\/coaching(?=\/|$)/);
   if (coaching) {
     const url = request.nextUrl.clone();
     url.pathname = `${coaching[1] ?? ""}/plans`;
@@ -37,6 +40,14 @@ export function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = pathname.replace(/^\/en(?=\/|$)/, "") || "/";
     return NextResponse.redirect(url, 308);
+  }
+
+  // Remembered choice: an unprefixed (English) URL opens in the language the visitor picked.
+  const remembered = request.cookies.get(LANG_COOKIE)?.value;
+  if (remembered && PREFIXED.includes(remembered)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/${remembered}${pathname === "/" ? "" : pathname}`;
+    return NextResponse.redirect(url, 307);
   }
 
   const url = request.nextUrl.clone();

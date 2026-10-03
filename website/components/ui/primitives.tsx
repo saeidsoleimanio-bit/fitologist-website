@@ -12,12 +12,23 @@ export function Reveal({
   className,
   delay = 0,
   as = "div",
+  load = false,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
   as?: "div" | "li" | "p" | "span";
+  /** First-screen content: CSS page-load animation that starts on first paint (no JS wait, good LCP). */
+  load?: boolean;
 }) {
+  if (load) {
+    const Tag = as;
+    return (
+      <Tag className={`load-fade-up ${className ?? ""}`} style={{ "--load-delay": `${delay}s` } as React.CSSProperties}>
+        {children}
+      </Tag>
+    );
+  }
   const Comp = motion[as];
   return (
     <Comp

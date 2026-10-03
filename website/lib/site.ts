@@ -40,12 +40,6 @@ export const PLANS_START_PATH = `/plans#${START_ID}`;
 /** Where the primary CTA goes from a given (locale-free) path. */
 export const startPathFor = (path: string) => (path === "/plans" ? PLANS_START_PATH : START_PATH);
 
-/**
- * Pages whose hero has a photo behind the header: on mobile the header is transparent at the top
- * there (owner revision of §2.1). Every other page keeps the solid header.
- */
-export const HERO_PHOTO_PATHS: readonly string[] = ["/"];
-
 /** Coaching keys — labels live in the dictionary (`coaching.options.<key>`). */
 export const COACHING_TYPES = ["personal", "online", "hybrid"] as const;
 export type CoachingType = (typeof COACHING_TYPES)[number];

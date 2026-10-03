@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { BodyCheck } from "@/components/sections/BodyCheck";
 import { Hero } from "@/components/sections/Hero";
-import { HowItWorks } from "@/components/sections/HowItWorks";
 import { MeetSaeid } from "@/components/sections/MeetSaeid";
-import { PlansPreview } from "@/components/sections/PlansPreview";
 import { StartTraining } from "@/components/sections/StartTraining";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { TrustStrip } from "@/components/sections/TrustStrip";
@@ -16,7 +14,7 @@ export async function generateMetadata({ params }: PageProps<"/[lang]">): Promis
   return isLocale(lang) ? pageMetadata(lang, "home") : {};
 }
 
-/** Home (§4): hero · trust · who · body check · how it works · plans (+ FAQ link) · meet Saeid · testimonials · form. */
+/** Home (§4): hero · trust · who · body check · meet Saeid · testimonials · what happens next + form. */
 export default function HomePage() {
   return (
     <>
@@ -24,11 +22,9 @@ export default function HomePage() {
       <TrustStrip />
       <WhoIsThisFor />
       <BodyCheck />
-      <HowItWorks />
-      <PlansPreview />
       <MeetSaeid />
       <Testimonials />
-      <StartTraining />
+      <StartTraining nextSteps />
     </>
   );
 }

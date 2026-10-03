@@ -27,9 +27,9 @@ export const site = {
 
   credentials: {
     // {{ACTIVEIQ}} — set show: true once issued
-    activeIq: { show: false, title: "Level 3 Diploma in Gym Instructing & Personal Training" },
+    activeIq: { show: true, title: "Level 3 Diploma in Gym Instructing & Personal Training" },
     // {{REPS_NO}}
-    reps: { show: false, category: "Category A Personal Trainer", number: "" },
+    reps: { show: true, category: "", number: "" }, // category optional (e.g. a REPs category) — shown in the card subline when set
   },
 
   stats: { yearsTraining: 5, yearsCorporate: 12 },
@@ -49,5 +49,5 @@ export const site = {
   analytics: { ga4Id: "", metaPixelId: "" }, // {{GA4_ID}} {{PIXEL_ID}} — load scripts only if set
 };
 
-/** True when at least one credential is published (drives "Certified" wording). */
-export const hasAnyCredential = site.credentials.activeIq.show || site.credentials.reps.show;
+/** "Certified" wording (Home H1/title, About subtitle) comes only from the Active IQ certificate — never from REPs, which is a registration. */
+export const isCertified = site.credentials.activeIq.show;

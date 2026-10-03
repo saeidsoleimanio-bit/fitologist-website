@@ -28,7 +28,8 @@ import {
   type Sex,
   type UnitSystem,
 } from "@/lib/bodycheck";
-import { GOALS, toggleGoal, type Goal } from "@/lib/lead";
+import { GOALS, toLatinDigits, toggleGoal, type Goal } from "@/lib/lead";
+import { track } from "@/lib/analytics";
 import { EASE } from "@/lib/motion";
 import { whatsappLink } from "@/lib/site";
 
@@ -109,7 +110,7 @@ function Field({
           inputMode={inputMode}
           autoComplete="off"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange(toLatinDigits(e.target.value))}
           aria-invalid={error || undefined}
           aria-describedby={describedBy}
           dir="ltr"
@@ -239,6 +240,7 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
     setErrors(e);
     if (heightCm && weightKg && sex && activity && !Object.keys(e).length) {
       const bmi = calculateBmi(weightKg, heightCm);
+      track("bmi_calculated", { category: bmiCategory(bmi), goals: goals.join(",") });
       setResult({
         bmi,
         tone: bmiCategory(bmi),
@@ -305,12 +307,12 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
     >
       <div className="relative mx-auto grid max-w-[88rem] gap-6 px-4 sm:px-8 lg:grid-cols-12 lg:gap-12 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]">
         <div className="min-w-0 lg:col-span-4 lg:pt-6">
-          <Reveal>
+          <Reveal load={headingLevel === "h1"}>
             <Heading id={`${uid}-title`} className="display text-[clamp(2.25rem,7.4vw,4rem)] text-bone text-balance">
               {b.title}
             </Heading>
           </Reveal>
-          <Reveal delay={0.08}>
+          <Reveal load={headingLevel === "h1"} delay={0.08}>
             <p className="mt-3 max-w-md text-[1.05rem] leading-relaxed text-silver lg:text-[1.15rem]">{b.subtitle}</p>
           </Reveal>
           {/* Units live outside the card to keep the card compact (§3, owner revision) */}
@@ -330,7 +332,7 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
           </div>
         </div>
 
-        <Reveal delay={0.12} className="min-w-0 lg:col-span-8">
+        <Reveal load={headingLevel === "h1"} delay={0.12} className="min-w-0 lg:col-span-8">
           <div
             className="relative mx-auto w-full max-w-[44rem] overflow-hidden border border-silver/30 p-4 sm:p-5 lg:p-6 shadow-[0_40px_90px_-45px_rgba(0,0,0,0.95),inset_0_1px_0_rgb(255_255_255/0.14)] "
             style={{
@@ -529,6 +531,8 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                         <ButtonLink
                           href={whatsappLink(waMessage)}
+                          data-track="bmi_whatsapp"
+                          data-category={result.tone}
                           target="_blank"
                           rel="noopener noreferrer"
                           icon={<WhatsAppGlyph className="size-5" color="#050505" handset="#FF6A00" />}
@@ -542,7 +546,10 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                           className="w-full bg-[#1b1d20]! backdrop-blur-none sm:w-auto"
                           data-fab-avoid
                          
-                          onClick={() => startApplication({ age: String(result.age), ...(sex ? { sex } : {}), goals: result.goals, bmi: fmt(result.bmi) })}
+                          onClick={() => {
+                            track("bmi_to_form");
+                            startApplication({ age: String(result.age), ...(sex ? { sex } : {}), goals: result.goals, bmi: fmt(result.bmi) });
+                          }}
                         >
                           {b.book}
                         </Button>

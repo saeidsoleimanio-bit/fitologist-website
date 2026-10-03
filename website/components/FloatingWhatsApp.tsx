@@ -86,6 +86,7 @@ export function FloatingWhatsApp() {
             key="wa-fab"
             data-fab
             href={whatsappLink(t.common.defaultWhatsAppMessage)}
+            data-wa="floating"
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t.common.chatOnWhatsApp}

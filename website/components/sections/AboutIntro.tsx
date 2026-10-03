@@ -1,11 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
+import { Fragment } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
+import { UAEFlag, UKFlag } from "@/components/ui/Flags";
 import { AccentLine, Reveal } from "@/components/ui/primitives";
-import { hasAnyCredential, site } from "@/config/site";
-import { EASE } from "@/lib/motion";
+import { isCertified, site } from "@/config/site";
 import { COACH_NAME, CREDENTIALS } from "@/lib/site";
 
 /**
@@ -15,7 +15,7 @@ import { COACH_NAME, CREDENTIALS } from "@/lib/site";
  * when enabled in config.
  */
 export function AboutIntro() {
-  const { t, dir } = useI18n();
+  const { t, dir, locale } = useI18n();
   const a = t.about;
 
   return (
@@ -38,11 +38,8 @@ export function AboutIntro() {
       />
 
       {/* Portrait — in flow below the header on mobile, full-height on the left from lg */}
-      <motion.div
-        className="about-portrait-mask relative -z-10 aspect-square w-full lg:absolute lg:inset-y-0 lg:left-0 lg:aspect-auto lg:w-[min(60vw,60rem)]"
-        initial={{ opacity: 0, scale: 1.03 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.6, ease: EASE }}
+      <div
+        className="load-fade-in about-portrait-mask relative -z-10 aspect-square w-full lg:absolute lg:inset-y-0 lg:left-0 lg:aspect-auto lg:w-[min(60vw,60rem)]"
       >
         <Image
           src={site.photos.about}
@@ -53,15 +50,15 @@ export function AboutIntro() {
           sizes="(min-width: 1024px) 60vw, 100vw"
           className="object-cover object-[45%_20%] lg:object-[30%_22%]"
         />
-      </motion.div>
+      </div>
 
       <div className="relative mx-auto -mt-20 grid w-full max-w-[88rem] px-4 sm:-mt-32 sm:px-8 lg:mt-0 lg:grid-cols-12 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]" dir="ltr">
         <div className="flex flex-col justify-center lg:col-span-6 lg:col-start-7 xl:col-span-5 xl:col-start-7" dir={dir}>
-          <Reveal className="eyebrow flex items-center gap-4">
+          <Reveal load className="eyebrow flex items-center gap-4">
             <AccentLine className="w-10" />
             <span className="text-ember">{a.eyebrow}</span>
           </Reveal>
-          <Reveal delay={0.06}>
+          <Reveal load delay={0.06}>
             <h1
               id="about-title"
               className="display mt-4 text-[clamp(2.75rem,8vw,5.25rem)] text-bone [font-family:var(--font-barlow),var(--font-display)] rtl:leading-[0.95]!"
@@ -70,56 +67,103 @@ export function AboutIntro() {
               <span className="block rtl:text-right">{COACH_NAME}</span>
             </h1>
           </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-3 font-display text-lg font-semibold uppercase tracking-[0.12em] text-silver sm:text-xl">
-              {hasAnyCredential ? a.subtitleCertified : a.subtitle}
+          <Reveal load delay={0.12}>
+            {/* REPs subtitle stays on one line on phones: slightly tighter letter-spacing below sm */}
+            <p
+              className={`mt-3 font-display text-lg font-semibold uppercase tracking-[0.12em] text-silver sm:text-xl ${
+                site.credentials.reps.show ? "whitespace-nowrap max-sm:tracking-[0.08em]" : ""
+              }`}
+            >
+              {site.credentials.reps.show ? a.subtitleRegistered : isCertified ? a.subtitleCertified : a.subtitle}
+            </p>
+            {/* Languages line (owner revision) — names in their own script, isolated so commas keep their order */}
+            <p className="mt-2 text-base text-silver">
+              {a.languagesLine.before}{" "}
+              {site.languagesSpoken.map((l, i, all) => (
+                <Fragment key={l}>
+                  {i > 0 && (i === all.length - 1 ? ` ${a.languagesLine.and}${locale === "ar" ? "" : " "}` : locale === "en" ? ", " : "، ")}
+                  <bdi className={`text-bone ${/[\u0100-\u02ff]/.test(l) ? "font-[system-ui,sans-serif]" : ""}`}>{l}</bdi>
+                </Fragment>
+              ))}
+              {/* RLM keeps the full stop at the sentence end on RTL pages */}
+              {locale === "en" ? "." : "\u200F."}
             </p>
           </Reveal>
-          <Reveal delay={0.18}>
+          <Reveal load delay={0.18}>
             <p className="mt-6 max-w-2xl border-s-2 border-ember ps-5 font-display text-[1.55rem] font-semibold leading-[1.15] text-bone sm:text-[1.8rem]">
               {a.lead}
             </p>
           </Reveal>
 
-          {/* Stats — separate items */}
-          <Reveal delay={0.24} className="mt-6">
-            <ul className="flex flex-wrap gap-2.5">
-              {a.stats.map((s) => (
-                <li key={s.label} className="flex items-baseline gap-2 border hairline bg-carbon/70 px-4 py-2.5">
-                  <span className="font-display text-[1.5rem] font-bold text-ember">{s.value}</span>
-                  <span className="text-base text-bone">{s.label}</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+          {/*
+            Credentials (cards with logos) render only when enabled in config/site.ts, in place of the
+            stats; while both switches are off, the stats show as one compact row instead.
+          */}
+          {CREDENTIALS.length === 0 && (
+            <Reveal load delay={0.24} className="mt-6">
+              <p className="flex items-baseline gap-x-2 whitespace-nowrap text-[length:min(1rem,calc((100vw-2.5rem)/25))] text-silver sm:text-base">
+                {a.stats.map((st, i) => (
+                  <Fragment key={st.label}>
+                    {i > 0 && (
+                      <span aria-hidden className="text-ember">
+                        ·
+                      </span>
+                    )}
+                    <span>
+                      <strong className="font-semibold text-bone">{st.value}</strong> {st.label}
+                    </span>
+                  </Fragment>
+                ))}
+              </p>
+            </Reveal>
+          )}
 
           {/* Credentials render only when enabled in config/site.ts */}
           {CREDENTIALS.length > 0 && (
-            <Reveal delay={0.3} className="mt-7 max-w-2xl">
+            <Reveal load delay={0.24} className="mt-7 max-w-2xl">
               <h2 className="eyebrow text-ember">{a.credentialsTitle}</h2>
               <ul className="mt-3 grid gap-3 sm:grid-cols-2 sm:gap-4">
                 {CREDENTIALS.map((c) => {
-                  const lines = a.credentials[c.key].lines;
+                  const aiq = a.credentials.aiq;
+                  const reps = a.credentials.reps;
                   return (
                     <li key={c.key} className="relative flex flex-col border border-bone/10 bg-carbon/70 p-4 sm:p-5">
                       <span aria-hidden className="absolute -top-px start-0 h-px w-12 bg-ember" />
-                      <div className="flex items-center justify-between gap-3">
+                      {/* Label + logo on one row; if space runs out, the logo box wraps above the label */}
+                      <div className="flex flex-wrap-reverse items-center justify-between gap-x-3 gap-y-2">
                         <span className="font-sans text-[0.85rem] font-bold tracking-[0.08em] text-silver" dir="ltr">
                           {c.org}
                         </span>
-                        <span className="inline-flex h-9 shrink-0 items-center rounded-[3px] bg-[#ededed] px-2.5">
+                        {/* Both logo boxes share one height (46px, ~28% larger); each logo keeps its proportions */}
+                        <span className="inline-flex h-[2.875rem] shrink-0 items-center rounded-[3px] bg-[#ededed] px-3">
                           <Image
                             src={c.logo.src}
                             alt={c.logo.alt}
                             width={c.logo.width}
                             height={c.logo.height}
                             unoptimized
-                            className={`w-auto max-w-none object-contain ${c.key === "reps" ? "h-6" : "h-[18px]"}`}
+                            className={`w-auto max-w-none object-contain ${c.key === "reps" ? "h-[38px]" : "h-[22px]"}`}
                           />
                         </span>
                       </div>
-                      <p className="mt-3 font-display text-[1.45rem] font-bold uppercase leading-[1.05] text-bone">{lines[0]}</p>
-                      {lines[1] && <p className="mt-1 text-base leading-snug text-silver">{lines[1]}</p>}
+                      <p className="mt-3 font-display text-[1.45rem] font-bold uppercase leading-[1.05] text-bone">
+                        {c.key === "aiq" ? aiq.title : reps.title}
+                      </p>
+                      {c.key === "aiq" ? (
+                        <>
+                          <p className="mt-1 text-base leading-snug text-silver">{aiq.line}</p>
+                          <p className="mt-1 flex items-center gap-1.5 text-[0.85rem] leading-snug text-silver/75">
+                            <UKFlag label={a.flags.uk} />
+                            {aiq.note}
+                          </p>
+                        </>
+                      ) : (
+                        /* "[UAE flag] UAE · Level 3" (+ " · {category}" when set in config) */
+                        <p className="mt-1 flex items-center gap-1.5 text-[0.95rem] leading-snug text-silver">
+                          <UAEFlag label={a.flags.uae} />
+                          {[reps.country, reps.level, site.credentials.reps.category].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
                       {c.key === "reps" && site.credentials.reps.number && (
                         <p className="mt-1 text-sm text-silver">
                           {a.repsNo} <span dir="ltr">{site.credentials.reps.number}</span>

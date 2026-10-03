@@ -6,15 +6,19 @@ import { Fragment, useEffect, useId, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { LOCALE_META, LOCALES, localizePath, stripLocale, type Locale } from "@/lib/i18n/config";
 
-/** Short text labels for the switcher (`EN | ع`). Persian (`فا`) is added with the /fa locale. */
-const SHORT: Record<Locale, string> = { en: "EN", ar: "ع" };
+/** Short text labels for the switcher (`EN | فا | ع`). */
+const SHORT: Record<Locale, string> = { en: "EN", fa: "فا", ar: "ع" };
 
-/** Keeps the current section hash when switching; the active language is a no-op. */
-function onSwitch(e: React.MouseEvent<HTMLAnchorElement>, active: boolean, href: string) {
+/**
+ * Remembers the choice (cookie read by proxy.ts) and keeps the current section hash when switching;
+ * the active language is a no-op.
+ */
+function onSwitch(e: React.MouseEvent<HTMLAnchorElement>, active: boolean, href: string, locale: Locale) {
   if (active) {
     e.preventDefault();
     return;
   }
+  document.cookie = `fit_lang=${locale}; path=/; max-age=31536000; samesite=lax`;
   const hash = window.location.hash;
   if (hash) {
     e.preventDefault();
@@ -51,7 +55,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
                   lang={LOCALE_META[l].htmlLang}
                   aria-label={LOCALE_META[l].label}
                   aria-current={active ? "true" : undefined}
-                  onClick={(e) => onSwitch(e, active, href)}
+                  onClick={(e) => onSwitch(e, active, href, l)}
                   className={`flex min-h-11 min-w-11 items-center justify-center px-1.5 font-sans text-[0.9rem] font-semibold transition-colors duration-300 ${
                     active ? "text-ember" : "text-silver hover:text-bone"
                   }`}
@@ -130,7 +134,7 @@ export function LanguageMenu({ className = "" }: { className?: string }) {
                   lang={LOCALE_META[l].htmlLang}
                   aria-current={active ? "true" : undefined}
                   onClick={(e) => {
-                    onSwitch(e, active, href);
+                    onSwitch(e, active, href, l);
                     if (active) setOpen(false);
                   }}
                   className={`flex min-h-11 items-center justify-between gap-4 px-4 text-[0.95rem] font-medium ${

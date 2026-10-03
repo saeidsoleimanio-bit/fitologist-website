@@ -8,9 +8,8 @@ import { useRef } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { scrollToSection } from "@/components/providers/ApplicationProvider";
 import { ButtonLink } from "@/components/ui/Button";
-import { hasAnyCredential } from "@/config/site";
-import { stripLocale } from "@/lib/i18n/config";
-import { EASE } from "@/lib/motion";
+import { isCertified } from "@/config/site";
+import { stripLocale, type Locale } from "@/lib/i18n/config";
 import { BMI_PATH, START_PATH } from "@/lib/site";
 
 /*
@@ -24,8 +23,15 @@ import { BMI_PATH, START_PATH } from "@/lib/site";
  * never by dimming the whole image — Saeid stays at full strength.
  */
 
+/** Widest H1 line ÷ font-size in the hero font, per language and title variant (measured with Playwright). */
+const H1_RATIO: Record<Locale, { base: number; certified: number }> = {
+  en: { base: 8.037, certified: 9.313 },
+  fa: { base: 7.133, certified: 9.93 },
+  ar: { base: 6.534, certified: 6.534 },
+};
+
 export function Hero() {
-  const { t, href } = useI18n();
+  const { t, href, locale } = useI18n();
   const pathname = stripLocale(usePathname() ?? "/");
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
@@ -71,11 +77,8 @@ export function Hero() {
               />
             </div>
           </div>
-          <motion.div
-            className="absolute inset-0 [--veil-x:74%] max-sm:[container-type:size] max-sm:[mask-image:linear-gradient(to_bottom,transparent_0,#000_12%)] lg:[mask-image:linear-gradient(to_bottom,transparent_0,#000_140px)] lg:[--veil-x:75%] xl:[--veil-x:74%]"
-            initial={{ scale: 1.06 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 2.2, ease: EASE }}
+          <div
+            className="load-settle absolute inset-0 [--veil-x:74%] max-sm:[container-type:size] max-sm:[mask-image:linear-gradient(to_bottom,transparent_0,#000_12%)] lg:[mask-image:linear-gradient(to_bottom,transparent_0,#000_140px)] lg:[--veil-x:75%] xl:[--veil-x:74%]"
           >
             <Image
               src="/images/hero-desktop.webp"
@@ -134,15 +137,9 @@ export function Hero() {
                 }}
               />
             </div>
-          </motion.div>
-          {/* Fade-from-black veil (keeps the LCP image itself fully opaque) */}
-          <motion.div
-            aria-hidden
-            className="absolute inset-0 bg-ink"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            transition={{ duration: 1.6, ease: EASE }}
-          />
+          </div>
+          {/* Fade-from-black veil (keeps the LCP image itself fully opaque); CSS, so it starts on first paint */}
+          <div aria-hidden className="load-fade-out pointer-events-none absolute inset-0 bg-ink" />
         </motion.div>
 
         {/* Cinematic grade */}
@@ -169,25 +166,40 @@ export function Hero() {
         eyebrow, H1, subtitle and the primary button fit the first screen. Desktop: right-hand
         column over the darker side of the photo. One page-load reveal only — no scroll fade.
       */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: EASE, delay: 0.35 }}
-        className="relative z-10 -mt-16 px-4 pb-6 sm:-mt-20 sm:px-8 md:pb-10 lg:absolute lg:inset-y-0 lg:right-[max(3rem,5vw)] lg:mt-0 lg:flex lg:w-[min(36rem,38vw)] lg:flex-col lg:justify-center lg:px-0 lg:pb-0 lg:pt-[var(--header-h)] rtl:pr-6 rtl:sm:pr-10 rtl:lg:right-[max(5rem,8vw)] rtl:lg:pr-0"
+      <div
+        style={{ "--load-y": "12px", "--load-delay": "0.35s" } as React.CSSProperties}
+        className="load-fade-up relative z-10 -mt-16 px-4 pb-6 sm:-mt-20 sm:px-8 md:pb-10 lg:absolute lg:inset-y-0 lg:right-[max(3rem,5vw)] lg:mt-0 lg:flex lg:w-[min(36rem,38vw)] lg:flex-col lg:justify-center lg:px-0 lg:pb-0 lg:pt-[var(--header-h)] rtl:pr-6 rtl:sm:pr-10 rtl:lg:right-[max(5rem,8vw)] rtl:lg:pr-0"
       >
-        <p className="eyebrow text-[0.78rem] text-ember">
-          {hasAnyCredential ? t.hero.eyebrowCertified : t.hero.eyebrow}
+        {/* Eyebrow: sentence case, display font, clearly smaller than the H1 (owner revision) */}
+        <p className="font-display text-[clamp(1.5rem,6.15vw,1.75rem)] font-semibold leading-tight text-ember lg:text-[1.75rem]">
+          {t.hero.eyebrow}
         </p>
+        {/*
+          H1 on two controlled lines (owner revision): each line is its own block, so the break never
+          moves. Font-size = content width ÷ (widest line's width at 1px), per language and title
+          variant (H1_RATIO, measured in the real font) × 0.97 safety — as large as possible while
+          each line stays on one line. Desktop: same structure, sized to the copy column. Re-measure
+          if the H1 copy changes.
+        */}
         <h1
           id="hero-title"
-          className="display mt-2.5 text-[clamp(2rem,8.4vw,2.6rem)] normal-case leading-[1.02] text-bone text-balance sm:text-[3rem] lg:mt-4 lg:text-[clamp(2.6rem,min(3.7vw,6.6vh),4.25rem)]"
+          style={{ "--h1-ratio": H1_RATIO[locale][isCertified ? "certified" : "base"] } as React.CSSProperties}
+          className="display mt-2 whitespace-nowrap font-extrabold normal-case leading-[1.02] text-bone text-[length:calc((100vw-2rem)/var(--h1-ratio)*0.97)] rtl:text-[length:calc((100vw-2.5rem)/var(--h1-ratio)*0.97)] sm:text-[length:min(calc((100vw-4rem)/var(--h1-ratio)*0.97),5rem)] rtl:sm:text-[length:min(calc((100vw-4.5rem)/var(--h1-ratio)*0.97),5rem)] lg:mt-4 lg:text-[length:min(calc(min(36rem,38vw)/var(--h1-ratio)*0.97),9vh,4.5rem)] rtl:lg:text-[length:min(calc(min(36rem,38vw)/var(--h1-ratio)*0.97),9vh,4.5rem)]"
         >
-          {t.hero.title}
+          {(isCertified ? t.hero.titleCertifiedLines : t.hero.titleLines).map((line, i) => (
+            <span key={i} className="block">
+              {i > 0 && " "}
+              {line}
+            </span>
+          ))}
         </h1>
-        <p className="mt-3 max-w-xl text-base leading-relaxed text-silver sm:text-lg lg:mt-5">{t.hero.sub}</p>
+        <p className="mt-3 max-w-xl text-base leading-relaxed sm:text-lg lg:mt-5">
+          <span className="block font-semibold text-bone">{t.hero.subLead}</span>
+          <span className="block text-silver">{t.hero.sub}</span>
+        </p>
 
         <div className="mt-5 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-6 lg:mt-8 lg:flex-col lg:items-start lg:gap-4">
-          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto">
+          <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto" data-cta="hero">
             {t.hero.primary}
           </ButtonLink>
           <Link
@@ -206,7 +218,7 @@ export function Hero() {
         <p aria-hidden className="mt-6 hidden font-display text-sm font-semibold uppercase tracking-[0.12em] text-steel lg:block">
           {t.common.tagline.join(" · ")}
         </p>
-      </motion.div>
+      </div>
     </section>
   );
 }

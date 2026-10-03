@@ -40,6 +40,8 @@ const jobs = [
   { out: "journey-12me.webp", from: "12me.PNG", q: 86 },
   // Landscape brand banner (#10, banner2) — homepage philosophy visual + Method hero. Encode only.
   { out: "brand-banner2.webp", from: "10-fitologist-brand-banner2.PNG", q: 88 },
+  // /plans hero (owner revision): Saeid with a clipboard; dark wall on the right for the copy. Encode only.
+  { out: "training-plan.webp", from: "training-plan.PNG", q: 86 },
 ];
 
 /**

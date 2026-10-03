@@ -97,6 +97,14 @@ export const FIELD_ORDER: LeadField[] = ["name", "phone", "age", "goals", "type"
 
 export const isInPerson = (type: string) => (IN_PERSON_TYPES as readonly string[]).includes(type);
 
+/** Converts Persian (۰–۹) and Arabic-Indic (٠–٩) digits and the Arabic decimal mark to Latin. */
+export function toLatinDigits(v: string): string {
+  return v
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[٫]/g, ".");
+}
+
 /** Full international number, digits only (country code + local number, leading 0 dropped). */
 export function fullNumber(countryCode: string, phone: string): string {
   const local = phone.replace(/\D/g, "").replace(/^0+/, "");

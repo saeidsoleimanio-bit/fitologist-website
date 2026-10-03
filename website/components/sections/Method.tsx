@@ -1,36 +1,54 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { AccentLine, BrandWord, Reveal } from "@/components/ui/primitives";
-import { EASE } from "@/lib/motion";
+import { CalendarCheck, Camera, Dumbbell, Ruler } from "lucide-react";
+import { FoodPyramid, DrumstickAndOats } from "@/components/ui/GymVectors";
+import { caveat } from "@/lib/handwriting";
 import { CtaBlock } from "./CtaBlock";
+import { PhotoHero, type Veil } from "./PhotoHero";
 
-/** Method page hero — plain dark background (the composite banner image was removed, §2.5). */
+/*
+ * Photo 10 (10-fitologist-brand-banner2.PNG → brand-banner2.webp) as the intro image (owner revision).
+ * Its baked-in logo, tagline and slogans are covered by localized veils in photo coordinates.
+ */
+const BANNER_VEILS: Veil[] = [
+  { x: 73.5, y: 20, rx: 20, ry: 18 }, // "F" barbell icon
+  { x: 71.5, y: 39.5, rx: 29, ry: 11.5 }, // "FITologist.me" + "TRAIN • TRANSFORM • TRANSCEND"
+  { x: 64.5, y: 81.5, rx: 9, ry: 8 }, // "CONSISTENCY ALWAYS WINS" (towel)
+  { x: 92.5, y: 70, rx: 6.5, ry: 11 }, // "BETTER STRONGER YOU" (dumbbell)
+];
+
+/** Icons in the order of `method.track`: Body Measurements · Consistency · Progress Photos · Strength Numbers. */
+const TRACK_ICONS = [Ruler, CalendarCheck, Camera, Dumbbell];
+
 function MethodHero() {
   const { t } = useI18n();
   const m = t.method;
   return (
-    <section
-      aria-labelledby="method-title"
-      className="relative isolate overflow-hidden bg-ink pb-2 pt-[calc(var(--header-compact)+2rem)] lg:pb-4 lg:pt-[calc(var(--header-h)+3rem)]"
+    <PhotoHero
+      id="method-title"
+      src="/images/brand-banner2.webp"
+      alt={m.heroAlt}
+      ratio={1672 / 941}
+      focus={{ mobile: "38%", desktop: "50%" }}
+      side="left"
+      veils={BANNER_VEILS}
     >
-      <div className="mx-auto max-w-[88rem] px-4 sm:px-8 lg:px-12">
-        <Reveal className="eyebrow flex items-center gap-4">
-          <AccentLine className="w-10" />
-          <span className="text-ember">{m.eyebrow}</span>
-        </Reveal>
-        <Reveal delay={0.08}>
-          <h1 id="method-title" className="display mt-4 text-[clamp(2.5rem,9vw,5.5rem)] leading-[0.92] text-bone">
-            {m.titleBefore} <BrandWord />
-            {m.titleAfter && <> {m.titleAfter}</>}
-          </h1>
-        </Reveal>
-        <Reveal delay={0.16}>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-silver">{m.intro}</p>
-        </Reveal>
-      </div>
-    </section>
+      <Reveal load className="eyebrow flex items-center gap-4">
+        <AccentLine className="w-10" />
+        <span className="text-ember">{m.eyebrow}</span>
+      </Reveal>
+      <Reveal load delay={0.08}>
+        <h1 id="method-title" className="display mt-4 text-[clamp(2.5rem,9vw,5.5rem)] leading-[0.92] text-bone">
+          {m.titleBefore} <BrandWord />
+          {m.titleAfter && <> {m.titleAfter}</>}
+        </h1>
+      </Reveal>
+      <Reveal load delay={0.16}>
+        <p className="mt-5 max-w-xl text-lg leading-relaxed text-silver">{m.intro}</p>
+      </Reveal>
+    </PhotoHero>
   );
 }
 
@@ -39,21 +57,15 @@ function MethodStages() {
   const { t } = useI18n();
   return (
     <section aria-label={t.method.eyebrow} className="section-y relative overflow-hidden bg-ink">
-      <motion.ol
+      {/* Right under the intro on first load: CSS entrance (staggered) so it never waits for JS (LCP). */}
+      <ol
         className="relative mx-auto grid max-w-[88rem] gap-x-10 gap-y-8 px-4 sm:grid-cols-2 sm:px-8 lg:px-12 xl:grid-cols-4 xl:gap-x-8 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12 } } }}
       >
         {t.method.stages.map((s, i) => (
-          <motion.li
+          <li
             key={s.title}
-            variants={{
-              hidden: { opacity: 0, y: 24 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
-            }}
-            className="group relative border-t border-bone/10 pt-5"
+            style={{ "--load-y": "24px", "--load-delay": `${0.2 + i * 0.12}s` } as React.CSSProperties}
+            className="load-fade-up group relative border-t border-bone/10 pt-5"
           >
             <span aria-hidden className="absolute -top-px start-0 block h-px w-16 bg-ember" />
             <div className="flex items-baseline gap-3 sm:block">
@@ -72,9 +84,9 @@ function MethodStages() {
               </div>
             </div>
             <p className="mt-3 text-base leading-relaxed text-silver">{s.body}</p>
-          </motion.li>
+          </li>
         ))}
-      </motion.ol>
+      </ol>
     </section>
   );
 }
@@ -104,15 +116,27 @@ function MethodDetails() {
         <div className="space-y-10">
           <div>
             <h2 className="display text-[clamp(2rem,6vw,3.25rem)] text-bone">{m.trackTitle}</h2>
-            <ul className="mt-5 flex flex-wrap gap-2.5">
-              {m.track.map((x) => (
-                <li key={x} className="border hairline bg-carbon px-4 py-2.5 text-base font-medium text-bone">
-                  {x}
-                </li>
-              ))}
+            {/* 2×2 equal boxes, centred labels with a small orange line icon (owner revision) */}
+            <ul className="mt-5 grid grid-cols-2 gap-2.5">
+              {m.track.map((x, i) => {
+                const Icon = TRACK_ICONS[i] ?? Ruler;
+                return (
+                  <li key={x} className="flex flex-col items-center justify-center gap-2 border hairline bg-carbon px-3 py-4 text-center text-base font-medium leading-snug text-bone">
+                    <Icon aria-hidden className="size-6 text-ember" strokeWidth={1.5} />
+                    {x}
+                  </li>
+                );
+              })}
             </ul>
           </div>
-          <div>
+          {/*
+            Room below the paragraph for the faint food art. The art's base reaches into the section's
+            bottom padding (gap to the next section ≈ 56–64px on mobile); the pyramid tip sits behind the
+            last line; drumstick + oats bowl on the start side, below the text.
+          */}
+          <div className="relative isolate pb-[6.125rem] sm:pb-[7.125rem] lg:pb-[5.75rem]">
+            <FoodPyramid fontClass={caveat.className} />
+            <DrumstickAndOats fontClass={caveat.className} />
             <h2 className="display text-[clamp(2rem,6vw,3.25rem)] text-bone">{m.nutritionTitle}</h2>
             <p className="mt-4 text-base leading-relaxed text-silver lg:text-lg">{m.nutrition}</p>
           </div>

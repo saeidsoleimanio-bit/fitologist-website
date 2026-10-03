@@ -12,7 +12,7 @@ import { scrollToSection } from "@/components/providers/ApplicationProvider";
 import { InstagramGlyph, WhatsAppGlyph } from "@/components/ui/icons";
 import { stripLocale } from "@/lib/i18n/config";
 import { EASE } from "@/lib/motion";
-import { HERO_PHOTO_PATHS, INSTAGRAM, NAV_ITEMS, SITE, WHATSAPP, startPathFor, whatsappLink } from "@/lib/site";
+import { INSTAGRAM, NAV_ITEMS, SITE, WHATSAPP, startPathFor, whatsappLink } from "@/lib/site";
 
 /**
  * Header (§2.1).
@@ -104,10 +104,12 @@ export function Header() {
 
   const solid = scrolled || open;
   /**
-   * Home, below xl, at the very top: transparent header over the hero (with a top gradient for
-   * legibility), larger logo, no header CTA (the hero shows it). Solid once scrolled or menu open.
+   * Every page (owner revision), below xl, at the very top: transparent header (top gradient for
+   * legibility), larger logo, no header CTA. Solid, compact logo and the CTA fades in once scrolled
+   * or with the menu open. Hero photos are positioned so these never sit over Saeid's face.
    */
-  const homeOverlay = HERO_PHOTO_PATHS.includes(pathname) && !scrolled && !open;
+  const homeOverlay = !scrolled && !open;
+  const ctaHidden = homeOverlay;
   const startPath = startPathFor(pathname);
   const isActive = (path: string) => !path.includes("#") && pathname === path;
 
@@ -165,7 +167,7 @@ export function Header() {
               preload
               sizes="(min-width: 1280px) 168px, 120px"
               className={`h-10 w-auto origin-top-left drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] transition-[scale] duration-[240ms] ease-out motion-reduce:transition-none rtl:origin-top-right xl:h-[92px] xl:duration-500 ${
-                homeOverlay ? "scale-[1.7]" : "scale-100"
+                ctaHidden ? "scale-[1.7]" : "scale-100"
               } ${solid ? "xl:scale-[0.7]" : "xl:scale-100"}`}
             />
           </Link>
@@ -205,10 +207,11 @@ export function Header() {
             <Link
               href={href(startPath)}
               onClick={(e) => onNavigate(e, startPath)}
-              aria-hidden={homeOverlay ? true : undefined}
-              tabIndex={homeOverlay ? -1 : undefined}
+              data-cta="header"
+              aria-hidden={ctaHidden ? true : undefined}
+              tabIndex={ctaHidden ? -1 : undefined}
               className={`group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 transition-[opacity,visibility] duration-[240ms] ease-out xl:visible xl:pointer-events-auto xl:opacity-100 ${
-                homeOverlay ? "pointer-events-none invisible opacity-0" : "visible opacity-100"
+                ctaHidden ? "pointer-events-none invisible opacity-0" : "visible opacity-100"
               } font-sans text-[0.8rem] font-semibold tracking-[0.01em] text-ink min-[360px]:inline-flex sm:px-4 sm:text-[0.85rem] xl:ms-4 xl:px-5`}
             >
               <span
@@ -299,6 +302,7 @@ export function Header() {
               <Link
                 href={href(startPath)}
                 onClick={(e) => onNavigate(e, startPath)}
+                data-cta="menu"
                 className="flex min-h-13 items-center justify-center bg-ember px-5 font-sans text-[0.95rem] font-semibold tracking-[0.01em] text-ink"
               >
                 {t.nav.cta}
@@ -307,6 +311,7 @@ export function Header() {
                 href={whatsappLink(t.common.defaultWhatsAppMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-wa="menu"
                 className="flex min-h-13 items-center justify-center gap-3 border hairline px-5 font-sans text-[0.95rem] font-semibold tracking-[0.01em] text-bone"
               >
                 <WhatsAppGlyph className="size-5" />

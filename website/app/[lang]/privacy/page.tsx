@@ -5,6 +5,9 @@ import { site } from "@/config/site";
 import { getDictionary, isLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/i18n/metadata";
 
+/** Persian uses its own (Solar Hijri) calendar and digits; Arabic keeps Latin digits. */
+const DATE_LOCALE = { en: "en-GB", fa: "fa-IR", ar: "ar-u-nu-latn" } as const;
+
 export async function generateMetadata({ params }: PageProps<"/[lang]/privacy">): Promise<Metadata> {
   const { lang } = await params;
   return isLocale(lang) ? pageMetadata(lang, "privacy") : {};
@@ -19,7 +22,7 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
   if (!isLocale(lang)) notFound();
   const p = getDictionary(lang).privacy;
   const hasAnalytics = Boolean(site.analytics.ga4Id || site.analytics.metaPixelId);
-  const updated = new Intl.DateTimeFormat(lang === "ar" ? "ar-u-nu-latn" : "en-GB", { dateStyle: "long" }).format(BUILD_DATE);
+  const updated = new Intl.DateTimeFormat(DATE_LOCALE[lang], { dateStyle: "long" }).format(BUILD_DATE);
 
   const items: { title: string; body: React.ReactNode }[] = [
     {

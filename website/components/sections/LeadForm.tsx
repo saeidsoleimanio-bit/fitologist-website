@@ -20,6 +20,7 @@ import {
   TRAINING_TYPES,
   isInPerson,
   leadMessage,
+  toLatinDigits,
   toggleGoal,
   validateLead,
   type Frequency,
@@ -30,6 +31,7 @@ import {
   type Time,
   type TrainingType,
 } from "@/lib/lead";
+import { track } from "@/lib/analytics";
 import { EASE } from "@/lib/motion";
 import { whatsappLink } from "@/lib/site";
 
@@ -214,12 +216,19 @@ export function LeadForm({ titleId }: { titleId: string }) {
     // 2. Sending state.
     setStatus("sending");
 
+    // Tracked before WhatsApp opens: on phones the page can be replaced, which would lose the event.
+    track("form_submit", { type: data.type, goals: data.goals.join(",") });
+
     // 3. Open WhatsApp in the same click handler.
     if (isMobileDevice()) window.location.href = url;
     else window.open(url, "_blank", "noopener");
 
     // 4. Success only if the API confirmed delivery; otherwise the fallback.
-    void request.then((ok) => setStatus(ok ? "success" : "fallback"));
+    void request.then((ok) => {
+      // Delivery result, when the page is still open to hear it (on phones WhatsApp may have replaced it).
+      track("lead_delivery", { api_ok: ok });
+      setStatus(ok ? "success" : "fallback");
+    });
   };
 
   const describe = (key: LeadField) => (errors[key] ? `lead-${key}-error` : undefined);
@@ -307,7 +316,7 @@ export function LeadForm({ titleId }: { titleId: string }) {
                     inputMode="tel"
                     autoComplete="tel-national"
                     value={data.phone}
-                    onChange={(e) => update("phone", e.target.value)}
+                    onChange={(e) => update("phone", toLatinDigits(e.target.value))}
                     aria-invalid={errors.phone ? true : undefined}
                     aria-describedby={describe("phone")}
                     aria-required
@@ -331,7 +340,7 @@ export function LeadForm({ titleId }: { titleId: string }) {
                   inputMode="numeric"
                   autoComplete="off"
                   value={data.age}
-                  onChange={(e) => update("age", e.target.value.replace(/[^\d]/g, "").slice(0, 2))}
+                  onChange={(e) => update("age", toLatinDigits(e.target.value).replace(/[^\d]/g, "").slice(0, 2))}
                   aria-invalid={errors.age ? true : undefined}
                   aria-describedby={describe("age")}
                   aria-required

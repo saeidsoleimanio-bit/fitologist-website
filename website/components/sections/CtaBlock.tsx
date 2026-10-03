@@ -21,7 +21,7 @@ export function CtaBlock({ title, id = "cta-block" }: { title?: string; id?: str
           </h2>
         </Reveal>
         <Reveal delay={0.1} className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href={href(startPathFor(path))} className="w-full sm:w-auto">
+          <ButtonLink href={href(startPathFor(path))} className="w-full sm:w-auto" data-cta="cta_block">
             {t.nav.cta}
           </ButtonLink>
           <ButtonLink
@@ -29,6 +29,7 @@ export function CtaBlock({ title, id = "cta-block" }: { title?: string; id?: str
             target="_blank"
             rel="noopener noreferrer"
             variant="ghost"
+            data-wa="cta_block"
             icon={<WhatsAppGlyph className="size-5" />}
             className="w-full sm:w-auto"
           >

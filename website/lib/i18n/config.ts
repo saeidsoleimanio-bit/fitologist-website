@@ -1,4 +1,5 @@
-export const LOCALES = ["en", "ar"] as const;
+/** Switcher order: EN | فا | ع */
+export const LOCALES = ["en", "fa", "ar"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
 
@@ -10,6 +11,7 @@ export const LOCALE_META: Record<
   { dir: "ltr" | "rtl"; label: string; htmlLang: string; ogLocale: string }
 > = {
   en: { dir: "ltr", label: "English", htmlLang: "en", ogLocale: "en_AE" },
+  fa: { dir: "rtl", label: "فارسی", htmlLang: "fa", ogLocale: "fa_IR" },
   ar: { dir: "rtl", label: "العربية", htmlLang: "ar", ogLocale: "ar_AE" },
 };
 
@@ -36,10 +38,14 @@ export function localizePath(locale: Locale, path: string): string {
   return hash ? `${base}#${hash}` : base;
 }
 
-/** Strip a locale prefix from a pathname → locale-independent path. */
+/**
+ * Strip a locale prefix from a pathname → locale-independent path. `/en/...` is stripped too:
+ * English pages are prerendered at `/en/...` (proxy rewrite), so that is what usePathname()
+ * returns on the server, while the browser sees the clean URL; both must give the same path.
+ */
 export function stripLocale(pathname: string): string {
   const seg = pathname.split("/")[1];
-  if (isLocale(seg) && seg !== DEFAULT_LOCALE) {
+  if (isLocale(seg)) {
     const rest = pathname.slice(seg.length + 1);
     return rest === "" ? "/" : rest;
   }

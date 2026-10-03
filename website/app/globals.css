@@ -22,7 +22,7 @@
   --color-bmi-over: #ff6a00;
   --color-bmi-obese: #ff3b30;
 
-  /* --font-locale-* are set by app/[lang]/layout.tsx for scripts Inter/Barlow don't cover (Arabic, Cyrillic display) */
+  /* --font-locale-* are set by app/[lang]/layout.tsx for scripts Inter/Barlow don't cover (Arabic, Persian) */
   --font-sans: var(--font-locale-sans, var(--font-inter)), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-locale-display, var(--font-barlow)), "Arial Narrow", ui-sans-serif, sans-serif;
 
@@ -196,17 +196,26 @@
 }
 
 /*
- * Arabic: letter-spacing breaks letter joining and the condensed Latin line-heights clip
- * Arabic ascenders/descenders, so both are normalised for the whole document.
+ * Arabic & Persian: letter-spacing breaks letter joining and the condensed Latin line-heights clip
+ * Arabic-script ascenders/descenders, so both are normalised for the whole document.
  */
-html[lang="ar"] {
+html[lang="ar"],
+html[lang="fa"] {
   --font-locale-display: var(--font-locale-sans);
 }
-html[lang="ar"] body * {
+html[lang="ar"] body *,
+html[lang="fa"] body * {
   letter-spacing: 0 !important;
 }
-html[lang="ar"] .display {
+html[lang="ar"] .display,
+html[lang="fa"] .display {
   line-height: 1.2 !important;
+}
+/* Latin brand/plan names and numbers inside Arabic/Persian pages keep the condensed Latin display face. */
+html[lang="ar"] :is(.display, .font-display)[dir="ltr"],
+html[lang="fa"] :is(.display, .font-display)[dir="ltr"] {
+  font-family: var(--font-barlow), "Arial Narrow", ui-sans-serif, sans-serif;
+  line-height: 1 !important;
 }
 
 /* Header BMI CTA — slow, elegant attention pulse */
@@ -230,6 +239,52 @@ html[lang="ar"] .display {
   .cta-pulse {
     animation: none;
   }
+}
+
+/*
+ * First-screen entrance animations (hero copy, page intros) run in CSS from the first paint, so
+ * they never wait for JavaScript (LCP). Same feel as the Framer `fadeUp` used further down the page.
+ */
+@keyframes load-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--load-y, 28px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.load-fade-up {
+  animation: load-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--load-delay, 0s) both;
+}
+
+@keyframes load-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.load-fade-in {
+  animation: load-fade-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes load-fade-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+.load-fade-out {
+  animation: load-fade-out 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes load-settle {
+  from {
+    transform: scale(var(--load-scale, 1.06));
+  }
+}
+.load-settle {
+  animation: load-settle 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Meet Saeid — irregular orange glow behind the cut-out photo, slow calm "heartbeat" (~3.8s). */

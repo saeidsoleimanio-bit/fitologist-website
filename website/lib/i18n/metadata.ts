@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isCertified } from "@/config/site";
 import { SITE } from "@/lib/site";
 import { DEFAULT_LOCALE, LOCALE_META, LOCALES, PAGES, localizePath, type Locale } from "./config";
 import { getDictionary } from "./index";
@@ -14,11 +15,16 @@ export function languageAlternates(page: PageKey): Record<string, string> {
   return languages;
 }
 
+/** 1200×630 share image per language: hero portrait + H1 (§10.2). */
+export const ogImage = (locale: Locale) => `/images/og-${locale}.jpg`;
+
 /** Title/description, canonical, hreflang and Open Graph for a localized page. */
 export function pageMetadata(locale: Locale, page: PageKey): Metadata {
   const t = getDictionary(locale);
   const { title, description } =
-    page === "home" ? { title: t.meta.siteTitle, description: t.meta.siteDescription } : t.meta[page];
+    page === "home"
+      ? { title: isCertified ? t.meta.siteTitleCertified : t.meta.siteTitle, description: t.meta.siteDescription }
+      : t.meta[page];
   const url = localizePath(locale, PAGES[page]);
 
   return {
@@ -33,15 +39,8 @@ export function pageMetadata(locale: Locale, page: PageKey): Metadata {
       description,
       locale: LOCALE_META[locale].ogLocale,
       alternateLocale: LOCALES.filter((l) => l !== locale).map((l) => LOCALE_META[l].ogLocale),
-      images: [
-        {
-          url: "/images/og.jpg",
-          width: 1200,
-          height: 630,
-          alt: "Saeid, personal trainer, in a gym in front of the FITologist.me logo",
-        },
-      ],
+      images: [{ url: ogImage(locale), width: 1200, height: 630, alt: t.hero.alt }],
     },
-    twitter: { card: "summary_large_image", title, description, images: ["/images/og.jpg"] },
+    twitter: { card: "summary_large_image", title, description, images: [ogImage(locale)] },
   };
 }
