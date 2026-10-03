@@ -586,6 +586,27 @@ Replace the centered "Follow on / Contact on" block with the standard left-align
 
 ---
 
+## 9a. Floor Test landing page (printed card) — owner revision, Oct 2026
+
+The printed card's QR code points to **https://www.fitologist.me/c**.
+- **Routes:** `/c` → **302** to `/floor-test?utm_source=card&utm_medium=print&utm_campaign=floor-test` (temporary, so the destination can change without reprinting). Pages: `/floor-test` (EN) and `/fa/floor-test` (FA, RTL); `/ar/floor-test` → 404 (Arabic hidden). **noindex, nofollow**; not in the sitemap.
+- **Chrome:** minimal — logo + language switcher (EN | فا) only; no menu, no hamburger, no header CTA. Minimal footer: Terms, Privacy. Floating WhatsApp keeps its normal rules (never over the answer options, the Body Check buttons or the submit).
+- **Config:** `site.floorTest = { offer: "Your first session is free", offerValidUntil: "2026-12-31" }`. The offer is active until the end of that day (Dubai time); the page is re-checked hourly (ISR), so after the date the offer disappears everywhere on the page (badge, H2, validity line, WhatsApp text, success text) and the free 30-minute consultation wording is used — no redeploy needed.
+- **Step 1 — "How did it go?"** (first screen; all four options visible on load at 390×844): intro *You just tried the floor test: sit down and stand back up without using your hands.* Four large single-choice options; the result card appears on tap (no submit):
+  - a) *Perfect: no help at all* → **Excellent, about 10/10** — Top group. Your strength, balance and mobility work together really well.
+  - b) *Almost: I touched the floor once (hand or knee)* → **Very good, about 9/10** — Strong result. One small weak link is easy to fix.
+  - c) *I needed help 2–3 times* → **Good, about 7–8/10** — Solid base, with clear room to improve your strength and mobility.
+  - d) *I needed a lot of help / couldn't do it* → **Needs attention, 6/10 or less** — Good news: this is very trainable, and it improves quickly with the right plan.
+  - Under every result: *Researchers use this test as a simple marker of strength, balance and flexibility. It's a guide, not a medical assessment.* Never mention mortality or life expectancy.
+- **Step 2** (after the result): *Want to know your BMI too? It takes 10 seconds.* → the Body Check inline (same component, styling and maths; `embedded` mode: one "Continue" button instead of WhatsApp/Book). Optional: **Skip** goes straight to Step 3. A BMI result also reveals Step 3 and prefills Age + Sex.
+- **Step 3:** badge *Your first session is free* · H2 *Send your results to Saeid and claim your free first session* · *Card holders only · valid until 31 Dec 2026*. Short form: Name · WhatsApp (country select, +971 default) · Age + Sex · consent (Privacy link) · **Send to Saeid via WhatsApp**. Same one-tap flow as the main form (`/api/lead` keepalive + WhatsApp). Payload extras: `source: "floor-test-card"`, `floorTest` (answer a–d; the API turns it into the English answer + band), `bmi`, `bmiCategory`, goals (if the Body Check was done), UTM. Goals/training type are not required for card leads only.
+  - WhatsApp (localized): *Hi Saeid, I did the floor test from your card. Result: {band}. {My BMI: x (category).} I'd like to claim my free first session.* (after the offer date: *I'd like to book my free 30-minute consultation.*)
+  - Telegram starts with **🟠 CARD LEAD (floor test)**, then the floor-test result and BMI (+ category).
+  - Google Sheet: `source` = `floor-test-card`, new columns `floor_test` and `bmi_category`. The Apps Script (`scripts/sheets-webhook.gs`) now writes every field **by header name** and appends any missing header automatically.
+  - Success: *Request sent ✓ Saeid has your results and will message you within a few hours to book your free session.* (consultation wording after the offer date).
+- **Tracking** (only if IDs are set): `floor_test_answered {answer}`, `floor_test_bmi_done {category}`, `floor_test_bmi_skipped`, `form_submit {source: "floor-test-card", floor_test, bmi_done}`, `lead_delivery {api_ok}`.
+- **Persian:** natural conversational translation of all copy (polite «شما» form, as on the rest of the site); the validity date in Gregorian with Persian digits.
+
 ## 10. Languages, SEO, tracking
 
 ### 10.1 Languages

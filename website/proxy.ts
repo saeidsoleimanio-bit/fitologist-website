@@ -12,12 +12,21 @@ const REMOVED = ["ru"];
  * - unprefixed URL + `fit_lang` cookie = fa/ar → 307 to that language (the visitor chose it).
  * - `/ru`, `/ru/...`      → 301 to `/` (Russian was removed).
  * - `/coaching`, `/fa|ar/coaching` → 301 to `/plans`, `/fa|ar/plans`.
+ * - `/c`                  → 302 to /floor-test with the card UTM (printed QR code).
  * - `/en/...`             → 308 to the clean unprefixed URL (English is the default).
  * - everything else       → internally rewritten to `/en/...` (URL stays clean).
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const first = pathname.split("/")[1];
+
+  // Printed card QR (https://www.fitologist.me/c): 302, so the destination can change without reprinting.
+  if (pathname === "/c") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/floor-test";
+    url.search = "?utm_source=card&utm_medium=print&utm_campaign=floor-test";
+    return NextResponse.redirect(url, 302);
+  }
 
   if (REMOVED.includes(first)) {
     const url = request.nextUrl.clone();

@@ -1,6 +1,11 @@
 "use client";
 
-import { AnimatePresence, animate, motion, useReducedMotion } from "framer-motion";
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useReducedMotion,
+} from "framer-motion";
 import { Check } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
@@ -33,8 +38,17 @@ import { track } from "@/lib/analytics";
 import { EASE } from "@/lib/motion";
 import { whatsappLink } from "@/lib/site";
 
-type Fields = { cm: string; ft: string; inch: string; kg: string; lb: string; age: string };
-type Errors = Partial<Record<"height" | "weight" | "age" | "sex" | "activity", string>>;
+type Fields = {
+  cm: string;
+  ft: string;
+  inch: string;
+  kg: string;
+  lb: string;
+  age: string;
+};
+type Errors = Partial<
+  Record<"height" | "weight" | "age" | "sex" | "activity", string>
+>;
 type Result = {
   bmi: number;
   tone: BmiTone;
@@ -46,12 +60,16 @@ type Result = {
 };
 
 const EMPTY: Fields = { cm: "", ft: "", inch: "", kg: "", lb: "", age: "" };
-const LABEL = "block font-display text-[0.88rem] font-bold uppercase tracking-[0.12em] text-bone";
+const LABEL =
+  "block font-display text-[0.88rem] font-bold uppercase tracking-[0.12em] text-bone";
 const ERR = "text-[#ffb27a]";
 
 /** Number formatting in the active locale with Western digits (decimal comma-safe). */
 const fmt = (v: number, digits = 1) =>
-  v.toLocaleString("en", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  v.toLocaleString("en", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
 
 function CountUp({ value }: { value: number }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -117,7 +135,10 @@ function Field({
           className="w-full min-w-0 bg-transparent font-display text-[1.5rem] font-bold leading-none text-bone outline-none rtl:text-right"
           style={{ outline: "none" }}
         />
-        <span aria-hidden className="shrink-0 ps-1.5 font-display text-[0.85rem] font-bold uppercase tracking-[0.1em] text-silver">
+        <span
+          aria-hidden
+          className="shrink-0 ps-1.5 font-display text-[0.85rem] font-bold uppercase tracking-[0.1em] text-silver"
+        >
           {unit}
         </span>
       </div>
@@ -185,7 +206,31 @@ function RadioChips<T extends string>({
 }
 
 /** Free Body Check (§3) — used on the home page (#bmi) and on /bmi. */
-export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" }) {
+/** What the embedded Body Check reports to its host page (/floor-test). */
+export type BodyCheckOutcome = {
+  bmi: string;
+  category: BmiTone;
+  age: string;
+  sex: Sex | "";
+  goals: Goal[];
+};
+
+export function BodyCheck({
+  headingLevel = "h2",
+  embedded,
+}: {
+  headingLevel?: "h1" | "h2";
+  /**
+   * Inline use inside another page (/floor-test): the host supplies the heading; the card, units and
+   * maths are identical; the result shows one "Continue" button instead of WhatsApp / Book.
+   */
+  embedded?: {
+    heading: React.ReactNode;
+    continueLabel: string;
+    onResult: (r: BodyCheckOutcome) => void;
+    onContinue: () => void;
+  };
+}) {
   const { t } = useI18n();
   const b = t.bodyCheck;
   const { startApplication } = useApplication();
@@ -200,7 +245,8 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
   const reduce = useReducedMotion();
   const Heading = headingLevel;
 
-  const set = (key: keyof Fields) => (v: string) => setFields((f) => ({ ...f, [key]: v }));
+  const set = (key: keyof Fields) => (v: string) =>
+    setFields((f) => ({ ...f, [key]: v }));
 
   const validate = () => {
     const e: Errors = {};
@@ -208,20 +254,34 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
     let weightKg: number | undefined;
     if (units === "metric") {
       const h = parseNumber(fields.cm);
-      if (Number.isNaN(h) || h < LIMITS.heightCm.min || h > LIMITS.heightCm.max) e.height = b.errors.heightCm;
+      if (Number.isNaN(h) || h < LIMITS.heightCm.min || h > LIMITS.heightCm.max)
+        e.height = b.errors.heightCm;
       else heightCm = h;
       const w = parseNumber(fields.kg);
-      if (Number.isNaN(w) || w < LIMITS.weightKg.min || w > LIMITS.weightKg.max) e.weight = b.errors.weightKg;
+      if (Number.isNaN(w) || w < LIMITS.weightKg.min || w > LIMITS.weightKg.max)
+        e.weight = b.errors.weightKg;
       else weightKg = w;
     } else {
       const ft = parseNumber(fields.ft);
       const inch = fields.inch.trim() ? parseNumber(fields.inch) : 0;
       const cm = inToCm(ft * 12 + inch);
-      if (Number.isNaN(ft) || !Number.isInteger(ft) || Number.isNaN(inch) || inch >= 12 || cm < LIMITS.heightCm.min || cm > LIMITS.heightCm.max)
+      if (
+        Number.isNaN(ft) ||
+        !Number.isInteger(ft) ||
+        Number.isNaN(inch) ||
+        inch >= 12 ||
+        cm < LIMITS.heightCm.min ||
+        cm > LIMITS.heightCm.max
+      )
         e.height = b.errors.heightFt;
       else heightCm = cm;
       const kg = lbToKg(parseNumber(fields.lb));
-      if (Number.isNaN(kg) || kg < LIMITS.weightKg.min || kg > LIMITS.weightKg.max) e.weight = b.errors.weightLb;
+      if (
+        Number.isNaN(kg) ||
+        kg < LIMITS.weightKg.min ||
+        kg > LIMITS.weightKg.max
+      )
+        e.weight = b.errors.weightLb;
       else weightKg = kg;
     }
     const ageRaw = fields.age.trim();
@@ -240,7 +300,17 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
     setErrors(e);
     if (heightCm && weightKg && sex && activity && !Object.keys(e).length) {
       const bmi = calculateBmi(weightKg, heightCm);
-      track("bmi_calculated", { category: bmiCategory(bmi), goals: goals.join(",") });
+      track("bmi_calculated", {
+        category: bmiCategory(bmi),
+        goals: goals.join(","),
+      });
+      embedded?.onResult({
+        bmi: fmt(bmi),
+        category: bmiCategory(bmi),
+        age: String(age),
+        sex,
+        goals,
+      });
       setResult({
         bmi,
         tone: bmiCategory(bmi),
@@ -273,7 +343,11 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
   const errId = (k: keyof Errors) => `${uid}-${k}-err`;
   const described = (k: keyof Errors) => (errors[k] ? errId(k) : undefined);
   const errorLine = (k: keyof Errors) => (
-    <p id={errId(k)} className={`mt-0.5 min-h-[1rem] text-[0.8rem] font-medium leading-tight ${ERR}`} aria-live="polite">
+    <p
+      id={errId(k)}
+      className={`mt-0.5 min-h-[1rem] text-[0.8rem] font-medium leading-tight ${ERR}`}
+      aria-live="polite"
+    >
       {errors[k]}
     </p>
   );
@@ -287,34 +361,58 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
         [
           `${b.whatsapp.bmi}: ${fmt(result.bmi)} (${b.categories[result.tone]})`,
           `${b.whatsapp.age}: ${result.age}`,
-          ...(result.goals.length ? [`${b.whatsapp.goals}: ${goalLabels(result.goals).join(", ")}`] : []),
+          ...(result.goals.length
+            ? [`${b.whatsapp.goals}: ${goalLabels(result.goals).join(", ")}`]
+            : []),
         ].join(" · "),
         b.whatsapp.outro,
       ].join("\n")
     : "";
 
+  const Outer = embedded ? "div" : "section";
   return (
-    <section
-      id="bmi"
-      aria-labelledby={`${uid}-title`}
-      className="section-y relative overflow-hidden"
-      style={{
-        background: [
-          "radial-gradient(50% 60% at 78% 40%, rgb(191 192 194 / 0.07), transparent 70%)",
-          "linear-gradient(180deg, #050505 0%, #111315 16%, #141618 50%, #111315 84%, #050505 100%)",
-        ].join(", "),
-      }}
+    <Outer
+      id={embedded ? undefined : "bmi"}
+      aria-labelledby={embedded ? undefined : `${uid}-title`}
+      className={embedded ? "relative" : "section-y relative overflow-hidden"}
+      style={
+        embedded
+          ? undefined
+          : {
+              background: [
+                "radial-gradient(50% 60% at 78% 40%, rgb(191 192 194 / 0.07), transparent 70%)",
+                "linear-gradient(180deg, #050505 0%, #111315 16%, #141618 50%, #111315 84%, #050505 100%)",
+              ].join(", "),
+            }
+      }
     >
-      <div className="relative mx-auto grid max-w-[88rem] gap-6 px-4 sm:px-8 lg:grid-cols-12 lg:gap-12 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]">
-        <div className="min-w-0 lg:col-span-4 lg:pt-6">
-          <Reveal load={headingLevel === "h1"}>
-            <Heading id={`${uid}-title`} className="display text-[clamp(2.25rem,7.4vw,4rem)] text-bone text-balance">
-              {b.title}
-            </Heading>
-          </Reveal>
-          <Reveal load={headingLevel === "h1"} delay={0.08}>
-            <p className="mt-3 max-w-md text-[1.05rem] leading-relaxed text-silver lg:text-[1.15rem]">{b.subtitle}</p>
-          </Reveal>
+      <div
+        className={
+          embedded
+            ? "relative grid gap-4"
+            : "relative mx-auto grid max-w-[88rem] gap-6 px-4 sm:px-8 lg:grid-cols-12 lg:gap-12 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]"
+        }
+      >
+        <div className={embedded ? "min-w-0" : "min-w-0 lg:col-span-4 lg:pt-6"}>
+          {embedded ? (
+            embedded.heading
+          ) : (
+            <>
+              <Reveal load={headingLevel === "h1"}>
+                <Heading
+                  id={`${uid}-title`}
+                  className="display text-[clamp(2.25rem,7.4vw,4rem)] text-bone text-balance"
+                >
+                  {b.title}
+                </Heading>
+              </Reveal>
+              <Reveal load={headingLevel === "h1"} delay={0.08}>
+                <p className="mt-3 max-w-md text-[1.05rem] leading-relaxed text-silver lg:text-[1.15rem]">
+                  {b.subtitle}
+                </p>
+              </Reveal>
+            </>
+          )}
           {/* Units live outside the card to keep the card compact (§3, owner revision) */}
           <div className="mt-4 w-48">
             <RadioChips
@@ -332,7 +430,11 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
           </div>
         </div>
 
-        <Reveal load={headingLevel === "h1"} delay={0.12} className="min-w-0 lg:col-span-8">
+        <Reveal
+          load={headingLevel === "h1"}
+          delay={0.12}
+          className={embedded ? "min-w-0" : "min-w-0 lg:col-span-8"}
+        >
           <div
             className="relative mx-auto w-full max-w-[44rem] overflow-hidden border border-silver/30 p-4 sm:p-5 lg:p-6 shadow-[0_40px_90px_-45px_rgba(0,0,0,0.95),inset_0_1px_0_rgb(255_255_255/0.14)] "
             style={{
@@ -343,20 +445,53 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
               ].join(", "),
             }}
           >
-            <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-logo-silver-hi to-transparent" />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-logo-silver-hi to-transparent"
+            />
             <GymVectors />
 
-            <form noValidate onSubmit={onSubmit} aria-label={b.formLabel} className="relative space-y-2 lg:space-y-3">
+            <form
+              noValidate
+              onSubmit={onSubmit}
+              aria-label={b.formLabel}
+              className="relative space-y-2 lg:space-y-3"
+            >
               <div className="grid grid-cols-2 gap-x-3 sm:grid-cols-3 [&>div]:min-w-0">
                 <div className="col-span-2 sm:col-span-1">
                   {units === "metric" ? (
-                    <Field id={`${uid}-cm`} label={b.height} unit={b.unitCm} value={fields.cm} onChange={set("cm")} error={!!errors.height} describedBy={described("height")} />
+                    <Field
+                      id={`${uid}-cm`}
+                      label={b.height}
+                      unit={b.unitCm}
+                      value={fields.cm}
+                      onChange={set("cm")}
+                      error={!!errors.height}
+                      describedBy={described("height")}
+                    />
                   ) : (
                     <fieldset aria-describedby={described("height")}>
                       <legend className={LABEL}>{b.height}</legend>
                       <div className="mt-1 flex gap-1.5">
-                        <Field id={`${uid}-ft`} label={`${b.height} (${b.unitFt})`} unit={b.unitFt} value={fields.ft} onChange={set("ft")} error={!!errors.height} inputMode="numeric" hideLabel />
-                        <Field id={`${uid}-in`} label={`${b.height} (${b.unitIn})`} unit={b.unitIn} value={fields.inch} onChange={set("inch")} error={!!errors.height} hideLabel />
+                        <Field
+                          id={`${uid}-ft`}
+                          label={`${b.height} (${b.unitFt})`}
+                          unit={b.unitFt}
+                          value={fields.ft}
+                          onChange={set("ft")}
+                          error={!!errors.height}
+                          inputMode="numeric"
+                          hideLabel
+                        />
+                        <Field
+                          id={`${uid}-in`}
+                          label={`${b.height} (${b.unitIn})`}
+                          unit={b.unitIn}
+                          value={fields.inch}
+                          onChange={set("inch")}
+                          error={!!errors.height}
+                          hideLabel
+                        />
                       </div>
                     </fieldset>
                   )}
@@ -364,9 +499,25 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                 </div>
                 <div>
                   {units === "metric" ? (
-                    <Field id={`${uid}-kg`} label={b.weight} unit={b.unitKg} value={fields.kg} onChange={set("kg")} error={!!errors.weight} describedBy={described("weight")} />
+                    <Field
+                      id={`${uid}-kg`}
+                      label={b.weight}
+                      unit={b.unitKg}
+                      value={fields.kg}
+                      onChange={set("kg")}
+                      error={!!errors.weight}
+                      describedBy={described("weight")}
+                    />
                   ) : (
-                    <Field id={`${uid}-lb`} label={b.weight} unit={b.unitLb} value={fields.lb} onChange={set("lb")} error={!!errors.weight} describedBy={described("weight")} />
+                    <Field
+                      id={`${uid}-lb`}
+                      label={b.weight}
+                      unit={b.unitLb}
+                      value={fields.lb}
+                      onChange={set("lb")}
+                      error={!!errors.weight}
+                      describedBy={described("weight")}
+                    />
                   )}
                   {errorLine("weight")}
                 </div>
@@ -377,7 +528,9 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                     unit={b.unitYrs}
                     inputMode="numeric"
                     value={fields.age}
-                    onChange={(v) => set("age")(v.replace(/[^\d]/g, "").slice(0, 3))}
+                    onChange={(v) =>
+                      set("age")(v.replace(/[^\d]/g, "").slice(0, 3))
+                    }
                     error={!!errors.age}
                     describedBy={described("age")}
                   />
@@ -410,7 +563,10 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                   <RadioChips
                     name={`${uid}-activity`}
                     legend={b.activity}
-                    options={ACTIVITIES.map((a) => ({ value: a, label: b.activities[a] }))}
+                    options={ACTIVITIES.map((a) => ({
+                      value: a,
+                      label: b.activities[a],
+                    }))}
                     value={activity}
                     onChange={(v) => {
                       setActivity(v);
@@ -428,7 +584,10 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
               {/* Goals — optional multi-select; "Not sure yet" is exclusive */}
               <fieldset>
                 <legend className={LABEL}>
-                  {b.goals} <span className="font-sans text-[0.8rem] font-medium normal-case tracking-normal text-silver">{b.optional}</span>
+                  {b.goals}{" "}
+                  <span className="font-sans text-[0.8rem] font-medium normal-case tracking-normal text-silver">
+                    {b.optional}
+                  </span>
                 </legend>
                 <div className="mt-1 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
                   {GOALS.map((g) => {
@@ -437,12 +596,27 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                       <label
                         key={g}
                         className={`flex min-h-11 cursor-pointer items-center gap-2 border px-3 text-[0.9rem] font-semibold leading-tight transition-colors duration-300 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ember ${
-                          on ? "border-ember bg-[#2e1a0c] text-bone" : "border-silver/20 bg-[#0b0d0e] text-bone/85 hover:border-silver/45 hover:text-bone"
+                          on
+                            ? "border-ember bg-[#2e1a0c] text-bone"
+                            : "border-silver/20 bg-[#0b0d0e] text-bone/85 hover:border-silver/45 hover:text-bone"
                         }`}
                       >
-                        <input type="checkbox" checked={on} onChange={() => setGoals((gs) => toggleGoal(gs, g))} className="sr-only" />
-                        <span aria-hidden className={`flex size-4 shrink-0 items-center justify-center border ${on ? "border-ember bg-ember" : "border-bone/35"}`}>
-                          {on && <Check className="size-3 text-ink" strokeWidth={3} />}
+                        <input
+                          type="checkbox"
+                          checked={on}
+                          onChange={() => setGoals((gs) => toggleGoal(gs, g))}
+                          className="sr-only"
+                        />
+                        <span
+                          aria-hidden
+                          className={`flex size-4 shrink-0 items-center justify-center border ${on ? "border-ember bg-ember" : "border-bone/35"}`}
+                        >
+                          {on && (
+                            <Check
+                              className="size-3 text-ink"
+                              strokeWidth={3}
+                            />
+                          )}
                         </span>
                         {t.goals[g]}
                       </label>
@@ -452,7 +626,12 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
               </fieldset>
 
               <div className="pt-2.5">
-                <Button type="submit" className="w-full sm:w-auto" icon={false} data-fab-avoid>
+                <Button
+                  type="submit"
+                  className="w-full sm:w-auto"
+                  icon={false}
+                  data-fab-avoid
+                >
                   {b.calculate}
                 </Button>
               </div>
@@ -469,15 +648,25 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.55, ease: EASE }}
                     className="overflow-hidden"
-                   
                   >
                     <div className="mt-5 border-t border-silver/15 pt-5">
-                      <p className="font-display text-[1.05rem] font-bold uppercase tracking-[0.12em] text-ember">{b.yourBmi}</p>
+                      <p className="font-display text-[1.05rem] font-bold uppercase tracking-[0.12em] text-ember">
+                        {b.yourBmi}
+                      </p>
                       <p className="mt-1 flex flex-wrap items-baseline gap-x-3">
-                        <span className="display text-[3.5rem] leading-none sm:text-[4rem]" style={{ color: toneColor }}>
-                          <CountUp key={`${result.bmi}-${result.age}`} value={result.bmi} />
+                        <span
+                          className="display text-[3.5rem] leading-none sm:text-[4rem]"
+                          style={{ color: toneColor }}
+                        >
+                          <CountUp
+                            key={`${result.bmi}-${result.age}`}
+                            value={result.bmi}
+                          />
                         </span>
-                        <span className="font-display text-[1.6rem] font-bold uppercase tracking-[0.04em]" style={{ color: toneColor }}>
+                        <span
+                          className="font-display text-[1.6rem] font-bold uppercase tracking-[0.04em]"
+                          style={{ color: toneColor }}
+                        >
                           {b.categories[result.tone]}
                         </span>
                       </p>
@@ -489,20 +678,39 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
                             <span
                               key={band.tone}
                               className="h-full"
-                              style={{ flex: band.to - band.from, background: BMI_TONE_COLOR[band.tone], opacity: band.tone === result.tone ? 1 : 0.3 }}
+                              style={{
+                                flex: band.to - band.from,
+                                background: BMI_TONE_COLOR[band.tone],
+                                opacity: band.tone === result.tone ? 1 : 0.3,
+                              }}
                             />
                           ))}
                           <motion.span
                             className="absolute -top-1.5 h-[18px] w-1 -translate-x-1/2 bg-bone shadow-[0_0_0_2px_rgba(5,5,5,0.6)]"
-                            initial={{ left: reduce ? `${bmiScalePosition(result.bmi) * 100}%` : "0%" }}
-                            animate={{ left: `${bmiScalePosition(result.bmi) * 100}%` }}
+                            initial={{
+                              left: reduce
+                                ? `${bmiScalePosition(result.bmi) * 100}%`
+                                : "0%",
+                            }}
+                            animate={{
+                              left: `${bmiScalePosition(result.bmi) * 100}%`,
+                            }}
                             transition={{ duration: 1.1, ease: EASE }}
                           />
                         </div>
                         <div className="relative mt-1.5 h-4 text-[0.75rem] font-medium tabular-nums text-bone/70">
                           {BMI_BANDS.slice(1).map((band) => (
-                            <span key={band.tone} className="absolute -translate-x-1/2" style={{ left: `${bmiScalePosition(band.from) * 100}%` }}>
-                              {fmt(band.from, Number.isInteger(band.from) ? 0 : 1)}
+                            <span
+                              key={band.tone}
+                              className="absolute -translate-x-1/2"
+                              style={{
+                                left: `${bmiScalePosition(band.from) * 100}%`,
+                              }}
+                            >
+                              {fmt(
+                                band.from,
+                                Number.isInteger(band.from) ? 0 : 1,
+                              )}
                             </span>
                           ))}
                         </div>
@@ -510,14 +718,25 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
 
                       <dl className="mt-4 grid gap-3 sm:grid-cols-2">
                         <div className="border border-silver/15 bg-ink/40 p-3">
-                          <dt className="text-[0.85rem] text-silver">{b.healthyRange}</dt>
-                          <dd className="mt-0.5 font-display text-[1.6rem] font-bold text-bone" dir="ltr">
-                            {result.range.min}–{result.range.max} {result.units === "metric" ? b.unitKg : b.unitLb}
+                          <dt className="text-[0.85rem] text-silver">
+                            {b.healthyRange}
+                          </dt>
+                          <dd
+                            className="mt-0.5 font-display text-[1.6rem] font-bold text-bone"
+                            dir="ltr"
+                          >
+                            {result.range.min}–{result.range.max}{" "}
+                            {result.units === "metric" ? b.unitKg : b.unitLb}
                           </dd>
                         </div>
                         <div className="border border-silver/15 bg-ink/40 p-3">
-                          <dt className="text-[0.85rem] text-silver">{b.maintenance}</dt>
-                          <dd className="mt-0.5 font-display text-[1.6rem] font-bold text-bone" dir="ltr">
+                          <dt className="text-[0.85rem] text-silver">
+                            {b.maintenance}
+                          </dt>
+                          <dd
+                            className="mt-0.5 font-display text-[1.6rem] font-bold text-bone"
+                            dir="ltr"
+                          >
                             ~{result.kcal.toLocaleString("en")} {b.kcal}
                           </dd>
                         </div>
@@ -525,37 +744,65 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
 
                       <p className="mt-4 text-base leading-relaxed text-bone/90">
                         {b.explain}
-                        {result.goals.length > 0 ? `: ${goalLabels(result.goals).join(" & ")}.` : "."}
+                        {result.goals.length > 0
+                          ? `: ${goalLabels(result.goals).join(" & ")}.`
+                          : "."}
                       </p>
 
-                      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                        <ButtonLink
-                          href={whatsappLink(waMessage)}
-                          data-track="bmi_whatsapp"
-                          data-category={result.tone}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          icon={<WhatsAppGlyph className="size-5" color="#050505" handset="#FF6A00" />}
-                          className="w-full sm:w-auto"
-                          data-fab-avoid
-                        >
-                          {b.sendResult}
-                        </ButtonLink>
-                        <Button
-                          variant="ghost"
-                          className="w-full bg-[#1b1d20]! backdrop-blur-none sm:w-auto"
-                          data-fab-avoid
-                         
-                          onClick={() => {
-                            track("bmi_to_form");
-                            startApplication({ age: String(result.age), ...(sex ? { sex } : {}), goals: result.goals, bmi: fmt(result.bmi) });
-                          }}
-                        >
-                          {b.book}
-                        </Button>
-                      </div>
+                      {embedded ? (
+                        <div className="mt-4">
+                          <Button
+                            type="button"
+                            className="w-full sm:w-auto"
+                            data-fab-avoid
+                            onClick={embedded.onContinue}
+                          >
+                            {embedded.continueLabel}
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                          <ButtonLink
+                            href={whatsappLink(waMessage)}
+                            data-track="bmi_whatsapp"
+                            data-category={result.tone}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            icon={
+                              <WhatsAppGlyph
+                                className="size-5"
+                                color="#050505"
+                                handset="#FF6A00"
+                              />
+                            }
+                            className="w-full sm:w-auto"
+                            data-fab-avoid
+                          >
+                            {b.sendResult}
+                          </ButtonLink>
+                          <Button
+                            variant="ghost"
+                            className="w-full bg-[#1b1d20]! backdrop-blur-none sm:w-auto"
+                            data-fab-avoid
 
-                      <p className="mt-4 text-[0.85rem] text-silver">{b.disclaimer}</p>
+                            onClick={() => {
+                              track("bmi_to_form");
+                              startApplication({
+                                age: String(result.age),
+                                ...(sex ? { sex } : {}),
+                                goals: result.goals,
+                                bmi: fmt(result.bmi),
+                              });
+                            }}
+                          >
+                            {b.book}
+                          </Button>
+                        </div>
+                      )}
+
+                      <p className="mt-4 text-[0.85rem] text-silver">
+                        {b.disclaimer}
+                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -564,6 +811,6 @@ export function BodyCheck({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
           </div>
         </Reveal>
       </div>
-    </section>
+    </Outer>
   );
 }

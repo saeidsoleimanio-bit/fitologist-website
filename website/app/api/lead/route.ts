@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import en from "@/lib/i18n/dictionaries/en";
-import { fullNumber, isInPerson, sanitizeLead, validateLead, type LeadInput } from "@/lib/lead";
+import { CARD_SOURCE, fullNumber, isInPerson, sanitizeLead, validateLead, type LeadInput } from "@/lib/lead";
 
 /**
  * POST /api/lead — lead delivery (FITOLOGIST_SPEC.md §6.4).
@@ -26,7 +26,19 @@ function rateLimited(ip: string): boolean {
   return recent.length > RATE_LIMIT.max;
 }
 
-type Meta = { language: string; source: string; bmi: string; utm_source: string; utm_campaign: string };
+type Meta = {
+  language: string;
+  source: string;
+  bmi: string;
+  /** BMI category (English) when the Body Check was done — card leads */
+  bmiCategory: string;
+  /** Floor-test answer + score band — card leads */
+  floorTest: string;
+  utm_source: string;
+  utm_campaign: string;
+};
+
+const BMI_CATEGORIES: Record<string, string> = { under: "Underweight", healthy: "Healthy", over: "Overweight", obese: "Obesity" };
 
 function readMeta(raw: Record<string, unknown>): Meta {
   const str = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max).trim() : "");
@@ -35,8 +47,14 @@ function readMeta(raw: Record<string, unknown>): Meta {
   const bmi = str(raw.bmi, 5);
   return {
     language: ["en", "ar", "fa"].includes(language) ? language : "en",
-    source: source.startsWith("/") ? source : "",
+    source: source === CARD_SOURCE || source.startsWith("/") ? source : "",
     bmi: /^\d{1,2}(\.\d)?$/.test(bmi) ? bmi : "",
+    bmiCategory: BMI_CATEGORIES[str(raw.bmiCategory, 10)] ?? "",
+    // The page sends only the answer key (a–d); the owner always reads it in English.
+    floorTest: (() => {
+      const o = en.floorTest.options.find((x) => x.key === str(raw.floorTest, 2));
+      return o ? `${o.label} → ${o.band}` : "";
+    })(),
     utm_source: str(raw.utm_source, 100),
     utm_campaign: str(raw.utm_campaign, 100),
   };
@@ -70,33 +88,43 @@ function describe(lead: LeadInput) {
   };
 }
 
+/** Marks an intended blank line in the Telegram message. */
+const BREAK = "\u0000";
+
 async function sendTelegram(lead: LeadInput, meta: Meta, timestamp: string): Promise<boolean> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) return false;
   const d = describe(lead);
+  const card = meta.source === CARD_SOURCE;
   const lines = [
-    "🔔 New lead — fitologist.me",
-    "",
+    card ? "🟠 CARD LEAD (floor test)" : "🔔 New lead — fitologist.me",
+    BREAK,
+    card && meta.floorTest && `Floor test: ${meta.floorTest}`,
+    card && meta.bmi && `BMI: ${meta.bmi}${meta.bmiCategory ? ` (${meta.bmiCategory})` : ""}`,
+    card && (meta.floorTest || meta.bmi) && BREAK,
     `Name: ${lead.name.trim()}`,
     `WhatsApp: ${d.whatsapp}`,
     `Age: ${lead.age}`,
     d.sex && `Sex: ${d.sex}`,
-    `Goals: ${d.goals}`,
-    `Training type: ${d.type}`,
+    d.goals && `Goals: ${d.goals}`,
+    d.type && `Training type: ${d.type}`,
     d.frequency && `How often: ${d.frequency}`,
     d.area && `Area: ${d.area}`,
     d.times && `Preferred time: ${d.times}`,
     d.notes && `Notes: ${d.notes}`,
-    "",
+    BREAK,
     `Language: ${meta.language.toUpperCase()}`,
     `Source page: ${meta.source || "—"}`,
-    meta.bmi && `BMI: ${meta.bmi}`,
+    !card && meta.bmi && `BMI: ${meta.bmi}`,
     (meta.utm_source || meta.utm_campaign) && `UTM: ${meta.utm_source || "—"} / ${meta.utm_campaign || "—"}`,
     `Time (Dubai): ${timestamp}`,
-    "",
+    BREAK,
     `Chat: https://wa.me/${fullNumber(lead.countryCode, lead.phone)}`,
-  ].filter((x): x is string => typeof x === "string");
+    ]
+    // Empty optional fields ("" / false) are dropped; BREAK marks the intended blank lines.
+    .filter((x): x is string => typeof x === "string" && x !== "")
+    .map((x) => (x === BREAK ? "" : x));
 
   const base = process.env.TELEGRAM_API_BASE || "https://api.telegram.org";
   const res = await fetch(`${base}/bot${token}/sendMessage`, {
@@ -112,7 +140,7 @@ async function sendSheet(lead: LeadInput, meta: Meta, timestamp: string): Promis
   const url = process.env.SHEETS_WEBHOOK_URL;
   if (!url) return false;
   const d = describe(lead);
-  // Column order matches scripts/sheets-webhook.gs
+  // Keys are the Sheet's header names; the Apps Script writes them by name and appends new columns.
   const row = {
     timestamp,
     name: lead.name.trim(),
@@ -130,6 +158,8 @@ async function sendSheet(lead: LeadInput, meta: Meta, timestamp: string): Promis
     utm_source: meta.utm_source,
     utm_campaign: meta.utm_campaign,
     sex: d.sex,
+    floor_test: meta.floorTest,
+    bmi_category: meta.bmiCategory,
   };
   const res = await fetch(url, {
     method: "POST",
@@ -159,12 +189,12 @@ export async function POST(req: NextRequest) {
   // Honeypot filled → silently drop (looks like success to the bot).
   if (lead.company.trim() !== "") return NextResponse.json({ ok: true });
 
-  const errors = validateLead(lead, en.lead.errors);
+  const meta = readMeta(raw);
+  const errors = validateLead(lead, en.lead.errors, { requireGoalsAndType: meta.source !== CARD_SOURCE });
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ ok: false, error: "invalid", fields: Object.keys(errors) }, { status: 400 });
   }
 
-  const meta = readMeta(raw);
   const timestamp = dubaiTimestamp();
   const results = await Promise.allSettled([sendTelegram(lead, meta, timestamp), sendSheet(lead, meta, timestamp)]);
   const delivered = results.some((r) => r.status === "fulfilled" && r.value === true);

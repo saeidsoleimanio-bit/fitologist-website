@@ -6,8 +6,13 @@
  * Copy the web app URL into the SHEETS_WEBHOOK_URL environment variable on Vercel.
  *
  * The website's /api/lead function POSTs one JSON object per lead; this appends it as a row.
+ *
+ * Columns are matched BY HEADER NAME (row 1), so you may reorder or add your own columns freely.
+ * Any field the website sends that has no column yet gets a new header appended at the end
+ * (e.g. "floor_test", "bmi_category", "sex"); existing rows are never moved.
  */
 
+/** Order used only when the sheet is brand new (empty). */
 var COLUMNS = [
   "timestamp",
   "name",
@@ -24,7 +29,9 @@ var COLUMNS = [
   "bmi",
   "utm_source",
   "utm_campaign",
-  "sex", // added later: appended at the end so existing rows keep their columns
+  "sex",
+  "floor_test",
+  "bmi_category",
 ];
 
 var SHEET_NAME = "Leads";
@@ -37,19 +44,29 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
 
-    // Header row on first use; on an existing sheet, add any header cells that are missing
-    // (e.g. a column appended to COLUMNS later) without touching existing rows.
+    // Header row on first use.
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(COLUMNS);
       sheet.setFrozenRows(1);
-    } else {
-      var header = sheet.getRange(1, 1, 1, COLUMNS.length).getValues()[0];
-      COLUMNS.forEach(function (key, i) {
-        if (header[i] === "" || header[i] === null) sheet.getRange(1, i + 1).setValue(key);
-      });
     }
 
-    var row = COLUMNS.map(function (key) {
+    // Current headers (row 1), trimmed; empty trailing cells ignored.
+    var lastCol = Math.max(sheet.getLastColumn(), 1);
+    var header = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function (h) {
+      return String(h).trim();
+    });
+    while (header.length && header[header.length - 1] === "") header.pop();
+
+    // Append a header for every incoming field that has no column yet.
+    Object.keys(data).forEach(function (key) {
+      if (header.indexOf(key) === -1) {
+        header.push(key);
+        sheet.getRange(1, header.length).setValue(key);
+      }
+    });
+
+    // Build the row by header name (columns the website doesn't send stay empty).
+    var row = header.map(function (key) {
       var value = data[key] === undefined || data[key] === null ? "" : String(data[key]);
       // Prevent spreadsheet formula injection from user input
       return /^[=+\-@]/.test(value) ? "'" + value : value;

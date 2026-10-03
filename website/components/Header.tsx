@@ -7,12 +7,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
-import { LanguageMenu, LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import {
+  LanguageMenu,
+  LanguageSwitcher,
+} from "@/components/i18n/LanguageSwitcher";
+import { FLOOR_TEST_LOCALES } from "@/lib/site";
 import { scrollToSection } from "@/components/providers/ApplicationProvider";
 import { InstagramGlyph, WhatsAppGlyph } from "@/components/ui/icons";
 import { stripLocale } from "@/lib/i18n/config";
 import { EASE } from "@/lib/motion";
-import { INSTAGRAM, NAV_ITEMS, SITE, WHATSAPP, startPathFor, whatsappLink } from "@/lib/site";
+import {
+  INSTAGRAM,
+  NAV_ITEMS,
+  SITE,
+  WHATSAPP,
+  startPathFor,
+  whatsappLink,
+} from "@/lib/site";
 
 /**
  * Header (§2.1).
@@ -24,6 +35,8 @@ import { INSTAGRAM, NAV_ITEMS, SITE, WHATSAPP, startPathFor, whatsappLink } from
 export function Header() {
   const { t, href } = useI18n();
   const pathname = stripLocale(usePathname() ?? "/");
+  /** Floor-test landing page (printed card): minimal chrome — logo + language switcher only (EN | فا). */
+  const minimal = pathname === "/floor-test";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -59,7 +72,14 @@ export function Header() {
     if (p === pathname) {
       e.preventDefault();
       if (hash) scrollToSection(hash);
-      else window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      else
+        window.scrollTo({
+          top: 0,
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+            .matches
+            ? "auto"
+            : "smooth",
+        });
     }
   };
 
@@ -72,14 +92,18 @@ export function Header() {
 
     const focusables = () =>
       Array.from(
-        panelRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])") ?? [],
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          "a[href], button:not([disabled])",
+        ) ?? [],
       );
     requestAnimationFrame(() => focusables()[0]?.focus());
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       if (e.key === "Tab") {
-        const items = [toggleRef.current, ...focusables()].filter(Boolean) as HTMLElement[];
+        const items = [toggleRef.current, ...focusables()].filter(
+          Boolean,
+        ) as HTMLElement[];
         const first = items[0];
         const last = items[items.length - 1];
         if (e.shiftKey && document.activeElement === first) {
@@ -109,7 +133,10 @@ export function Header() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reset when the page changes
     setFormInView(false);
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => setFormInView(e.isIntersecting), { threshold: 0 });
+    const io = new IntersectionObserver(
+      ([e]) => setFormInView(e.isIntersecting),
+      { threshold: 0 },
+    );
     io.observe(el);
     return () => io.disconnect();
   }, [pathname]);
@@ -127,7 +154,8 @@ export function Header() {
    * (the hero shows the same CTA), /start (the page is the form), and any page while the lead form
    * (#start) is in the viewport. Same fade as mobile.
    */
-  const deskCtaHidden = (pathname === "/" && !scrolled) || pathname === "/start" || formInView;
+  const deskCtaHidden =
+    (pathname === "/" && !scrolled) || pathname === "/start" || formInView;
   const startPath = startPathFor(pathname);
   const isActive = (path: string) => !path.includes("#") && pathname === path;
 
@@ -135,7 +163,9 @@ export function Header() {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-50 border-b pt-[env(safe-area-inset-top)] transition-[background-color,border-color,backdrop-filter] duration-[240ms] ease-out xl:pt-0 xl:duration-400 ${
-          homeOverlay ? "border-transparent bg-transparent" : "border-white/[0.08] bg-ink"
+          homeOverlay
+            ? "border-transparent bg-transparent"
+            : "border-white/[0.08] bg-ink"
         } ${
           solid
             ? "xl:border-white/[0.08] xl:bg-[rgb(5_5_5/0.72)] xl:backdrop-blur-[14px]"
@@ -191,7 +221,10 @@ export function Header() {
           </Link>
 
           {/* Desktop navigation */}
-          <nav aria-label={t.nav.primaryLabel} className="hidden xl:block">
+          <nav
+            aria-label={t.nav.primaryLabel}
+            className={minimal ? "hidden" : "hidden xl:block"}
+          >
             <ul className="flex items-center">
               {NAV_ITEMS.map((item) => {
                 const active = isActive(item.path);
@@ -202,7 +235,9 @@ export function Header() {
                       onClick={(e) => onNavigate(e, item.path)}
                       aria-current={active ? "page" : undefined}
                       className={`relative flex min-h-11 items-center px-3 font-display text-[0.92rem] font-semibold uppercase tracking-[0.12em] transition-colors duration-300 2xl:px-4 ${
-                        active ? "text-ember" : "text-silver hover:text-ember-soft"
+                        active
+                          ? "text-ember"
+                          : "text-silver hover:text-ember-soft"
                       }`}
                     >
                       {t.nav[item.key]}
@@ -222,62 +257,76 @@ export function Header() {
 
           <div className="flex items-center gap-1.5 sm:gap-2 xl:gap-0">
             {/* Primary button — full label on desktop, short label below xl (hidden under 360px) */}
-            <Link
-              href={href(startPath)}
-              onClick={(e) => onNavigate(e, startPath)}
-              data-cta="header"
-              className={`group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 transition-[opacity,visibility] duration-[240ms] ease-out ${
-                deskCtaHidden ? "xl:pointer-events-none xl:invisible xl:opacity-0" : "xl:visible xl:pointer-events-auto xl:opacity-100"
-              } ${
-                ctaHidden ? "pointer-events-none invisible opacity-0" : "visible opacity-100"
-              } font-sans text-[0.8rem] font-semibold tracking-[0.01em] text-ink min-[360px]:inline-flex sm:px-4 sm:text-[0.85rem] xl:ms-4 xl:px-5`}
-            >
-              <span
-                aria-hidden
-                className="absolute inset-0 origin-left scale-x-0 bg-bone transition-transform duration-300 ease-[var(--ease-premium)] group-hover:scale-x-100 rtl:origin-right"
-              />
-              <span className="relative xl:hidden">{t.nav.ctaShort}</span>
-              <span className="relative hidden xl:inline">{t.nav.cta}</span>
-            </Link>
-
-            <div className="hidden items-center xl:ms-3 xl:flex">
-              <a
-                href={INSTAGRAM.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${t.nav.instagram} (${t.common.newTab})`}
-                className="flex min-h-11 min-w-11 items-center justify-center text-silver transition-colors duration-300 hover:text-ember-soft"
-              >
-                <InstagramGlyph className="size-[18px]" />
-              </a>
-              <span aria-hidden className="mx-1 h-4 w-px bg-bone/15" />
-              <LanguageSwitcher />
-            </div>
-
-            {/* Mobile language button — left of the hamburger, both header states */}
-            <LanguageMenu className="xl:hidden" />
-
-            <button
-              ref={toggleRef}
-              type="button"
-              onClick={() => (open ? close() : setOpen(true))}
-              aria-expanded={open}
-              aria-controls="mobile-menu"
-              aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
-              className="relative -me-2 flex size-11 items-center justify-center text-bone xl:hidden"
-            >
-              <AnimatePresence initial={false} mode="wait">
-                <motion.span
-                  key={open ? "x" : "menu"}
-                  initial={{ opacity: 0, rotate: -45 }}
-                  animate={{ opacity: 1, rotate: 0 }}
-                  exit={{ opacity: 0, rotate: 45 }}
-                  transition={{ duration: 0.25 }}
+            {minimal ? (
+              <LanguageSwitcher locales={FLOOR_TEST_LOCALES} />
+            ) : (
+              <>
+                <Link
+                  href={href(startPath)}
+                  onClick={(e) => onNavigate(e, startPath)}
+                  data-cta="header"
+                  className={`group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 transition-[opacity,visibility] duration-[240ms] ease-out ${
+                    deskCtaHidden
+                      ? "xl:pointer-events-none xl:invisible xl:opacity-0"
+                      : "xl:visible xl:pointer-events-auto xl:opacity-100"
+                  } ${
+                    ctaHidden
+                      ? "pointer-events-none invisible opacity-0"
+                      : "visible opacity-100"
+                  } font-sans text-[0.8rem] font-semibold tracking-[0.01em] text-ink min-[360px]:inline-flex sm:px-4 sm:text-[0.85rem] xl:ms-4 xl:px-5`}
                 >
-                  {open ? <X className="size-6" strokeWidth={1.5} /> : <Menu className="size-6" strokeWidth={1.5} />}
-                </motion.span>
-              </AnimatePresence>
-            </button>
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 origin-left scale-x-0 bg-bone transition-transform duration-300 ease-[var(--ease-premium)] group-hover:scale-x-100 rtl:origin-right"
+                  />
+                  <span className="relative xl:hidden">{t.nav.ctaShort}</span>
+                  <span className="relative hidden xl:inline">{t.nav.cta}</span>
+                </Link>
+
+                <div className="hidden items-center xl:ms-3 xl:flex">
+                  <a
+                    href={INSTAGRAM.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${t.nav.instagram} (${t.common.newTab})`}
+                    className="flex min-h-11 min-w-11 items-center justify-center text-silver transition-colors duration-300 hover:text-ember-soft"
+                  >
+                    <InstagramGlyph className="size-[18px]" />
+                  </a>
+                  <span aria-hidden className="mx-1 h-4 w-px bg-bone/15" />
+                  <LanguageSwitcher />
+                </div>
+
+                {/* Mobile language button — left of the hamburger, both header states */}
+                <LanguageMenu className="xl:hidden" />
+
+                <button
+                  ref={toggleRef}
+                  type="button"
+                  onClick={() => (open ? close() : setOpen(true))}
+                  aria-expanded={open}
+                  aria-controls="mobile-menu"
+                  aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
+                  className="relative -me-2 flex size-11 items-center justify-center text-bone xl:hidden"
+                >
+                  <AnimatePresence initial={false} mode="wait">
+                    <motion.span
+                      key={open ? "x" : "menu"}
+                      initial={{ opacity: 0, rotate: -45 }}
+                      animate={{ opacity: 1, rotate: 0 }}
+                      exit={{ opacity: 0, rotate: 45 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      {open ? (
+                        <X className="size-6" strokeWidth={1.5} />
+                      ) : (
+                        <Menu className="size-6" strokeWidth={1.5} />
+                      )}
+                    </motion.span>
+                  </AnimatePresence>
+                </button>
+              </>
+            )}
           </div>
         </motion.div>
       </header>

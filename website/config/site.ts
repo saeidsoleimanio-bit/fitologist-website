@@ -46,6 +46,12 @@ export const site = {
   },
   homeEquipmentNote: "", // {{EQUIPMENT_NOTE}} e.g. "I bring the equipment we need."
 
+  /**
+   * Printed "floor test" card (/c → /floor-test). After offerValidUntil (end of that day, Dubai time)
+   * the offer disappears from the page and the free 30-minute consultation wording is used instead.
+   */
+  floorTest: { offer: "Your first session is free", offerValidUntil: "2026-12-31" },
+
   analytics: { ga4Id: "", metaPixelId: "" }, // {{GA4_ID}} {{PIXEL_ID}} — load scripts only if set
 };
 

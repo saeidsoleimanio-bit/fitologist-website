@@ -474,6 +474,39 @@ const ar: Dictionary = {
     line2: "تدريب فردي، وثنائي، وأونلاين، وهجين",
   },
 
+  // Not shown: the floor-test page is EN/FA only (Arabic hidden). English copy satisfies the type.
+  /** Printed-card landing page (/floor-test). */
+  floorTest: {
+    metaTitle: "The Floor Test | FITologist.me",
+    metaDescription: "You just tried the floor test from Saeid's card. See what your result means and send it to Saeid.",
+    eyebrow: "The floor test",
+    title: "How did it go?",
+    intro: "You just tried the floor test: sit down and stand back up without using your hands.",
+    optionsLabel: "How did your floor test go?",
+    options: [
+      { key: "a", label: "Perfect: no help at all", band: "Excellent, about 10/10", body: "Top group. Your strength, balance and mobility work together really well." },
+      { key: "b", label: "Almost: I touched the floor once (hand or knee)", band: "Very good, about 9/10", body: "Strong result. One small weak link is easy to fix." },
+      { key: "c", label: "I needed help 2–3 times", band: "Good, about 7–8/10", body: "Solid base, with clear room to improve your strength and mobility." },
+      { key: "d", label: "I needed a lot of help / couldn't do it", band: "Needs attention, 6/10 or less", body: "Good news: this is very trainable, and it improves quickly with the right plan." },
+    ],
+    note: "Researchers use this test as a simple marker of strength, balance and flexibility. It's a guide, not a medical assessment.",
+    bmiTitle: "Want to know your BMI too? It takes 10 seconds.",
+    skip: "Skip",
+    continue: "Continue",
+    claimTitle: "Send your results to Saeid and claim your free first session",
+    consultTitle: "Send your results to Saeid and book your free 30-minute consultation",
+    validity: "Card holders only · valid until {date}",
+    offer: "Your first session is free",
+    success: { offer: "Saeid has your results and will message you within a few hours to book your free session.", consult: "Saeid has your results and will message you within a few hours to book your free consultation." },
+    whatsapp: {
+      intro: "Hi Saeid, I did the floor test from your card.",
+      result: "Result: {band}.",
+      bmi: "My BMI: {bmi} ({category}).",
+      offer: "I'd like to claim my free first session.",
+      consult: "I'd like to book my free 30-minute consultation.",
+    },
+  },
+
   notFound: {
     title: "الصفحة غير موجودة",
     body: "الصفحة التي تبحث عنها غير موجودة.",

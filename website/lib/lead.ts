@@ -44,6 +44,9 @@ export const COUNTRY_CODES = [
   { code: "7", label: "Russia / Kazakhstan" },
 ] as const;
 
+/** `source` of leads from the printed card's landing page (/floor-test). */
+export const CARD_SOURCE = "floor-test-card";
+
 export const LIMITS = {
   name: { min: 2, max: 60 },
   age: { min: 18, max: 80 },
@@ -119,7 +122,12 @@ export function toggleGoal(goals: Goal[], goal: Goal): Goal[] {
 }
 
 /** Same rules in the browser and on the server. Messages are passed in (localized). */
-export function validateLead(d: LeadInput, msg: LeadErrorMessages): LeadErrors {
+export function validateLead(
+  d: LeadInput,
+  msg: LeadErrorMessages,
+  /** Short card form (/floor-test) has no goals / training type fields. */
+  { requireGoalsAndType = true }: { requireGoalsAndType?: boolean } = {},
+): LeadErrors {
   const e: LeadErrors = {};
   const name = d.name.trim();
   if (name.length < LIMITS.name.min || name.length > LIMITS.name.max) e.name = msg.name;
@@ -138,8 +146,8 @@ export function validateLead(d: LeadInput, msg: LeadErrorMessages): LeadErrors {
   const age = Number(d.age.trim());
   if (!/^\d+$/.test(d.age.trim()) || age < LIMITS.age.min || age > LIMITS.age.max) e.age = msg.age;
 
-  if (d.goals.length === 0 || d.goals.some((g) => !GOALS.includes(g))) e.goals = msg.goals;
-  if (!TRAINING_TYPES.includes(d.type as TrainingType)) e.type = msg.type;
+  if (requireGoalsAndType && d.goals.length === 0 || d.goals.some((g) => !GOALS.includes(g))) e.goals = msg.goals;
+  if (requireGoalsAndType && !TRAINING_TYPES.includes(d.type as TrainingType)) e.type = msg.type;
   if (d.notes.length > LIMITS.notes) e.notes = msg.notes;
   if (!d.consent) e.consent = msg.consent;
   return e;
