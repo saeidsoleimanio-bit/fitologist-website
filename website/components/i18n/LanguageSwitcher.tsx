@@ -30,7 +30,7 @@ function onSwitch(e: React.MouseEvent<HTMLAnchorElement>, active: boolean, href:
  * Text language selector (no flags). Links keep the current page (and section hash) in the
  * target language. A full document load is used on purpose: <html lang/dir> and fonts change.
  */
-export function LanguageSwitcher({ className = "" }: { className?: string }) {
+export function LanguageSwitcher({ className = "", locales = LOCALES }: { className?: string; locales?: readonly Locale[] }) {
   const { locale, t } = useI18n();
   const pathname = usePathname() ?? "/";
   const path = stripLocale(pathname);
@@ -38,7 +38,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
   return (
     <nav aria-label={t.nav.language} className={className}>
       <ul className="flex items-center" dir="ltr">
-        {LOCALES.map((l, i) => {
+        {locales.map((l, i) => {
           const active = l === locale;
           const href = localizePath(l, path);
           return (
@@ -75,7 +75,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
  * Compact mobile header language button (left of the hamburger): shows the current code and opens a
  * small dropdown of languages. Closes on outside tap, Escape, or choosing a language.
  */
-export function LanguageMenu({ className = "" }: { className?: string }) {
+export function LanguageMenu({ className = "", locales = LOCALES }: { className?: string; locales?: readonly Locale[] }) {
   const { locale, t } = useI18n();
   const pathname = usePathname() ?? "/";
   const path = stripLocale(pathname);
@@ -123,7 +123,7 @@ export function LanguageMenu({ className = "" }: { className?: string }) {
           aria-label={t.nav.language}
           className="absolute end-0 top-full z-10 mt-1 min-w-36 border hairline bg-carbon py-1 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.9)]"
         >
-          {LOCALES.map((l) => {
+          {locales.map((l) => {
             const active = l === locale;
             const href = localizePath(l, path);
             return (

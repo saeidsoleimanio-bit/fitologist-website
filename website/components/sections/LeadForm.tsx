@@ -41,12 +41,12 @@ import { whatsappLink } from "@/lib/site";
 
 type Status = "idle" | "sending" | "success" | "fallback";
 
-const LABEL =
+export const LABEL =
   "block font-display text-[0.85rem] font-bold uppercase tracking-[0.12em] text-bone/90";
-const INPUT =
+export const INPUT =
   "mt-1.5 block h-12 w-full border bg-[#0b0d0e]/80 px-3.5 text-base text-bone shadow-[inset_0_1px_0_rgb(255_255_255/0.03)] placeholder:text-bone/45 transition-[border-color,box-shadow] duration-300 hover:border-silver/35 focus:border-ember focus:shadow-[0_0_0_3px_rgb(255_106_0/0.18)] focus:outline-none";
 
-function ErrorText({ id, children }: { id: string; children?: string }) {
+export function ErrorText({ id, children }: { id: string; children?: string }) {
   return (
     <p
       id={id}
@@ -132,7 +132,7 @@ function Chips<T extends string>({
   );
 }
 
-const isMobileDevice = () =>
+export const isMobileDevice = () =>
   typeof window !== "undefined" &&
   (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
     window.matchMedia("(pointer: coarse)").matches);

@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useI18n } from "@/components/i18n/I18nProvider";
+import { stripLocale } from "@/lib/i18n/config";
 import { InstagramGlyph, WhatsAppGlyph } from "@/components/ui/icons";
 import { INSTAGRAM, NAV_ITEMS, SITE, WHATSAPP, whatsappLink } from "@/lib/site";
 
@@ -17,8 +19,10 @@ const contactCls =
 export function Footer() {
   const { t, href } = useI18n();
   const year = new Date().getFullYear();
+  // Floor-test landing page (printed card): minimal footer — Privacy and Terms only.
+  const minimal = stripLocale(usePathname() ?? "/") === "/floor-test";
   const items = [
-    ...NAV_ITEMS.map((n) => ({ key: n.key as string, path: n.path as string, label: t.nav[n.key] })),
+    ...(minimal ? [] : NAV_ITEMS.map((n) => ({ key: n.key as string, path: n.path as string, label: t.nav[n.key] }))),
     { key: "terms", path: "/terms", label: t.footer.terms },
     { key: "privacy", path: "/privacy", label: t.footer.privacy },
   ];

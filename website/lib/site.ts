@@ -68,3 +68,6 @@ const ALL_CREDENTIALS = [
 export const CREDENTIALS = ALL_CREDENTIALS.filter((c) => c.show);
 
 export const COACH_NAME = site.coachName;
+
+/** Languages offered on the printed-card landing page (/floor-test). Arabic stays hidden there. */
+export const FLOOR_TEST_LOCALES = ["en", "fa"] as const;
