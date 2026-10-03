@@ -123,25 +123,32 @@ const PYRAMID_LABELS = [
  * ~6°. Sits at the end side of the block (right in LTR, left in RTL), base near the section's bottom
  * edge, tip behind the last line of the paragraph. Decorative: aria-hidden, no pointer events.
  */
-export function FoodPyramid({ fontClass }: { fontClass: string }) {
+export function FoodPyramid({ fontClass, column = false, boost = 1 }: { fontClass: string; column?: boolean; boost?: number }) {
+  // `column`: desktop placement in the empty left column of the section (owner revision); the inline
+  // placement (below the paragraph) is the mobile/tablet one and hides from lg up.
+  const o = (v: number) => Math.min(1, v * boost);
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute -bottom-3.5 end-1 w-[min(46vw,11rem)] text-ember sm:end-2 sm:w-52 lg:-bottom-9"
+      className={
+        column
+          ? "pointer-events-none absolute bottom-0 end-[6%] w-64 text-ember"
+          : "pointer-events-none absolute -bottom-3.5 end-1 w-[min(46vw,11rem)] text-ember sm:end-2 sm:w-52 lg:-bottom-9 lg:hidden"
+      }
       style={{ transform: "rotate(6deg)" }}
     >
       <svg viewBox="0 0 200 172" className={`h-auto w-full overflow-visible ${fontClass}`} lang="en">
-        <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" opacity={0.22}>
+        <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" opacity={o(0.22)}>
           {PYRAMID_LINES.map((d, i) => (
             <path key={i} d={d} strokeWidth={1.6} />
           ))}
         </g>
-        <g fill="none" stroke="currentColor" strokeLinecap="round" opacity={0.11}>
+        <g fill="none" stroke="currentColor" strokeLinecap="round" opacity={o(0.11)}>
           {PYRAMID_SKETCH.map((d, i) => (
             <path key={i} d={d} strokeWidth={1.1} />
           ))}
         </g>
-        <g fill="currentColor" opacity={0.35} textAnchor="middle">
+        <g fill="currentColor" opacity={o(0.35)} textAnchor="middle">
           {PYRAMID_LABELS.map((l) => (
             <text key={l.text} x={APEX.x} y={l.y} fontSize={l.size}>
               {l.text}
@@ -208,15 +215,20 @@ const OAT_FLAKES = [
  * other or the pyramid). They sit on the start side below the paragraph (left in LTR, right in RTL),
  * clear of the text and the pyramid. Decorative: aria-hidden, no pointer events.
  */
-export function DrumstickAndOats({ fontClass }: { fontClass: string }) {
+export function DrumstickAndOats({ fontClass, column = false, boost = 1 }: { fontClass: string; column?: boolean; boost?: number }) {
+  const o = (v: number) => Math.min(1, v * boost);
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0">
+    <div aria-hidden className={`pointer-events-none absolute inset-0 ${column ? "" : "lg:hidden"}`}>
       <svg
         viewBox="0 0 120 84"
-        className="absolute bottom-5 start-0 h-auto w-[min(19vw,4.75rem)] overflow-visible text-ember rtl:w-[min(16vw,4.25rem)] sm:bottom-6 sm:w-24 rtl:sm:w-24 lg:bottom-0"
+        className={
+          column
+            ? "absolute bottom-[52%] start-[3%] h-auto w-32 overflow-visible text-ember"
+            : "absolute bottom-5 start-0 h-auto w-[min(19vw,4.75rem)] overflow-visible text-ember rtl:w-[min(16vw,4.25rem)] sm:bottom-6 sm:w-24 rtl:sm:w-24 lg:bottom-0"
+        }
         style={{ transform: "rotate(-11deg)" }}
       >
-        <g {...SKETCH} opacity={0.22} strokeWidth={2}>
+        <g {...SKETCH} opacity={o(0.22)} strokeWidth={2}>
           <path d={DRUM_OUTLINE} />
           {DRUM_DETAIL.map((d, i) => (
             <path key={i} d={d} strokeWidth={i < 2 ? 2 : 1.4} />
@@ -225,15 +237,19 @@ export function DrumstickAndOats({ fontClass }: { fontClass: string }) {
             <circle key={i} cx={cx} cy={cy} r={r} />
           ))}
         </g>
-        <path d={DRUM_SKETCH} {...SKETCH} opacity={0.11} strokeWidth={1.3} />
+        <path d={DRUM_SKETCH} {...SKETCH} opacity={o(0.11)} strokeWidth={1.3} />
       </svg>
       <svg
         viewBox="0 0 120 96"
-        className={`absolute -bottom-3 start-[25%] h-auto w-[min(17vw,4.5rem)] rtl:start-[23%] rtl:w-[min(15vw,4rem)] rtl:sm:w-24 overflow-visible text-ember sm:start-[26%] sm:w-24 lg:-bottom-8 ${fontClass}`}
+        className={`${
+          column
+            ? "absolute bottom-[6%] start-[24%] h-auto w-32 overflow-visible text-ember"
+            : "absolute -bottom-3 start-[25%] h-auto w-[min(17vw,4.5rem)] rtl:start-[23%] rtl:w-[min(15vw,4rem)] rtl:sm:w-24 overflow-visible text-ember sm:start-[26%] sm:w-24 lg:-bottom-8"
+        } ${fontClass}`}
         style={{ transform: "rotate(7deg)" }}
         lang="en"
       >
-        <g {...SKETCH} opacity={0.22} strokeWidth={2}>
+        <g {...SKETCH} opacity={o(0.22)} strokeWidth={2}>
           <path d={BOWL_RIM} />
           <path d={BOWL_BODY} />
           <path d={BOWL_FOOT} />
@@ -241,7 +257,7 @@ export function DrumstickAndOats({ fontClass }: { fontClass: string }) {
             <ellipse key={i} cx={x} cy={y} rx={rx} ry={ry} transform={`rotate(${rot} ${x} ${y})`} strokeWidth={1.4} />
           ))}
         </g>
-        <text x={60} y={68} textAnchor="middle" fontSize={22} fill="currentColor" opacity={0.35}>
+        <text x={60} y={68} textAnchor="middle" fontSize={22} fill="currentColor" opacity={o(0.35)}>
           Oats
         </text>
       </svg>

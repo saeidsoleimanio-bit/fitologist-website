@@ -25,6 +25,8 @@ export function PhotoHero({
   side,
   belowHeader = false,
   veils = [],
+  alignTopDesktop = false,
+  tallDesktop = false,
   children,
 }: {
   id: string;
@@ -35,6 +37,10 @@ export function PhotoHero({
   side: "left" | "right";
   belowHeader?: boolean;
   veils?: Veil[];
+  /** Desktop: pin the photo's top edge to the top of the photo area (e.g. so a head isn't cut off). */
+  alignTopDesktop?: boolean;
+  /** Desktop: a taller photo area and a shorter bottom fade, so more of the photo shows. */
+  tallDesktop?: boolean;
   children: React.ReactNode;
 }) {
   const { dir } = useI18n();
@@ -43,7 +49,10 @@ export function PhotoHero({
       ? "linear-gradient(to right, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.75) 32%, rgba(5,5,5,0.25) 52%, transparent 64%)"
       : "linear-gradient(to left, rgba(5,5,5,0.9) 0%, rgba(5,5,5,0.7) 30%, rgba(5,5,5,0.2) 50%, transparent 60%)";
   return (
-    <section aria-labelledby={id} className="relative isolate overflow-hidden bg-ink lg:flex lg:min-h-[min(82svh,46rem)] lg:items-center">
+    <section
+      aria-labelledby={id}
+      className={`relative isolate overflow-hidden bg-ink lg:flex lg:items-center ${tallDesktop ? "lg:min-h-[min(100svh,58rem)]" : "lg:min-h-[min(82svh,46rem)]"}`}
+    >
       <div
         className={`relative w-full overflow-hidden lg:absolute lg:inset-0 lg:h-auto ${
           belowHeader
@@ -53,14 +62,17 @@ export function PhotoHero({
       >
         <div className="absolute inset-0 [container-type:size]">
           <div
-            className="load-fade-in absolute left-1/2 top-1/2 [--hero-x:var(--hero-x-m)] lg:[--hero-x:var(--hero-x-d)]"
+            className={`load-fade-in absolute left-1/2 [--hero-x:var(--hero-x-m)] lg:[--hero-x:var(--hero-x-d)] ${
+              alignTopDesktop ? "lg:[--hero-top:0%] lg:[--hero-ty:0%]" : ""
+            }`}
             style={
               {
                 "--hero-x-m": focus.mobile,
                 "--hero-x-d": focus.desktop,
                 width: `max(100cqw, 100cqh * ${ratio})`,
                 aspectRatio: String(ratio),
-                transform: "translate(calc(var(--hero-x) * -1), -50%)",
+                top: "var(--hero-top, 50%)",
+                transform: "translate(calc(var(--hero-x) * -1), var(--hero-ty, -50%))",
               } as React.CSSProperties
             }
           >
@@ -84,7 +96,10 @@ export function PhotoHero({
         </div>
         {/* Legibility: soft top fade (header / band edge), bottom fade into the page, dark reading side on desktop */}
         <div aria-hidden className={`absolute inset-x-0 top-0 bg-linear-to-b to-transparent ${belowHeader ? "h-12 from-ink" : "h-28 from-ink/60"}`} />
-        <div aria-hidden className="absolute inset-x-0 -bottom-px h-[42%] bg-linear-to-t from-ink via-ink/70 to-transparent lg:h-[30%]" />
+        <div
+          aria-hidden
+          className={`absolute inset-x-0 -bottom-px h-[42%] bg-linear-to-t from-ink via-ink/70 to-transparent ${tallDesktop ? "lg:h-[14%]" : "lg:h-[30%]"}`}
+        />
         <div aria-hidden className="absolute inset-0 hidden lg:block" style={{ background: shade }} />
       </div>
 

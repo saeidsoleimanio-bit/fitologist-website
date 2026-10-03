@@ -10,5 +10,5 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/start">): 
 
 /** Form only (for the Instagram bio) — same component as the coaching page. */
 export default function StartPage() {
-  return <StartTraining headingLevel="h1" standalone />;
+  return <StartTraining headingLevel="h1" standalone wide />;
 }

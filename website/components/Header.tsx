@@ -102,6 +102,18 @@ export function Header() {
     };
   }, [open, close]);
 
+  // Is the lead form (#start) on screen? (desktop CTA rule; re-observed on every page)
+  const [formInView, setFormInView] = useState(false);
+  useEffect(() => {
+    const el = document.getElementById("start");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset when the page changes
+    setFormInView(false);
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setFormInView(e.isIntersecting), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [pathname]);
+
   const solid = scrolled || open;
   /**
    * Every page (owner revision), below xl, at the very top: transparent header (top gradient for
@@ -110,6 +122,12 @@ export function Header() {
    */
   const homeOverlay = !scrolled && !open;
   const ctaHidden = homeOverlay;
+  /**
+   * Desktop (xl+) header CTA (owner revision): shown on every page, except — Home at the very top
+   * (the hero shows the same CTA), /start (the page is the form), and any page while the lead form
+   * (#start) is in the viewport. Same fade as mobile.
+   */
+  const deskCtaHidden = (pathname === "/" && !scrolled) || pathname === "/start" || formInView;
   const startPath = startPathFor(pathname);
   const isActive = (path: string) => !path.includes("#") && pathname === path;
 
@@ -208,9 +226,9 @@ export function Header() {
               href={href(startPath)}
               onClick={(e) => onNavigate(e, startPath)}
               data-cta="header"
-              aria-hidden={ctaHidden ? true : undefined}
-              tabIndex={ctaHidden ? -1 : undefined}
-              className={`group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 transition-[opacity,visibility] duration-[240ms] ease-out xl:visible xl:pointer-events-auto xl:opacity-100 ${
+              className={`group relative hidden min-h-11 items-center overflow-hidden bg-ember px-3.5 transition-[opacity,visibility] duration-[240ms] ease-out ${
+                deskCtaHidden ? "xl:pointer-events-none xl:invisible xl:opacity-0" : "xl:visible xl:pointer-events-auto xl:opacity-100"
+              } ${
                 ctaHidden ? "pointer-events-none invisible opacity-0" : "visible opacity-100"
               } font-sans text-[0.8rem] font-semibold tracking-[0.01em] text-ink min-[360px]:inline-flex sm:px-4 sm:text-[0.85rem] xl:ms-4 xl:px-5`}
             >

@@ -37,6 +37,8 @@ function PlansHero() {
       focus={{ mobile: "40%", desktop: "50%" }}
       side="right"
       belowHeader
+      alignTopDesktop
+      tallDesktop
     >
       <Reveal load className="eyebrow flex items-center gap-4">
         <AccentLine className="w-10" />
@@ -243,9 +245,14 @@ export function PlansPage() {
         </div>
       </section>
 
+      {/*
+        Desktop: "Your first step is free" (left) and the FAQ (right) side by side, top-aligned, on one
+        background. Below lg the wrapper is `display: contents`, so both stay separate sections as before.
+      */}
+      <div className="contents lg:mx-auto lg:grid lg:max-w-[88rem] lg:grid-cols-2 lg:items-start lg:gap-16 lg:px-12 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]">
       {/* Your first step is free — no button: the form follows */}
-      <section aria-labelledby="firststep-title" className="section-y surface-deep relative">
-        <div className={`mx-auto max-w-3xl px-4 sm:px-8 ${INSET}`}>
+      <section aria-labelledby="firststep-title" className="section-y surface-deep relative lg:[background:none]">
+        <div className="mx-auto max-w-3xl px-4 sm:px-8 lg:mx-0 lg:px-0 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-0">
           <h2 id="firststep-title" className="display text-[clamp(2rem,6vw,3.25rem)] text-bone">
             {p.firstStep.title}
           </h2>
@@ -267,8 +274,9 @@ export function PlansPage() {
         </div>
       </section>
 
-      <Faq />
-      <StartTraining />
+      <Faq inColumn />
+      </div>
+      <StartTraining wide />
     </>
   );
 }

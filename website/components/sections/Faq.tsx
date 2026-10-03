@@ -7,11 +7,12 @@ import { Reveal } from "@/components/ui/primitives";
 import { site } from "@/config/site";
 
 /** FAQ accordion (§9.1) — native <details>/<summary>: keyboard and screen-reader friendly. */
-export function Faq() {
+/** `inColumn`: /plans desktop — sits in the right column beside "Your first step is free". */
+export function Faq({ inColumn = false }: { inColumn?: boolean }) {
   const { t, href } = useI18n();
   return (
-    <section id="faq" aria-labelledby="faq-title" className="section-y relative bg-ink">
-      <div className="mx-auto max-w-3xl px-4 sm:px-8 rtl:pr-6 rtl:sm:pr-10">
+    <section id="faq" aria-labelledby="faq-title" className={`section-y relative bg-ink ${inColumn ? "lg:bg-transparent" : ""}`}>
+      <div className={`mx-auto max-w-3xl px-4 sm:px-8 rtl:pr-6 rtl:sm:pr-10 ${inColumn ? "lg:mx-0 lg:px-0 rtl:lg:pr-0" : ""}`}>
         <Reveal>
           <h2 id="faq-title" className="display text-[clamp(2.25rem,7vw,3.75rem)] text-bone">
             {t.faq.title}

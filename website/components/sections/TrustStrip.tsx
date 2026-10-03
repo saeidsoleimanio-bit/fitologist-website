@@ -47,16 +47,16 @@ export function TrustStrip() {
       {/* Phones: the lines are centred in the width left of the floating WhatsApp button (right of it on
           RTL pages), so no line ever runs under the button at any mobile width. */}
       {/* Three centered lines, icon at the start of each (credentials, when enabled, use the same style) */}
-      <ul className="flex flex-col items-center gap-2.5">
+      <ul className="flex flex-col items-center gap-2.5 lg:mx-auto lg:max-w-[88rem] lg:flex-row lg:flex-wrap lg:justify-center lg:gap-x-10 lg:gap-y-3 xl:gap-x-[clamp(1.25rem,calc((100vw-80rem)*0.25+1.25rem),3rem)] lg:border-y lg:border-ember/50 lg:py-5">
         {items.map(({ key, icon: Icon, label }) => (
-          <li key={key} className="flex min-h-7 items-center gap-2 whitespace-nowrap text-center text-[clamp(14px,4.2vw,16px)] font-medium text-bone">
-            <Icon aria-hidden className="size-[1.1rem] shrink-0 text-ember" strokeWidth={1.75} />
+          <li key={key} className="flex min-h-7 items-center gap-2 whitespace-nowrap text-center text-[clamp(14px,4.2vw,16px)] font-medium text-bone lg:gap-2.5 lg:text-[1.05rem] xl:text-[1.02rem] 2xl:text-[1.1rem]">
+            <Icon aria-hidden className="size-[1.1rem] shrink-0 text-ember lg:size-5" strokeWidth={1.75} />
             <span>{label}</span>
           </li>
         ))}
         {/* Languages: one line, never wrapped; each name isolated so mixed scripts keep comma order */}
-        <li className="flex min-h-7 max-w-full items-center gap-2 whitespace-nowrap text-[clamp(14px,4.2vw,16px)] font-medium text-bone">
-          <Languages aria-hidden className="size-[1.1rem] shrink-0 text-ember" strokeWidth={1.75} />
+        <li className="flex min-h-7 max-w-full items-center gap-2 whitespace-nowrap text-[clamp(14px,4.2vw,16px)] font-medium text-bone lg:gap-2.5 lg:text-[1.05rem] xl:text-[1.02rem] 2xl:text-[1.1rem]">
+          <Languages aria-hidden className="size-[1.1rem] shrink-0 text-ember lg:size-5" strokeWidth={1.75} />
           <span className="sr-only">{t.trust.languages}: </span>
           <span>
             {site.languagesSpoken.map((l, i) => (

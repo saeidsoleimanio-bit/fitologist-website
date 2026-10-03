@@ -56,7 +56,12 @@ function MethodHero() {
 function MethodStages() {
   const { t } = useI18n();
   return (
-    <section aria-label={t.method.eyebrow} className="section-y relative overflow-hidden bg-ink">
+    <section
+      aria-label={t.method.eyebrow}
+      // Desktop: the stage row moves up so the outlined numbers overlap the bottom of the hero photo
+      // (the hero's bottom fade keeps the text readable); mobile/tablet unchanged.
+      className="section-y relative overflow-hidden bg-ink lg:z-10 lg:-mt-[7.5rem] lg:bg-transparent"
+    >
       {/* Right under the intro on first load: CSS entrance (staggered) so it never waits for JS (LCP). */}
       <ol
         className="relative mx-auto grid max-w-[88rem] gap-x-10 gap-y-8 px-4 sm:grid-cols-2 sm:px-8 lg:px-12 xl:grid-cols-4 xl:gap-x-8 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]"
@@ -97,12 +102,17 @@ function MethodDetails() {
   const m = t.method;
   return (
     <section aria-labelledby="first30-title" className="section-y surface-deep relative overflow-hidden">
-      <div className="mx-auto grid max-w-[88rem] gap-12 px-4 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]">
-        <div>
-          <h2 id="first30-title" className="display text-[clamp(2rem,6vw,3.25rem)] text-bone">
+      {/*
+        Desktop grid (owner revision): row 1–2 = "Your first 30 days" | "How we track progress";
+        row 3 = food art | "Nutrition, kept simple", vertically centred with the art. The column
+        wrappers are `display: contents` from lg; below lg the stacked layout is unchanged.
+      */}
+      <div className="mx-auto grid max-w-[88rem] gap-12 px-4 sm:px-8 lg:grid-cols-2 lg:gap-x-16 lg:gap-y-0 lg:px-12 rtl:pr-6 rtl:sm:pr-10 rtl:lg:pr-[clamp(4.5rem,5.5vw,5.5rem)]">
+        <div className="lg:contents">
+          <h2 id="first30-title" className="display text-[clamp(2rem,6vw,3.25rem)] text-bone lg:col-start-1 lg:row-start-1">
             {m.first30Title}
           </h2>
-          <ol className="mt-5 border-s border-ember/40">
+          <ol className="mt-5 border-s border-ember/40 lg:col-start-1 lg:row-start-2 lg:self-start">
             {m.first30.map((d) => (
               <li key={d.when} className="relative ps-5 pb-5 last:pb-0">
                 <span aria-hidden className="absolute -start-[5px] top-2 size-2.5 rounded-full bg-ember" />
@@ -112,9 +122,14 @@ function MethodDetails() {
               </li>
             ))}
           </ol>
+          {/* Desktop only: the food art sits in this column's empty space (owner revision), ~35% stronger */}
+          <div aria-hidden className="relative mt-10 hidden min-h-[16rem] lg:col-start-1 lg:row-start-3 lg:block">
+            <FoodPyramid fontClass={caveat.className} column boost={1.35} />
+            <DrumstickAndOats fontClass={caveat.className} column boost={1.35} />
+          </div>
         </div>
-        <div className="space-y-10">
-          <div>
+        <div className="space-y-10 lg:contents">
+          <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <h2 className="display text-[clamp(2rem,6vw,3.25rem)] text-bone">{m.trackTitle}</h2>
             {/* 2×2 equal boxes, centred labels with a small orange line icon (owner revision) */}
             <ul className="mt-5 grid grid-cols-2 gap-2.5">
@@ -134,7 +149,7 @@ function MethodDetails() {
             bottom padding (gap to the next section ≈ 56–64px on mobile); the pyramid tip sits behind the
             last line; drumstick + oats bowl on the start side, below the text.
           */}
-          <div className="relative isolate pb-[6.125rem] sm:pb-[7.125rem] lg:pb-[5.75rem]">
+          <div className="relative isolate pb-[6.125rem] sm:pb-[7.125rem] lg:col-start-2 lg:row-start-3 lg:mt-10 lg:self-center lg:pb-0">
             <FoodPyramid fontClass={caveat.className} />
             <DrumstickAndOats fontClass={caveat.className} />
             <h2 className="display text-[clamp(2rem,6vw,3.25rem)] text-bone">{m.nutritionTitle}</h2>

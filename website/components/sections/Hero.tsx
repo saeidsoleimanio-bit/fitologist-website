@@ -26,7 +26,7 @@ import { BMI_PATH, START_PATH } from "@/lib/site";
 /** Widest H1 line ÷ font-size in the hero font, per language and title variant (measured with Playwright). */
 const H1_RATIO: Record<Locale, { base: number; certified: number }> = {
   en: { base: 8.037, certified: 9.313 },
-  fa: { base: 7.133, certified: 9.93 },
+  fa: { base: 7.133, certified: 10.064 },
   ar: { base: 6.534, certified: 6.534 },
 };
 
@@ -198,7 +198,8 @@ export function Hero() {
           <span className="block text-silver">{t.hero.sub}</span>
         </p>
 
-        <div className="mt-5 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-6 lg:mt-8 lg:flex-col lg:items-start lg:gap-4">
+        {/* Desktop: soft dark backdrop behind the CTA + BMI link + tagline, readable on any part of the photo */}
+        <div className="mt-5 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-6 lg:-mx-10 lg:mt-4 lg:flex-col lg:items-start lg:gap-4 lg:bg-[radial-gradient(ellipse_75%_70%_at_50%_50%,rgb(5_5_5/0.72),rgb(5_5_5/0.45)_55%,transparent_80%)] lg:px-10 lg:py-5">
           <ButtonLink href={href(START_PATH)} className="w-full sm:w-auto" data-cta="hero">
             {t.hero.primary}
           </ButtonLink>
@@ -210,14 +211,14 @@ export function Hero() {
                 scrollToSection("bmi");
               }
             }}
-            className="inline-flex min-h-11 items-center justify-center font-sans text-[0.95rem] font-semibold text-silver underline decoration-bone/30 underline-offset-[6px] transition-colors duration-300 hover:text-ember-soft hover:decoration-ember sm:justify-start"
+            className="inline-flex min-h-11 items-center justify-center font-sans text-[0.95rem] font-semibold text-silver underline decoration-bone/30 underline-offset-[6px] transition-colors duration-300 hover:text-ember-soft hover:decoration-ember sm:justify-start lg:text-[1.1rem] lg:text-bone lg:decoration-ember lg:decoration-2"
           >
             {t.hero.secondary}
           </Link>
+          <p aria-hidden className="hidden font-display text-base font-semibold uppercase tracking-[0.16em] text-silver lg:block">
+            {t.common.tagline.join(" · ")}
+          </p>
         </div>
-        <p aria-hidden className="mt-6 hidden font-display text-sm font-semibold uppercase tracking-[0.12em] text-steel lg:block">
-          {t.common.tagline.join(" · ")}
-        </p>
       </div>
     </section>
   );

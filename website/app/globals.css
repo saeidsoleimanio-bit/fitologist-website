@@ -47,7 +47,8 @@
 
   @media (min-width: 1024px) {
     :root {
-      --section-py: 3.5rem;
+      /* Desktop rhythm (owner revision): ~88px between sections (72–96px rule) */
+      --section-py: 2.75rem;
       --header-h: 5.375rem;
       --header-compact: 4.5rem;
     }

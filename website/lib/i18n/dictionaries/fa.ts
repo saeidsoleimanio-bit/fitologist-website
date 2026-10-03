@@ -7,7 +7,7 @@ import type { Dictionary } from "./en";
 const fa: Dictionary = {
   meta: {
     siteTitle: "مربی شخصی شما در دبی | سعید سلیمانی · FITologist.me",
-    siteTitleCertified: "مربی شخصی تأییدشده‌ی شما در دبی | سعید سلیمانی · FITologist.me",
+    siteTitleCertified: "مربی شخصی شما در دبی، با مدرک معتبر | سعید سلیمانی · FITologist.me",
     siteDescription:
       "سلام، سعید هستم؛ مربی شخصی شما در دبی. تمرینی که با برنامه‌ی شلوغ‌تان جور می‌شود: یک‌به‌یک، دونفره، آنلاین و ترکیبی، در خانه‌ی شما یا الجداف. مشاوره‌ی رایگان ۳۰ دقیقه‌ای.",
     about: {
@@ -77,7 +77,7 @@ const fa: Dictionary = {
     /** H1 as two controlled lines (credentials off) */
     titleLines: ["مربی شخصی شما", "در دبی"],
     /** H1 as two controlled lines when the Active IQ certificate is on (§1) */
-    titleCertifiedLines: ["مربی شخصی تأییدشده‌ی", "شما در دبی"],
+    titleCertifiedLines: ["مربی شخصی شما در دبی", "با مدرک معتبر"],
     subLead: "تمرینی هماهنگ با برنامه‌ی شلوغ شما:",
     sub: "تمرین یک‌به‌یک و دونفره (زوج‌ها و دوستان)، تمرین آنلاین و ترکیبی.",
     primary: "رزرو مشاوره‌ی رایگان",
