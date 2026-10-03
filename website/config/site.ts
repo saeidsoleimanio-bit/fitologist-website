@@ -27,9 +27,9 @@ export const site = {
 
   credentials: {
     // {{ACTIVEIQ}} — set show: true once issued
-    activeIq: { show: true, title: "Level 3 Diploma in Gym Instructing & Personal Training" },
+    activeIq: { show: false, title: "Level 3 Diploma in Gym Instructing & Personal Training" },
     // {{REPS_NO}}
-    reps: { show: true, category: "", number: "" }, // category optional (e.g. a REPs category) — shown in the card subline when set
+    reps: { show: false, category: "", number: "" }, // category optional (e.g. a REPs category) — shown in the card subline when set
   },
 
   stats: { yearsTraining: 5, yearsCorporate: 12 },
