@@ -73,6 +73,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
     title: t.meta.siteTitle,
     description: t.meta.siteDescription,
     applicationName: SITE.name,
+    // Google Search Console ownership (property https://www.fitologist.me).
+    verification: { google: "4XCoeuZeguG5YxARse-41aAT_-Geyv-3aoF59LKvB_Y" },
     // Vercel preview deployments (VERCEL_ENV=preview) are never indexed; production and local builds are.
     robots: IS_PREVIEW ? { index: false, follow: false, googleBot: { index: false, follow: false } } : { index: true, follow: true },
   };
